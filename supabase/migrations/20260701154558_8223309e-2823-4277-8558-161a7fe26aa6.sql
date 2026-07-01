@@ -1,0 +1,22 @@
+
+-- Public read
+CREATE POLICY "public read listings" ON storage.objects FOR SELECT
+  USING (bucket_id = 'listings');
+CREATE POLICY "public read avatars" ON storage.objects FOR SELECT
+  USING (bucket_id = 'avatars');
+
+-- Authenticated upload into own folder
+CREATE POLICY "auth upload listings" ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'listings' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "auth upload avatars" ON storage.objects FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Owner update / delete
+CREATE POLICY "owner update listings" ON storage.objects FOR UPDATE TO authenticated
+  USING (bucket_id = 'listings' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "owner delete listings" ON storage.objects FOR DELETE TO authenticated
+  USING (bucket_id = 'listings' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "owner update avatars" ON storage.objects FOR UPDATE TO authenticated
+  USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "owner delete avatars" ON storage.objects FOR DELETE TO authenticated
+  USING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
