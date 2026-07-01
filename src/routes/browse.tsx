@@ -78,7 +78,7 @@ function Browse() {
         <div className="flex flex-wrap items-center gap-2">
           <select
             value={search.sort ?? "newest"}
-            onChange={(e) => nav({ search: (s) => ({ ...s, sort: e.target.value as never }) })}
+            onChange={(e) => nav({ to: "/browse", search: { ...search, sort: e.target.value as "newest" | "price_asc" | "price_desc" } })}
             className="bg-white ring-1 ring-hairline rounded-full px-4 py-1.5 text-xs font-medium text-navy/70"
           >
             <option value="newest">Newest</option>
@@ -87,7 +87,7 @@ function Browse() {
           </select>
           <select
             value={search.parish ?? ""}
-            onChange={(e) => nav({ search: (s) => ({ ...s, parish: e.target.value || undefined }) })}
+            onChange={(e) => nav({ to: "/browse", search: { ...search, parish: e.target.value || undefined } })}
             className="bg-white ring-1 ring-hairline rounded-full px-4 py-1.5 text-xs font-medium text-navy/70"
           >
             <option value="">All parishes</option>
