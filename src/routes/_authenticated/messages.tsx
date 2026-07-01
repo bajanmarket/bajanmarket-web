@@ -17,18 +17,22 @@ function Inbox() {
     queryKey: ["conversations", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: convs, error } = await supabase
         .from("conversations")
-        .select(`
-          id, last_message_at, buyer_id, seller_id,
-          listing:listings(id, title, cover_image_url),
-          buyer:profiles!conversations_buyer_id_fkey(id, display_name, avatar_url),
-          seller:profiles!conversations_seller_id_fkey(id, display_name, avatar_url)
-        `)
+        .select(`id, last_message_at, buyer_id, seller_id, listing:listings(id, title, cover_image_url)`)
         .or(`buyer_id.eq.${user!.id},seller_id.eq.${user!.id}`)
         .order("last_message_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const ids = Array.from(new Set((convs ?? []).flatMap((c) => [c.buyer_id, c.seller_id])));
+      const { data: profs } = ids.length
+        ? await supabase.from("profiles").select("id, display_name, avatar_url").in("id", ids)
+        : { data: [] };
+      const byId = new Map((profs ?? []).map((p) => [p.id, p]));
+      return (convs ?? []).map((c) => ({
+        ...c,
+        buyer: byId.get(c.buyer_id) ?? null,
+        seller: byId.get(c.seller_id) ?? null,
+      }));
     },
   });
 
@@ -39,7 +43,7 @@ function Inbox() {
         <div className="flex flex-col gap-2">
           {data.map((c) => {
             const isBuyer = c.buyer_id === user?.id;
-            const other = (isBuyer ? c.seller : c.buyer) as { id: string; display_name: string; avatar_url: string | null } | null;
+            const other = isBuyer ? c.seller : c.buyer;
             const listing = c.listing as { id: string; title: string; cover_image_url: string | null } | null;
             return (
               <Link

@@ -29,19 +29,24 @@ function ListingDetail() {
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: listing, error } = await supabase
         .from("listings")
         .select(`
           id, title, description, price, currency, negotiable, condition, parish,
           status, views, cover_image_url, created_at, seller_id,
           listing_images (id, url, sort_order),
-          profiles!listings_seller_id_fkey (id, display_name, avatar_url, created_at),
           categories (name, slug)
         `)
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!listing) return null;
+      const { data: seller } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url, created_at")
+        .eq("id", listing.seller_id)
+        .maybeSingle();
+      return { ...listing, seller };
     },
   });
 
@@ -115,7 +120,7 @@ function ListingDetail() {
     ...(data.listing_images ?? []).sort((a, b) => a.sort_order - b.sort_order),
   ];
   const currentUrl = gallery[activeImg]?.url;
-  const seller = Array.isArray(data.profiles) ? data.profiles[0] : data.profiles;
+  const seller = data.seller;
 
   const share = async () => {
     const url = window.location.href;

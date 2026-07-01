@@ -23,18 +23,19 @@ function Thread() {
   const { data: conv } = useQuery({
     queryKey: ["conversation", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: c, error } = await supabase
         .from("conversations")
-        .select(`
-          id, buyer_id, seller_id,
-          listing:listings(id, title, price, currency, cover_image_url, status),
-          buyer:profiles!conversations_buyer_id_fkey(id, display_name),
-          seller:profiles!conversations_seller_id_fkey(id, display_name)
-        `)
+        .select(`id, buyer_id, seller_id, listing:listings(id, title, price, currency, cover_image_url, status)`)
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      if (!c) return null;
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", [c.buyer_id, c.seller_id]);
+      const byId = new Map((profs ?? []).map((p) => [p.id, p]));
+      return { ...c, buyer: byId.get(c.buyer_id) ?? null, seller: byId.get(c.seller_id) ?? null };
     },
   });
 
