@@ -56,17 +56,22 @@ function Profile() {
     if (!user) return;
     setSaving(true);
     const fd = new FormData(e.currentTarget);
+    const phone = String(fd.get("phone") || "") || null;
     const { error } = await supabase.from("profiles").update({
       display_name: String(fd.get("display_name") || "").trim(),
       bio: String(fd.get("bio") || ""),
-      phone: String(fd.get("phone") || "") || null,
       parish: (fd.get("parish") || null) as never,
     }).eq("id", user.id);
+    const { error: pErr } = await supabase.from("profile_private").upsert({
+      user_id: user.id,
+      phone,
+    });
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error || pErr) { toast.error((error ?? pErr)!.message); return; }
     toast.success("Profile updated");
     setEditing(false);
     qc.invalidateQueries({ queryKey: ["profile", user.id] });
+    qc.invalidateQueries({ queryKey: ["profile_private", user.id] });
   };
 
   const uploadAvatar = async (file: File | null) => {
