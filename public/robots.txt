@@ -2,3 +2,9 @@ User-agent: *
 Allow: /
 Disallow: /auth
 Disallow: /messages
+Disallow: /favourites
+Disallow: /my-listings
+Disallow: /post
+Disallow: /profile
+
+Sitemap: https://bajanmarketplacetest.lovable.app/sitemap.xml
