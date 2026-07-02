@@ -50,9 +50,7 @@ function ListingDetail() {
     },
   });
 
-  useEffect(() => {
-    supabase.rpc("increment_listing_views", { _id: id });
-  }, [id]);
+  // View-count RPC removed for security; tracking will move to a server function.
 
   const { data: isFav } = useQuery({
     queryKey: ["fav", id, user?.id],
