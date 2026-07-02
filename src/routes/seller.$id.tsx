@@ -77,7 +77,7 @@ function Seller() {
             : initials(profile.display_name)}
         </div>
         <div>
-          <div className="text-xl font-medium">{profile.display_name}</div>
+          <h1 className="text-xl font-medium">{profile.display_name}</h1>
           <div className="text-xs text-navy/50">
             {parishLabel(profile.parish)} · Joined {new Date(profile.created_at).toLocaleDateString("en-BB", { month: "short", year: "numeric" })}
           </div>
