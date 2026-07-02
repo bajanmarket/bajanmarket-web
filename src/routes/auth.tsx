@@ -13,7 +13,11 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in — Bajan.market" },
       { name: "description", content: "Sign in or create your Bajan.market account to post listings, save favourites and message sellers." },
+      { property: "og:title", content: "Sign in — Bajan.market" },
+      { property: "og:url", content: "https://bajanmarketplacetest.lovable.app/auth" },
+      { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://bajanmarketplacetest.lovable.app/auth" }],
   }),
   component: AuthPage,
 });
@@ -74,9 +78,9 @@ function AuthPage() {
           <Link to="/" className="text-2xl font-semibold text-navy tracking-tight">
             Bajan<span className="text-teal">.market</span>
           </Link>
-          <p className="text-navy/60 text-sm mt-2">
-            {mode === "signup" ? "Create your account" : "Welcome back"}
-          </p>
+          <h1 className="text-navy/60 text-sm mt-2 font-normal">
+            {mode === "signup" ? "Create your Bajan.market account" : "Welcome back to Bajan.market"}
+          </h1>
         </div>
 
         <div className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-4">
@@ -93,8 +97,9 @@ function AuthPage() {
 
           <form onSubmit={submit} className="flex flex-col gap-3">
             {mode === "signup" && (
-              <Field label="Your name">
+              <Field label="Your name" htmlFor="auth-name">
                 <input
+                  id="auth-name"
                   required minLength={2} maxLength={80}
                   value={displayName} onChange={(e) => setDisplayName(e.target.value)}
                   className="w-full bg-sand rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-teal"
@@ -102,15 +107,17 @@ function AuthPage() {
                 />
               </Field>
             )}
-            <Field label="Email">
+            <Field label="Email" htmlFor="auth-email">
               <input
+                id="auth-email"
                 required type="email" autoComplete="email"
                 value={email} onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-sand rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-teal"
               />
             </Field>
-            <Field label="Password">
+            <Field label="Password" htmlFor="auth-password">
               <input
+                id="auth-password"
                 required type="password" minLength={8}
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 value={password} onChange={(e) => setPassword(e.target.value)}
@@ -142,11 +149,11 @@ function AuthPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">{label}</span>
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={htmlFor} className="text-[11px] font-medium uppercase tracking-wider text-navy/50">{label}</label>
       {children}
-    </label>
+    </div>
   );
 }

@@ -6,13 +6,42 @@ import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { initials } from "@/lib/format";
 import { parishLabel } from "@/lib/parishes";
 
+const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+
 export const Route = createFileRoute("/seller/$id")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Seller — Bajan.market` },
-      { name: "description", content: `Listings from this Bajan.market seller (${params.id}).` },
-    ],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("id, display_name, avatar_url, bio")
+      .eq("id", params.id)
+      .maybeSingle();
+    return { profile: data };
+  },
+  head: ({ params, loaderData }) => {
+    const p = loaderData?.profile;
+    const url = `${SITE_URL}/seller/${params.id}`;
+    const name = p?.display_name ?? "Seller";
+    const title = `${name} — Seller on Bajan.market`;
+    const desc = (p?.bio ?? `Browse listings from ${name} on Bajan.market, Barbados' cleaner marketplace.`).slice(0, 155);
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "profile" },
+      { property: "og:url", content: url },
+    ];
+    if (p?.avatar_url) meta.push({ property: "og:image", content: p.avatar_url });
+    const scripts = p ? [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        mainEntity: { "@type": "Person", name, image: p.avatar_url ?? undefined, url },
+      }),
+    }] : undefined;
+    return { meta, links: [{ rel: "canonical", href: url }], scripts };
+  },
   component: Seller,
 });
 
@@ -48,7 +77,7 @@ function Seller() {
             : initials(profile.display_name)}
         </div>
         <div>
-          <div className="text-xl font-medium">{profile.display_name}</div>
+          <h1 className="text-xl font-medium">{profile.display_name}</h1>
           <div className="text-xs text-navy/50">
             {parishLabel(profile.parish)} · Joined {new Date(profile.created_at).toLocaleDateString("en-BB", { month: "short", year: "numeric" })}
           </div>

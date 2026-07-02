@@ -9,13 +9,46 @@ import { useAuth } from "@/lib/useAuth";
 import { Heart, Share2, Flag, MessageCircle, Eye, ImageOff } from "lucide-react";
 import { toast } from "sonner";
 
+const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+
 export const Route = createFileRoute("/listing/$id")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Listing — Bajan.market` },
-      { name: "description", content: `View listing ${params.id} on Bajan.market — Barbados' cleaner marketplace.` },
-    ],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("listings")
+      .select("id, title, description, price, currency, cover_image_url")
+      .eq("id", params.id)
+      .maybeSingle();
+    return { listing: data };
+  },
+  head: ({ params, loaderData }) => {
+    const l = loaderData?.listing;
+    const url = `${SITE_URL}/listing/${params.id}`;
+    const title = l ? `${l.title} — ${formatBBD(l.price, l.currency)} · Bajan.market` : "Listing — Bajan.market";
+    const desc = l
+      ? (l.description ?? "").replace(/\s+/g, " ").trim().slice(0, 155) || `${l.title} for sale on Bajan.market.`
+      : "View this listing on Bajan.market — Barbados' cleaner marketplace.";
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: title },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: url },
+    ];
+    if (l?.cover_image_url) meta.push({ property: "og:image", content: l.cover_image_url }, { name: "twitter:image", content: l.cover_image_url });
+    const scripts = l ? [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: l.title,
+        description: l.description ?? undefined,
+        image: l.cover_image_url ?? undefined,
+        offers: { "@type": "Offer", price: l.price, priceCurrency: l.currency ?? "BBD", url, availability: "https://schema.org/InStock" },
+      }),
+    }] : undefined;
+    return { meta, links: [{ rel: "canonical", href: url }], scripts };
+  },
   component: ListingDetail,
 });
 
