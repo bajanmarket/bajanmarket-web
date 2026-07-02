@@ -76,11 +76,13 @@ function Browse() {
   return (
     <AppShell>
       <div className="flex flex-col gap-5">
+        <h1 className="text-2xl font-medium text-navy">Browse listings across Barbados</h1>
         <SearchBar initialQuery={search.q ?? ""} initialParish={search.parish ?? ""} />
         <CategoryChips selected={search.category} />
 
         <div className="flex flex-wrap items-center gap-2">
           <select
+            aria-label="Sort listings"
             value={search.sort ?? "newest"}
             onChange={(e) => nav({ to: "/browse", search: { ...search, sort: e.target.value as "newest" | "price_asc" | "price_desc" } })}
             className="bg-white ring-1 ring-hairline rounded-full px-4 py-1.5 text-xs font-medium text-navy/70"
@@ -90,6 +92,7 @@ function Browse() {
             <option value="price_desc">Price: high → low</option>
           </select>
           <select
+            aria-label="Filter by parish"
             value={search.parish ?? ""}
             onChange={(e) => nav({ to: "/browse", search: { ...search, parish: e.target.value || undefined } })}
             className="bg-white ring-1 ring-hairline rounded-full px-4 py-1.5 text-xs font-medium text-navy/70"
