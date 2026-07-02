@@ -23,7 +23,11 @@ export const Route = createFileRoute("/browse")({
     meta: [
       { title: "Browse listings — Bajan.market" },
       { name: "description", content: "Search and filter thousands of listings across Barbados by category, parish, and price." },
+      { property: "og:title", content: "Browse listings — Bajan.market" },
+      { property: "og:description", content: "Search and filter thousands of listings across Barbados by category, parish, and price." },
+      { property: "og:url", content: "https://bajanmarketplacetest.lovable.app/browse" },
     ],
+    links: [{ rel: "canonical", href: "https://bajanmarketplacetest.lovable.app/browse" }],
   }),
   component: Browse,
 });
