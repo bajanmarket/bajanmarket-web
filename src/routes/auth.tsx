@@ -13,7 +13,11 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in — Bajan.market" },
       { name: "description", content: "Sign in or create your Bajan.market account to post listings, save favourites and message sellers." },
+      { property: "og:title", content: "Sign in — Bajan.market" },
+      { property: "og:url", content: "https://bajanmarketplacetest.lovable.app/auth" },
+      { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://bajanmarketplacetest.lovable.app/auth" }],
   }),
   component: AuthPage,
 });
