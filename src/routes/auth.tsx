@@ -145,11 +145,11 @@ function AuthPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">{label}</span>
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={htmlFor} className="text-[11px] font-medium uppercase tracking-wider text-navy/50">{label}</label>
       {children}
-    </label>
+    </div>
   );
 }
