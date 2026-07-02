@@ -74,9 +74,9 @@ function AuthPage() {
           <Link to="/" className="text-2xl font-semibold text-navy tracking-tight">
             Bajan<span className="text-teal">.market</span>
           </Link>
-          <p className="text-navy/60 text-sm mt-2">
-            {mode === "signup" ? "Create your account" : "Welcome back"}
-          </p>
+          <h1 className="text-navy/60 text-sm mt-2 font-normal">
+            {mode === "signup" ? "Create your Bajan.market account" : "Welcome back to Bajan.market"}
+          </h1>
         </div>
 
         <div className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-4">
@@ -93,8 +93,9 @@ function AuthPage() {
 
           <form onSubmit={submit} className="flex flex-col gap-3">
             {mode === "signup" && (
-              <Field label="Your name">
+              <Field label="Your name" htmlFor="auth-name">
                 <input
+                  id="auth-name"
                   required minLength={2} maxLength={80}
                   value={displayName} onChange={(e) => setDisplayName(e.target.value)}
                   className="w-full bg-sand rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-teal"
@@ -102,15 +103,17 @@ function AuthPage() {
                 />
               </Field>
             )}
-            <Field label="Email">
+            <Field label="Email" htmlFor="auth-email">
               <input
+                id="auth-email"
                 required type="email" autoComplete="email"
                 value={email} onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-sand rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-teal"
               />
             </Field>
-            <Field label="Password">
+            <Field label="Password" htmlFor="auth-password">
               <input
+                id="auth-password"
                 required type="password" minLength={8}
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 value={password} onChange={(e) => setPassword(e.target.value)}
