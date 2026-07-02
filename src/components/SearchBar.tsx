@@ -27,6 +27,7 @@ export function SearchBar({ initialQuery = "", initialParish = "" }: { initialQu
       </div>
       <div className="h-px sm:h-8 w-full sm:w-px bg-hairline sm:mx-1 self-stretch sm:self-center" />
       <select
+        aria-label="Filter by parish"
         value={parish}
         onChange={(e) => setParish(e.target.value)}
         className="bg-transparent border-none outline-none text-sm font-medium px-4 py-3 text-navy/70"
