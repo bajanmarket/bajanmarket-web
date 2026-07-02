@@ -240,6 +240,24 @@ export type Database = {
           },
         ]
       }
+      profile_private: {
+        Row: {
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -248,7 +266,6 @@ export type Database = {
           display_name: string
           id: string
           parish: Database["public"]["Enums"]["parish"] | null
-          phone: string | null
           updated_at: string
         }
         Insert: {
@@ -258,7 +275,6 @@ export type Database = {
           display_name: string
           id: string
           parish?: Database["public"]["Enums"]["parish"] | null
-          phone?: string | null
           updated_at?: string
         }
         Update: {
@@ -268,7 +284,6 @@ export type Database = {
           display_name?: string
           id?: string
           parish?: Database["public"]["Enums"]["parish"] | null
-          phone?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -332,14 +347,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      increment_listing_views: { Args: { _id: string }; Returns: undefined }
+      [_ in never]: never
     }
     Enums: {
       app_role: "user" | "moderator" | "admin"

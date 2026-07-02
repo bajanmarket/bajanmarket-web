@@ -31,6 +31,19 @@ function Profile() {
     },
   });
 
+  const { data: privateProfile } = useQuery({
+    queryKey: ["profile_private", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profile_private")
+        .select("phone")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
@@ -43,17 +56,22 @@ function Profile() {
     if (!user) return;
     setSaving(true);
     const fd = new FormData(e.currentTarget);
+    const phone = String(fd.get("phone") || "") || null;
     const { error } = await supabase.from("profiles").update({
       display_name: String(fd.get("display_name") || "").trim(),
       bio: String(fd.get("bio") || ""),
-      phone: String(fd.get("phone") || "") || null,
       parish: (fd.get("parish") || null) as never,
     }).eq("id", user.id);
+    const { error: pErr } = await supabase.from("profile_private").upsert({
+      user_id: user.id,
+      phone,
+    });
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error || pErr) { toast.error((error ?? pErr)!.message); return; }
     toast.success("Profile updated");
     setEditing(false);
     qc.invalidateQueries({ queryKey: ["profile", user.id] });
+    qc.invalidateQueries({ queryKey: ["profile_private", user.id] });
   };
 
   const uploadAvatar = async (file: File | null) => {
@@ -111,7 +129,7 @@ function Profile() {
               <textarea name="bio" rows={3} maxLength={500} defaultValue={profile.bio ?? ""} className={inp} />
             </F>
             <F label="Phone">
-              <input name="phone" type="tel" defaultValue={profile.phone ?? ""} className={inp} placeholder="+1 246 …" />
+              <input name="phone" type="tel" defaultValue={privateProfile?.phone ?? ""} className={inp} placeholder="+1 246 …" />
             </F>
             <F label="Parish">
               <select name="parish" defaultValue={profile.parish ?? ""} className={inp}>
