@@ -11,6 +11,36 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Bajan.market — Barbados' cleaner marketplace" },
       { name: "description", content: "Buy and sell across Barbados. Vehicles, property, electronics, furniture, jobs, road tennis and more." },
+      { property: "og:title", content: "Bajan.market — Barbados' cleaner marketplace" },
+      { property: "og:description", content: "Buy and sell across Barbados. Vehicles, property, electronics, furniture, jobs, road tennis and more." },
+      { property: "og:url", content: "https://bajanmarketplacetest.lovable.app/" },
+    ],
+    links: [{ rel: "canonical", href: "https://bajanmarketplacetest.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Bajan.market",
+          url: "https://bajanmarketplacetest.lovable.app/",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://bajanmarketplacetest.lovable.app/browse?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Bajan.market",
+          url: "https://bajanmarketplacetest.lovable.app/",
+          areaServed: "Barbados",
+        }),
+      },
     ],
   }),
   component: Home,
