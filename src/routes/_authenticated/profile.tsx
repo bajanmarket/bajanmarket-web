@@ -31,6 +31,19 @@ function Profile() {
     },
   });
 
+  const { data: privateProfile } = useQuery({
+    queryKey: ["profile_private", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profile_private")
+        .select("phone")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const signOut = async () => {
     await qc.cancelQueries();
     qc.clear();
