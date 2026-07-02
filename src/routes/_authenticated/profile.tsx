@@ -129,7 +129,7 @@ function Profile() {
               <textarea name="bio" rows={3} maxLength={500} defaultValue={profile.bio ?? ""} className={inp} />
             </F>
             <F label="Phone">
-              <input name="phone" type="tel" defaultValue={profile.phone ?? ""} className={inp} placeholder="+1 246 …" />
+              <input name="phone" type="tel" defaultValue={privateProfile?.phone ?? ""} className={inp} placeholder="+1 246 …" />
             </F>
             <F label="Parish">
               <select name="parish" defaultValue={profile.parish ?? ""} className={inp}>
