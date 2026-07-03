@@ -77,6 +77,7 @@ function Home() {
 
         <SearchBar />
         <CategoryChips />
+        <SellerOnboarding variant="banner" />
       </section>
 
       <section className="mt-10">
