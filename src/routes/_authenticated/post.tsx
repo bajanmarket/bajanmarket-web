@@ -9,6 +9,7 @@ import { uploadImage } from "@/lib/uploadImage";
 import { useAuth } from "@/lib/useAuth";
 import { ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
+import { SellerOnboarding } from "@/components/SellerOnboarding";
 
 export const Route = createFileRoute("/_authenticated/post")({
   head: () => ({ meta: [{ title: "Post a listing — Bajan.market" }] }),
