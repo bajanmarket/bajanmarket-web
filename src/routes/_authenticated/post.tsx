@@ -9,6 +9,7 @@ import { uploadImage } from "@/lib/uploadImage";
 import { useAuth } from "@/lib/useAuth";
 import { ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
+import { SellerOnboarding } from "@/components/SellerOnboarding";
 
 export const Route = createFileRoute("/_authenticated/post")({
   head: () => ({ meta: [{ title: "Post a listing — Bajan.market" }] }),
@@ -98,6 +99,8 @@ function PostListing() {
       <div className="max-w-2xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-medium tracking-tight mb-1">Post a listing</h1>
         <p className="text-navy/60 text-sm mb-6">Sell it to the island. Takes about a minute.</p>
+
+        <SellerOnboarding variant="steps" />
 
         <form onSubmit={onSubmit} className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-5">
           <div>

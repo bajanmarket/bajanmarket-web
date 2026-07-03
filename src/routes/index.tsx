@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoryChips, CategoryGrid } from "@/components/CategoryChips";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
+import { SellerOnboarding } from "@/components/SellerOnboarding";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -76,6 +77,7 @@ function Home() {
 
         <SearchBar />
         <CategoryChips />
+        <SellerOnboarding variant="banner" />
       </section>
 
       <section className="mt-10">
