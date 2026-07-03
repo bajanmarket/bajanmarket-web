@@ -21,6 +21,7 @@ import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedMyListingsRouteImport } from './routes/_authenticated/my-listings'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedFavouritesRouteImport } from './routes/_authenticated/favourites'
+import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
 import { Route as AuthenticatedMessagesIdRouteImport } from './routes/_authenticated/messages.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -82,6 +83,12 @@ const AuthenticatedFavouritesRoute = AuthenticatedFavouritesRouteImport.update({
   path: '/favourites',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMessagesIndexRoute =
+  AuthenticatedMessagesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedMessagesRoute,
+  } as any)
 const AuthenticatedMessagesIdRoute = AuthenticatedMessagesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -101,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/messages/': typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -108,13 +116,13 @@ export interface FileRoutesByTo {
   '/browse': typeof BrowseRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/favourites': typeof AuthenticatedFavouritesRoute
-  '/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/my-listings': typeof AuthenticatedMyListingsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/messages': typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/_authenticated/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/seller/$id'
     | '/messages/$id'
+    | '/messages/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -154,13 +164,13 @@ export interface FileRouteTypes {
     | '/browse'
     | '/sitemap.xml'
     | '/favourites'
-    | '/messages'
     | '/my-listings'
     | '/post'
     | '/profile'
     | '/listing/$id'
     | '/seller/$id'
     | '/messages/$id'
+    | '/messages'
   id:
     | '__root__'
     | '/'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/seller/$id'
     | '/_authenticated/messages/$id'
+    | '/_authenticated/messages/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -274,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFavouritesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/messages/': {
+      id: '/_authenticated/messages/'
+      path: '/'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof AuthenticatedMessagesIndexRouteImport
+      parentRoute: typeof AuthenticatedMessagesRoute
+    }
     '/_authenticated/messages/$id': {
       id: '/_authenticated/messages/$id'
       path: '/$id'
@@ -286,10 +304,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedMessagesRouteChildren {
   AuthenticatedMessagesIdRoute: typeof AuthenticatedMessagesIdRoute
+  AuthenticatedMessagesIndexRoute: typeof AuthenticatedMessagesIndexRoute
 }
 
 const AuthenticatedMessagesRouteChildren: AuthenticatedMessagesRouteChildren = {
   AuthenticatedMessagesIdRoute: AuthenticatedMessagesIdRoute,
+  AuthenticatedMessagesIndexRoute: AuthenticatedMessagesIndexRoute,
 }
 
 const AuthenticatedMessagesRouteWithChildren =
