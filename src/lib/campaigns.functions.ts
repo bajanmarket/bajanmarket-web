@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const CAP = 500;
-const FROM = "Bajan.market <bajanmarket@bajmarket.app>";
+const FROM = "Bajan.market <bajanmarket@bajanmarket.app>";
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
 async function assertAdmin(supabase: any, userId: string) {
