@@ -7,7 +7,15 @@ import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/useAuth";
 import { formatRelative } from "@/lib/format";
 import { formatBBD } from "@/lib/format";
-import { Send, ArrowLeft, Trash2 } from "lucide-react";
+import { Send, ArrowLeft, Trash2, EyeOff } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 import { markConversationRead } from "@/lib/markConversationRead";
 
 export const Route = createFileRoute("/_authenticated/messages/$id")({
