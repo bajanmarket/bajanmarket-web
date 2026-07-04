@@ -107,23 +107,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap",
       },
     ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "Bajan.market",
-          url: "https://bajanmarketplacetest.lovable.app",
-          description: "Barbados' cleaner marketplace — buy and sell across the island.",
-          potentialAction: {
-            "@type": "SearchAction",
-            target: "https://bajanmarketplacetest.lovable.app/browse?q={search_term_string}",
-            "query-input": "required name=search_term_string",
-          },
-        }),
-      },
-    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
