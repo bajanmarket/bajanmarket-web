@@ -289,6 +289,32 @@ function CampaignsPage() {
               ))}
             </div>
           )}
+          {selectedId && (() => {
+            const c = (campaigns ?? []).find((x) => x.id === selectedId);
+            if (!c) return null;
+            const canSend = c.status === "draft" || c.status === "failed";
+            return (
+              <div className="flex items-center justify-between gap-2 border-t border-hairline pt-3">
+                <div className="text-[11px] text-navy/50">
+                  {c.sent_count ?? 0} sent · {c.failed_count ?? 0} failed
+                </div>
+                {canSend && (
+                  <button
+                    onClick={() => {
+                      if (confirm(`Send this campaign to ${c.recipients_count} recipients?`)) {
+                        sendMutation.mutate(c.id);
+                      }
+                    }}
+                    disabled={sendMutation.isPending}
+                    className="inline-flex items-center gap-1.5 bg-teal text-white rounded-full px-3 py-1.5 text-xs font-medium disabled:opacity-40"
+                  >
+                    <Send className="size-3" />
+                    {sendMutation.isPending ? "Sending…" : "Send now"}
+                  </button>
+                )}
+              </div>
+            );
+          })()}
           {selectedId && <CampaignDetail campaignId={selectedId} />}
         </div>
       </div>
