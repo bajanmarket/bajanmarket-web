@@ -1,10 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { initials } from "@/lib/format";
 import { parishLabel } from "@/lib/parishes";
+import { useAuth } from "@/lib/useAuth";
+import { ReportDialog } from "@/components/ReportDialog";
+import { Flag } from "lucide-react";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
