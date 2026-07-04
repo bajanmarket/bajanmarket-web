@@ -155,6 +155,9 @@ function Profile() {
           </Link>
         </div>
 
+        <ModeratorLink />
+
+
         <div className="flex flex-col gap-2">
           <button
             onClick={signOut}
