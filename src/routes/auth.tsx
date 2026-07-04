@@ -44,11 +44,18 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
-          options: { data: { display_name: displayName || email.split("@")[0] } },
+          options: {
+            data: { display_name: displayName || email.split("@")[0] },
+            emailRedirectTo: `${window.location.origin}${safeRedirect}`,
+          },
         });
         if (error) throw error;
+        if (!data.session) {
+          toast.success("Check your email to confirm your account.");
+          return;
+        }
         toast.success("Welcome to Bajan.market!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
