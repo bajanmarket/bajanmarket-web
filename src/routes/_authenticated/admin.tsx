@@ -31,10 +31,12 @@ type ReportRow = {
 };
 
 type Tab = "open" | "reviewing" | "resolved" | "dismissed";
+type Section = "reports" | "insights";
 
 function AdminPage() {
   const { data: role, isLoading: roleLoading } = useIsModerator();
   const qc = useQueryClient();
+  const [section, setSection] = useState<Section>("reports");
   const [tab, setTab] = useState<Tab>("open");
 
   const { data: reports, isLoading } = useQuery({
