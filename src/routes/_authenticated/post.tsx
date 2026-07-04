@@ -91,8 +91,16 @@ function PostListing() {
 
   const addFiles = (fs: FileList | null) => {
     if (!fs) return;
-    setFiles((prev) => [...prev, ...Array.from(fs).slice(0, 10 - prev.length)]);
+    const incoming = Array.from(fs);
+    const accepted: File[] = [];
+    for (const f of incoming) {
+      const err = validateImage(f);
+      if (err) { toast.error(`${f.name}: ${err}`); continue; }
+      accepted.push(f);
+    }
+    setFiles((prev) => [...prev, ...accepted].slice(0, 10));
   };
+
 
   return (
     <AppShell>
