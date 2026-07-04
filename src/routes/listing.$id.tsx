@@ -163,15 +163,12 @@ function ListingDetail() {
     } catch { /* dismissed */ }
   };
 
-  const report = async () => {
+  const openReport = () => {
     if (!user) { nav({ to: "/auth", search: { redirect: `/listing/${id}` } }); return; }
-    const reason = window.prompt("Reason for reporting this listing?");
-    if (!reason) return;
-    await supabase.from("reports").insert({
-      reporter_id: user.id, target_type: "listing", target_id: id, reason,
-    });
-    toast.success("Report submitted. Our team will review it.");
+    setReportOpen(true);
   };
+
+
 
   return (
     <AppShell>
