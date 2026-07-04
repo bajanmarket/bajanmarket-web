@@ -266,7 +266,7 @@ function TopParishesCard({ sinceIso }: { sinceIso: string }) {
           {data.map((p) => (
             <li key={p.parish} className="flex items-center justify-between text-sm py-1">
               <Link to="/browse" search={{ parish: p.parish as never }} className="text-navy hover:underline">
-                {parishLabel.get(p.parish) ?? p.parish}
+                {parishLabel.get(p.parish as never) ?? p.parish}
               </Link>
               <span className="text-xs text-navy/60 shrink-0 ml-3">
                 {p.listings} listings · {p.views} views
