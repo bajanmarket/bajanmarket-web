@@ -155,3 +155,18 @@ export const sendCampaign = createServerFn({ method: "POST" })
 
     return { sent, failed, skipped };
   });
+
+export const unsubscribeByToken = createServerFn({ method: "POST" })
+  .inputValidator((data) => z.object({ token: z.string().min(8) }).parse(data))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: pref, error } = await supabaseAdmin
+      .from("marketing_preferences")
+      .update({ email_opt_in: false, sms_opt_in: false, whatsapp_opt_in: false })
+      .eq("unsubscribe_token", data.token)
+      .select("user_id")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!pref) throw new Error("Invalid or expired unsubscribe link.");
+    return { ok: true };
+  });
