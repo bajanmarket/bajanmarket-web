@@ -132,7 +132,6 @@ export const sendCampaign = createServerFn({ method: "POST" })
         } else {
           await supabaseAdmin.from("campaign_sends").update({
             status: "sent",
-            provider_id: json?.id ?? null,
             sent_at: new Date().toISOString(),
           }).eq("id", row.id);
           sent++;
