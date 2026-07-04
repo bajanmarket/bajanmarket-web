@@ -8,6 +8,7 @@ import { parishLabel, conditionLabel } from "@/lib/parishes";
 import { useAuth } from "@/lib/useAuth";
 import { Heart, Share2, Flag, MessageCircle, Eye, ImageOff } from "lucide-react";
 import { toast } from "sonner";
+import { ReportDialog } from "@/components/ReportDialog";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
