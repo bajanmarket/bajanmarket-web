@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
 
@@ -14,7 +15,21 @@ import { useAuth } from "@/lib/useAuth";
 export function useMessageNotifications() {
   const { user } = useAuth();
   const router = useRouter();
+  const qc = useQueryClient();
   const seen = useRef<Set<string>>(new Set());
+
+  const openThread = (conversationId: string) => {
+    if (typeof window !== "undefined") window.focus();
+    // Prime caches so the thread + inbox render fresh state immediately
+    qc.invalidateQueries({ queryKey: ["messages", conversationId] });
+    if (user) qc.invalidateQueries({ queryKey: ["conversations", user.id] });
+    router.navigate({
+      to: "/messages/$id",
+      params: { id: conversationId },
+    });
+  };
+
+
 
   // Ask for permission once, on the first mount after sign-in
   useEffect(() => {
@@ -27,6 +42,22 @@ export function useMessageNotifications() {
       return () => window.clearTimeout(id);
     }
   }, [user]);
+
+  // When the tab regains focus, resync inbox + any open thread instantly
+  useEffect(() => {
+    if (!user) return;
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      qc.invalidateQueries({ queryKey: ["conversations", user.id] });
+      qc.invalidateQueries({ queryKey: ["messages"] });
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
+  }, [user, qc]);
 
   useEffect(() => {
     if (!user) return;
@@ -77,11 +108,7 @@ export function useMessageNotifications() {
             description: m.body.length > 120 ? `${m.body.slice(0, 117)}…` : m.body,
             action: {
               label: "Open",
-              onClick: () =>
-                router.navigate({
-                  to: "/messages/$id",
-                  params: { id: m.conversation_id },
-                }),
+              onClick: () => openThread(m.conversation_id),
             },
           });
 
@@ -98,11 +125,7 @@ export function useMessageNotifications() {
                 icon: "/favicon.ico",
               });
               n.onclick = () => {
-                window.focus();
-                router.navigate({
-                  to: "/messages/$id",
-                  params: { id: m.conversation_id },
-                });
+                openThread(m.conversation_id);
                 n.close();
               };
             } catch {
@@ -116,5 +139,6 @@ export function useMessageNotifications() {
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [user, router]);
+  }, [user, router, qc]);
 }
+
