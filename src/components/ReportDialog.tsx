@@ -20,7 +20,7 @@ const REASONS: Record<TargetType, { value: string; label: string }[]> = {
     { value: "offensive", label: "Offensive content" },
     { value: "other", label: "Other" },
   ],
-  profile: [
+  user: [
     { value: "scam", label: "Scammer or fraudulent seller" },
     { value: "harassment", label: "Harassment or abusive behaviour" },
     { value: "impersonation", label: "Impersonation or fake account" },
