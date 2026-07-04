@@ -70,7 +70,7 @@ export const sendCampaign = createServerFn({ method: "POST" })
     if (!sends || sends.length === 0) throw new Error("No queued recipients");
 
     // Fetch unsub tokens + names for personalization
-    const userIds = Array.from(new Set(sends.map((s) => s.user_id)));
+    const userIds = Array.from(new Set(sends.map((s) => s.user_id).filter((v): v is string => !!v)));
     const [{ data: prefs }, { data: profiles }] = await Promise.all([
       supabaseAdmin.from("marketing_preferences").select("user_id, unsubscribe_token, email_opt_in").in("user_id", userIds),
       supabaseAdmin.from("profiles").select("id, display_name").in("id", userIds),
@@ -78,7 +78,7 @@ export const sendCampaign = createServerFn({ method: "POST" })
     const prefMap = new Map((prefs ?? []).map((p) => [p.user_id, p]));
     const nameMap = new Map((profiles ?? []).map((p) => [p.id, p.display_name]));
 
-    await supabaseAdmin.from("campaigns").update({ status: "sending", started_at: new Date().toISOString() }).eq("id", campaign.id);
+    await supabaseAdmin.from("campaigns").update({ status: "sending" }).eq("id", campaign.id);
 
     let sent = 0;
     let failed = 0;
