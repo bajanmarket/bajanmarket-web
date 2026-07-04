@@ -59,6 +59,7 @@ function ListingDetail() {
   const qc = useQueryClient();
   const nav = useNavigate();
   const [activeImg, setActiveImg] = useState(0);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
