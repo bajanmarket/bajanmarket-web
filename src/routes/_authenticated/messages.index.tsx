@@ -21,10 +21,16 @@ function Inbox() {
     queryFn: async () => {
       const { data: convs, error } = await supabase
         .from("conversations")
-        .select(`id, last_message_at, buyer_id, seller_id, listing:listings(id, title, cover_image_url)`)
+        .select(`id, last_message_at, buyer_id, seller_id, buyer_hidden_at, seller_hidden_at, listing:listings(id, title, cover_image_url)`)
         .or(`buyer_id.eq.${user!.id},seller_id.eq.${user!.id}`)
         .order("last_message_at", { ascending: false });
       if (error) throw error;
+      const visible = (convs ?? []).filter((c) => {
+        const hiddenAt = c.buyer_id === user!.id ? c.buyer_hidden_at : c.seller_hidden_at;
+        if (!hiddenAt) return true;
+        // A new message after the hide time brings the thread back
+        return new Date(c.last_message_at).getTime() > new Date(hiddenAt).getTime();
+      });
       const convIds = (convs ?? []).map((c) => c.id);
       const ids = Array.from(new Set((convs ?? []).flatMap((c) => [c.buyer_id, c.seller_id])));
       const [{ data: profs }, unreadRes] = await Promise.all([
