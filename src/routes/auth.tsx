@@ -44,11 +44,18 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
-          options: { data: { display_name: displayName || email.split("@")[0] } },
+          options: {
+            data: { display_name: displayName || email.split("@")[0] },
+            emailRedirectTo: `${window.location.origin}${safeRedirect}`,
+          },
         });
         if (error) throw error;
+        if (!data.session) {
+          toast.success("Check your email to confirm your account.");
+          return;
+        }
         toast.success("Welcome to Bajan.market!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -141,8 +148,12 @@ function AuthPage() {
           </button>
         </div>
 
-        <p className="text-[11px] text-navy/40 text-center mt-6 max-w-xs mx-auto">
-          By continuing you agree to trade respectfully with fellow Bajans and to keep the marketplace clean.
+        <p className="text-[11px] text-navy/40 text-center mt-6 max-w-xs mx-auto leading-relaxed">
+          By continuing you agree to our{" "}
+          <Link to="/terms" className="underline hover:text-navy">Terms</Link>,{" "}
+          <Link to="/privacy" className="underline hover:text-navy">Privacy Policy</Link>{" "}
+          and{" "}
+          <Link to="/community-guidelines" className="underline hover:text-navy">Community Guidelines</Link>.
         </p>
       </div>
     </div>

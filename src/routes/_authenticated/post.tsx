@@ -5,7 +5,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { PARISHES, CONDITIONS } from "@/lib/parishes";
-import { uploadImage } from "@/lib/uploadImage";
+import { uploadImage, validateImage } from "@/lib/uploadImage";
 import { useAuth } from "@/lib/useAuth";
 import { ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
@@ -91,8 +91,16 @@ function PostListing() {
 
   const addFiles = (fs: FileList | null) => {
     if (!fs) return;
-    setFiles((prev) => [...prev, ...Array.from(fs).slice(0, 10 - prev.length)]);
+    const incoming = Array.from(fs);
+    const accepted: File[] = [];
+    for (const f of incoming) {
+      const err = validateImage(f);
+      if (err) { toast.error(`${f.name}: ${err}`); continue; }
+      accepted.push(f);
+    }
+    setFiles((prev) => [...prev, ...accepted].slice(0, 10));
   };
+
 
   return (
     <AppShell>
@@ -121,7 +129,7 @@ function PostListing() {
               {files.length < 10 && (
                 <label className="aspect-square rounded-xl border-2 border-dashed border-hairline grid place-items-center cursor-pointer hover:bg-sand transition-colors">
                   <ImagePlus className="size-5 text-navy/40" />
-                  <input type="file" accept="image/*" multiple hidden onChange={(e) => addFiles(e.target.files)} />
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden onChange={(e) => addFiles(e.target.files)} />
                 </label>
               )}
             </div>
