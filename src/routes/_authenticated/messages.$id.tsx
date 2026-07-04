@@ -56,12 +56,29 @@ function Thread() {
     const ch = supabase
       .channel(`msg-${id}`)
       .on("postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${id}` },
+        { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${id}` },
         () => qc.invalidateQueries({ queryKey: ["messages", id] }),
       )
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [id, qc]);
+
+  // Mark incoming unread messages as read
+  useEffect(() => {
+    if (!user || !messages?.length) return;
+    const unreadIds = messages
+      .filter((m) => m.sender_id !== user.id && !m.read_at)
+      .map((m) => m.id);
+    if (unreadIds.length === 0) return;
+    void supabase
+      .from("messages")
+      .update({ read_at: new Date().toISOString() })
+      .in("id", unreadIds)
+      .then(({ error }) => {
+        if (!error) qc.invalidateQueries({ queryKey: ["messages", id] });
+      });
+  }, [messages, user, id, qc]);
+
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -107,21 +124,34 @@ function Thread() {
         )}
 
         <div ref={scrollRef} className="bg-white rounded-3xl ring-1 ring-hairline p-4 h-[55vh] overflow-y-auto flex flex-col gap-2">
-          {messages?.map((m) => {
-            const mine = m.sender_id === user?.id;
-            return (
-              <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[78%] rounded-2xl px-4 py-2 text-sm ${mine ? "bg-navy text-white rounded-br-md" : "bg-sand text-navy rounded-bl-md"}`}>
-                  <div className="whitespace-pre-wrap break-words">{m.body}</div>
-                  <div className={`text-[10px] mt-1 ${mine ? "text-white/60" : "text-navy/40"}`}>{formatRelative(m.created_at)}</div>
+          {(() => {
+            let lastReadMineIdx = -1;
+            messages?.forEach((m, i) => {
+              if (m.sender_id === user?.id && m.read_at) lastReadMineIdx = i;
+            });
+            return messages?.map((m, i) => {
+              const mine = m.sender_id === user?.id;
+              return (
+                <div key={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
+                  <div className={`max-w-[78%] rounded-2xl px-4 py-2 text-sm ${mine ? "bg-navy text-white rounded-br-md" : "bg-sand text-navy rounded-bl-md"}`}>
+                    <div className="whitespace-pre-wrap break-words">{m.body}</div>
+                    <div className={`text-[10px] mt-1 ${mine ? "text-white/60" : "text-navy/40"}`}>{formatRelative(m.created_at)}</div>
+                  </div>
+                  {mine && i === lastReadMineIdx && (
+                    <div className="text-[10px] text-navy/50 mt-0.5 pr-1">Read {formatRelative(m.read_at!)}</div>
+                  )}
+                  {mine && i === (messages?.length ?? 0) - 1 && !m.read_at && (
+                    <div className="text-[10px] text-navy/40 mt-0.5 pr-1">Sent</div>
+                  )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
           {messages?.length === 0 && (
             <div className="text-center text-navy/40 text-sm py-8">Say hello — sellers respond faster to polite messages.</div>
           )}
         </div>
+
 
         <form
           onSubmit={(e) => { e.preventDefault(); send.mutate(); }}
