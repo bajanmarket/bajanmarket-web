@@ -148,7 +148,7 @@ export const sendCampaign = createServerFn({ method: "POST" })
 
     await supabaseAdmin.from("campaigns").update({
       status: failed > 0 && sent === 0 ? "failed" : "sent",
-      completed_at: new Date().toISOString(),
+      sent_at: new Date().toISOString(),
       sent_count: sent,
       failed_count: failed,
     }).eq("id", campaign.id);
