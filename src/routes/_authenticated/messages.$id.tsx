@@ -106,7 +106,25 @@ function Thread() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Conversation deleted");
+      toast.success("Conversation deleted for both people");
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+      nav({ to: "/messages" });
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
+  const hideConversation = useMutation({
+    mutationFn: async () => {
+      if (!user || !conv) return;
+      const patch =
+        conv.buyer_id === user.id
+          ? { buyer_hidden_at: new Date().toISOString() }
+          : { seller_hidden_at: new Date().toISOString() };
+      const { error } = await supabase.from("conversations").update(patch).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Hidden from your inbox");
       qc.invalidateQueries({ queryKey: ["conversations"] });
       nav({ to: "/messages" });
     },
