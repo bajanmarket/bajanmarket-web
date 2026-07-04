@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/useAuth";
 import { formatRelative } from "@/lib/format";
 import { formatBBD } from "@/lib/format";
 import { Send, ArrowLeft } from "lucide-react";
+import { markConversationRead } from "@/lib/markConversationRead";
 
 export const Route = createFileRoute("/_authenticated/messages/$id")({
   head: () => ({ meta: [{ title: "Conversation — Bajan.market" }] }),
