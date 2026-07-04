@@ -56,12 +56,29 @@ function Thread() {
     const ch = supabase
       .channel(`msg-${id}`)
       .on("postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${id}` },
+        { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${id}` },
         () => qc.invalidateQueries({ queryKey: ["messages", id] }),
       )
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [id, qc]);
+
+  // Mark incoming unread messages as read
+  useEffect(() => {
+    if (!user || !messages?.length) return;
+    const unreadIds = messages
+      .filter((m) => m.sender_id !== user.id && !m.read_at)
+      .map((m) => m.id);
+    if (unreadIds.length === 0) return;
+    void supabase
+      .from("messages")
+      .update({ read_at: new Date().toISOString() })
+      .in("id", unreadIds)
+      .then(({ error }) => {
+        if (!error) qc.invalidateQueries({ queryKey: ["messages", id] });
+      });
+  }, [messages, user, id, qc]);
+
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
