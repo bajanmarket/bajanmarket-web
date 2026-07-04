@@ -92,11 +92,7 @@ export function useMessageNotifications() {
             description: m.body.length > 120 ? `${m.body.slice(0, 117)}…` : m.body,
             action: {
               label: "Open",
-              onClick: () =>
-                router.navigate({
-                  to: "/messages/$id",
-                  params: { id: m.conversation_id },
-                }),
+              onClick: () => openThread(m.conversation_id),
             },
           });
 
@@ -113,11 +109,7 @@ export function useMessageNotifications() {
                 icon: "/favicon.ico",
               });
               n.onclick = () => {
-                window.focus();
-                router.navigate({
-                  to: "/messages/$id",
-                  params: { id: m.conversation_id },
-                });
+                openThread(m.conversation_id);
                 n.close();
               };
             } catch {
@@ -131,5 +123,6 @@ export function useMessageNotifications() {
     return () => {
       supabase.removeChannel(ch);
     };
-  }, [user, router]);
+  }, [user, router, qc]);
 }
+
