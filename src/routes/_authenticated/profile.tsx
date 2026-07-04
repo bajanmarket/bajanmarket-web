@@ -156,6 +156,8 @@ function Profile() {
           </Link>
         </div>
 
+        <MarketingPrefs />
+
         <ModeratorLink />
 
 
