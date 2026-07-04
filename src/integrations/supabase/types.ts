@@ -353,7 +353,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_listing_view: {
+        Args: { _listing_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "user" | "moderator" | "admin"

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { formatBBD, formatRelative, initials } from "@/lib/format";
@@ -85,7 +85,16 @@ function ListingDetail() {
     },
   });
 
-  // View-count RPC removed for security; tracking will move to a server function.
+  // Increment view count once per session per listing
+  useEffect(() => {
+    if (typeof window === "undefined" || !id) return;
+    const key = `viewed:${id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    supabase.rpc("increment_listing_view", { _listing_id: id }).then(() => {
+      // silent; don't refetch — counts are eventually consistent
+    });
+  }, [id]);
 
   const { data: isFav } = useQuery({
     queryKey: ["fav", id, user?.id],
