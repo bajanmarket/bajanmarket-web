@@ -8,6 +8,7 @@ import { parishLabel, conditionLabel } from "@/lib/parishes";
 import { useAuth } from "@/lib/useAuth";
 import { Heart, Share2, Flag, MessageCircle, Eye, ImageOff } from "lucide-react";
 import { toast } from "sonner";
+import { ReportDialog } from "@/components/ReportDialog";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
@@ -58,6 +59,7 @@ function ListingDetail() {
   const qc = useQueryClient();
   const nav = useNavigate();
   const [activeImg, setActiveImg] = useState(0);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
@@ -161,15 +163,12 @@ function ListingDetail() {
     } catch { /* dismissed */ }
   };
 
-  const report = async () => {
+  const openReport = () => {
     if (!user) { nav({ to: "/auth", search: { redirect: `/listing/${id}` } }); return; }
-    const reason = window.prompt("Reason for reporting this listing?");
-    if (!reason) return;
-    await supabase.from("reports").insert({
-      reporter_id: user.id, target_type: "listing", target_id: id, reason,
-    });
-    toast.success("Report submitted. Our team will review it.");
+    setReportOpen(true);
   };
+
+
 
   return (
     <AppShell>
@@ -264,13 +263,14 @@ function ListingDetail() {
               <button onClick={share} className="bg-white ring-1 ring-hairline text-navy p-3 rounded-2xl" aria-label="Share">
                 <Share2 className="size-4" />
               </button>
-              <button onClick={report} className="bg-white ring-1 ring-hairline text-navy/60 p-3 rounded-2xl" aria-label="Report">
+              <button onClick={openReport} className="bg-white ring-1 ring-hairline text-navy/60 p-3 rounded-2xl" aria-label="Report">
                 <Flag className="size-4" />
               </button>
             </div>
           </div>
         </div>
       </div>
+      <ReportDialog open={reportOpen} onOpenChange={setReportOpen} targetType="listing" targetId={id} redirectPath={`/listing/${id}`} />
     </AppShell>
   );
 }
