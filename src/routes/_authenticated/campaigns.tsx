@@ -140,12 +140,25 @@ function CampaignsPage() {
       return campaign;
     },
     onSuccess: (campaign) => {
-      toast.success("Campaign saved as draft — sending is disabled until an email provider is connected.");
+      toast.success(`Draft saved — ${campaign.recipients_count} recipients queued. Click Send to deliver.`);
       qc.invalidateQueries({ queryKey: ["campaigns_list"] });
       setName("");
       setSubject("");
       setBodyText("");
       setSelectedId(campaign.id);
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
+  const sendFn = useServerFn(sendCampaign);
+  const sendMutation = useMutation({
+    mutationFn: async (campaignId: string) => {
+      return await sendFn({ data: { campaign_id: campaignId, origin: window.location.origin } });
+    },
+    onSuccess: (r) => {
+      toast.success(`Sent ${r.sent} · Failed ${r.failed} · Skipped ${r.skipped}`);
+      qc.invalidateQueries({ queryKey: ["campaigns_list"] });
+      qc.invalidateQueries({ queryKey: ["campaign_sends"] });
     },
     onError: (e) => toast.error((e as Error).message),
   });
