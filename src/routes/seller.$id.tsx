@@ -51,6 +51,9 @@ export const Route = createFileRoute("/seller/$id")({
 
 function Seller() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
+  const nav = useNavigate();
+  const [reportOpen, setReportOpen] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["seller-profile", id],
