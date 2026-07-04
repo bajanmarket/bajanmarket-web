@@ -92,6 +92,19 @@ function Thread() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["messages", id] }),
   });
 
+  const deleteConversation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("conversations").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Conversation deleted");
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+      nav({ to: "/messages" });
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
   const listing = conv?.listing as { id: string; title: string; price: number; currency: string; cover_image_url: string | null; status: string } | null;
   const other = user?.id === conv?.buyer_id ? conv?.seller : conv?.buyer;
 
