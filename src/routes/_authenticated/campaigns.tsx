@@ -184,7 +184,7 @@ function CampaignsPage() {
       </div>
 
       <div className="rounded-2xl bg-sand ring-1 ring-hairline p-3 text-xs text-navy/70 mb-4">
-        Email provider isn't connected yet. Campaigns save as <b>draft</b> with the recipient list snapshotted — nothing is sent until Resend (or similar) is wired in.
+        Sending via Resend from <b>marketing@bajanmarket.app</b>. Drafts snapshot the recipient list — click <b>Send</b> on a draft below to deliver. Cap: {CAP} recipients per campaign.
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
