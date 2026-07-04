@@ -265,7 +265,7 @@ function TopParishesCard({ sinceIso }: { sinceIso: string }) {
         <ul className="flex flex-col gap-1">
           {data.map((p) => (
             <li key={p.parish} className="flex items-center justify-between text-sm py-1">
-              <Link to="/browse" search={{ parish: p.parish }} className="text-navy hover:underline">
+              <Link to="/browse" search={{ parish: p.parish as never }} className="text-navy hover:underline">
                 {parishLabel.get(p.parish) ?? p.parish}
               </Link>
               <span className="text-xs text-navy/60 shrink-0 ml-3">
@@ -320,7 +320,7 @@ function TrendingListingsCard({ sinceIso, className = "" }: { sinceIso: string; 
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium truncate">{l.title}</div>
                 <div className="text-xs text-navy/60 flex items-center gap-2">
-                  <span>{formatPrice(l.price, l.currency)}</span>
+                  <span>{formatBBD(l.price, l.currency)}</span>
                   <span className="inline-flex items-center gap-1">
                     <Eye className="size-3" /> {l.views ?? 0}
                   </span>
