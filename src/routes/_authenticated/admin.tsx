@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { formatRelative } from "@/lib/format";
-import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw } from "lucide-react";
+import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3 } from "lucide-react";
+import { InsightsPanel } from "@/components/InsightsPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
