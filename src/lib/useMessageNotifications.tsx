@@ -43,6 +43,22 @@ export function useMessageNotifications() {
     }
   }, [user]);
 
+  // When the tab regains focus, resync inbox + any open thread instantly
+  useEffect(() => {
+    if (!user) return;
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      qc.invalidateQueries({ queryKey: ["conversations", user.id] });
+      qc.invalidateQueries({ queryKey: ["messages"] });
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
+  }, [user, qc]);
+
   useEffect(() => {
     if (!user) return;
 
