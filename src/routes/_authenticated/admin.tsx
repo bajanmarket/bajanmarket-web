@@ -168,10 +168,20 @@ function AdminPage() {
         >
           <BarChart3 className="size-3" /> Insights
         </button>
+        <button
+          onClick={() => setSection("audience")}
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+            section === "audience" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
+          }`}
+        >
+          <Users className="size-3" /> Audience
+        </button>
       </div>
 
       {section === "insights" ? (
         <InsightsPanel />
+      ) : section === "audience" ? (
+        <AudiencePanel />
       ) : (
         <ReportsSection
           tab={tab}
