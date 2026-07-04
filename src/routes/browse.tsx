@@ -7,6 +7,8 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoryChips } from "@/components/CategoryChips";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { PARISHES } from "@/lib/parishes";
+import { logSearchEvent } from "@/lib/logSearchEvent";
+import type { Database } from "@/integrations/supabase/types";
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -67,7 +69,18 @@ function Browse() {
 
       const { data, error } = await q.limit(60);
       if (error) throw error;
-      return (data ?? []) as ListingCardData[];
+      const rows = (data ?? []) as ListingCardData[];
+
+      if (search.q && search.q.trim()) {
+        logSearchEvent({
+          query: search.q,
+          parish: (search.parish as Database["public"]["Enums"]["parish"] | undefined) ?? null,
+          categorySlug: search.category ?? null,
+          resultCount: rows.length,
+        });
+      }
+
+      return rows;
     },
   });
 
