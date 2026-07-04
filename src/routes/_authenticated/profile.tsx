@@ -106,7 +106,7 @@ function Profile() {
             {profile.avatar_url
               ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
               : initials(profile.display_name)}
-            <input type="file" accept="image/*" hidden onChange={(e) => uploadAvatar(e.target.files?.[0] ?? null)} />
+            <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onChange={(e) => uploadAvatar(e.target.files?.[0] ?? null)} />
           </label>
           <div className="flex-1 min-w-0">
             <div className="text-lg font-medium truncate">{profile.display_name}</div>
