@@ -127,8 +127,14 @@ function Inbox() {
         </div>
       ) : (
         <div className="bg-white rounded-3xl ring-1 ring-hairline p-10 text-center">
+          <div className="mx-auto size-14 rounded-full bg-teal-soft grid place-items-center text-teal mb-3">
+            <span className="text-2xl">💬</span>
+          </div>
           <h3 className="text-lg font-medium">No conversations yet.</h3>
-          <p className="text-sm text-navy/60 mt-2">When you message a seller, the thread will appear here.</p>
+          <p className="text-sm text-navy/60 mt-2 mb-4">When you message a seller, the thread will appear here.</p>
+          <Link to="/browse" className="inline-flex rounded-2xl bg-coral text-white px-5 py-2.5 text-sm font-medium">
+            Find something to buy
+          </Link>
         </div>
       )}
     </AppShell>

@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
@@ -35,8 +36,14 @@ function Favs() {
         </div>
       ) : (
         <div className="bg-white rounded-3xl ring-1 ring-hairline p-10 text-center">
+          <div className="mx-auto size-14 rounded-full bg-coral/10 grid place-items-center text-coral mb-3">
+            <Heart className="size-6" />
+          </div>
           <h3 className="text-lg font-medium">Nothing saved yet.</h3>
-          <p className="text-sm text-navy/60 mt-2">Tap the heart on any listing to save it here.</p>
+          <p className="text-sm text-navy/60 mt-2 mb-4">Tap the heart on any listing to keep it here for later.</p>
+          <Link to="/browse" className="inline-flex rounded-2xl bg-coral text-white px-5 py-2.5 text-sm font-medium">
+            Start browsing
+          </Link>
         </div>
       )}
     </AppShell>

@@ -1,10 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Trash2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/useAuth";
 import { formatBBD } from "@/lib/format";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/my-listings")({
   head: () => ({ meta: [{ title: "My listings — Bajan.market" }] }),
@@ -14,6 +26,8 @@ export const Route = createFileRoute("/_authenticated/my-listings")({
 function MyListings() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; title: string } | null>(null);
+
   const { data } = useQuery({
     queryKey: ["my-listings", user?.id],
     enabled: !!user,
@@ -28,19 +42,26 @@ function MyListings() {
     },
   });
 
+  const invalidateFeeds = () => {
+    qc.invalidateQueries({ queryKey: ["my-listings"] });
+    qc.invalidateQueries({ queryKey: ["listings"] });
+    qc.invalidateQueries({ queryKey: ["home"] });
+  };
+
   const setStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("listings").update({ status: status as never }).eq("id", id);
     if (error) { toast.error(error.message); return; }
-    toast.success("Updated");
-    qc.invalidateQueries({ queryKey: ["my-listings"] });
+    toast.success(status === "sold" ? "Marked as sold" : "Updated");
+    invalidateFeeds();
   };
 
-  const del = async (id: string) => {
-    if (!window.confirm("Delete this listing?")) return;
-    const { error } = await supabase.from("listings").delete().eq("id", id);
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    const { error } = await supabase.from("listings").delete().eq("id", pendingDelete.id);
+    setPendingDelete(null);
     if (error) { toast.error(error.message); return; }
-    toast.success("Deleted");
-    qc.invalidateQueries({ queryKey: ["my-listings"] });
+    toast.success("Listing deleted");
+    invalidateFeeds();
   };
 
   return (
@@ -62,17 +83,33 @@ function MyListings() {
               </div>
               <div className="text-xs text-navy/60">{formatBBD(l.price, l.currency)} · {l.views} views</div>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 shrink-0">
               <select
                 value={l.status}
                 onChange={(e) => setStatus(l.id, e.target.value)}
                 className="text-[11px] bg-sand rounded-full px-2 py-1 outline-none"
+                aria-label="Change listing status"
               >
                 <option value="active">Active</option>
                 <option value="paused">Paused</option>
                 <option value="sold">Sold</option>
               </select>
-              <button onClick={() => del(l.id)} className="text-[11px] text-destructive">Delete</button>
+              {l.status !== "sold" && (
+                <button
+                  onClick={() => setStatus(l.id, "sold")}
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-teal hover:text-teal/80"
+                  title="Mark as sold"
+                >
+                  <CheckCircle2 className="size-3.5" /> Sold
+                </button>
+              )}
+              <button
+                onClick={() => setPendingDelete({ id: l.id, title: l.title })}
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-destructive hover:opacity-80"
+                title="Delete listing"
+              >
+                <Trash2 className="size-3.5" /> Delete
+              </button>
             </div>
           </div>
         ))}
@@ -84,6 +121,24 @@ function MyListings() {
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this listing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{pendingDelete?.title}" will be permanently removed. This can't be undone.
+              If you've sold it, mark it as Sold instead to keep the history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }
