@@ -7,6 +7,8 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoryChips } from "@/components/CategoryChips";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { PARISHES } from "@/lib/parishes";
+import { logSearchEvent } from "@/lib/logSearchEvent";
+import type { Database } from "@/integrations/supabase/types";
 
 const searchSchema = z.object({
   q: z.string().optional(),
