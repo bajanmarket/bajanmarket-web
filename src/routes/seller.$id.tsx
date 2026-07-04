@@ -83,14 +83,29 @@ function Seller() {
             ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
             : initials(profile.display_name)}
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl font-medium">{profile.display_name}</h1>
           <div className="text-xs text-navy/50">
             {parishLabel(profile.parish)} · Joined {new Date(profile.created_at).toLocaleDateString("en-BB", { month: "short", year: "numeric" })}
           </div>
           {profile.bio && <p className="text-sm text-navy/70 mt-2 max-w-md">{profile.bio}</p>}
         </div>
+        {user?.id !== profile.id && (
+          <button
+            onClick={() => {
+              if (!user) { nav({ to: "/auth", search: { redirect: `/seller/${id}` } }); return; }
+              setReportOpen(true);
+            }}
+            className="ring-1 ring-hairline text-navy/60 hover:text-navy p-2.5 rounded-2xl shrink-0"
+            aria-label="Report seller"
+            title="Report seller"
+          >
+            <Flag className="size-4" />
+          </button>
+        )}
       </div>
+
+      <ReportDialog open={reportOpen} onOpenChange={setReportOpen} targetType="user" targetId={id} redirectPath={`/seller/${id}`} />
 
       <h2 className="text-sm font-semibold uppercase tracking-wider text-navy/50 mb-3">Listings</h2>
       {listings && listings.length > 0 ? (
