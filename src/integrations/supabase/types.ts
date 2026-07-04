@@ -211,6 +211,45 @@ export type Database = {
           },
         ]
       }
+      marketing_preferences: {
+        Row: {
+          consented_at: string | null
+          created_at: string
+          email_opt_in: boolean
+          marketing_email: string | null
+          sms_opt_in: boolean
+          unsubscribe_token: string
+          updated_at: string
+          user_id: string
+          whatsapp_number: string | null
+          whatsapp_opt_in: boolean
+        }
+        Insert: {
+          consented_at?: string | null
+          created_at?: string
+          email_opt_in?: boolean
+          marketing_email?: string | null
+          sms_opt_in?: boolean
+          unsubscribe_token?: string
+          updated_at?: string
+          user_id: string
+          whatsapp_number?: string | null
+          whatsapp_opt_in?: boolean
+        }
+        Update: {
+          consented_at?: string | null
+          created_at?: string
+          email_opt_in?: boolean
+          marketing_email?: string | null
+          sms_opt_in?: boolean
+          unsubscribe_token?: string
+          updated_at?: string
+          user_id?: string
+          whatsapp_number?: string | null
+          whatsapp_opt_in?: boolean
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
@@ -274,7 +313,16 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string
+          favourites_count: number
+          first_listing_at: string | null
+          first_message_at: string | null
           id: string
+          last_active_at: string | null
+          listings_count: number
+          messages_sent_count: number
+          onboarded_at: string | null
+          onboarding_categories: string[] | null
+          onboarding_intent: string | null
           parish: Database["public"]["Enums"]["parish"] | null
           updated_at: string
         }
@@ -284,7 +332,16 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name: string
+          favourites_count?: number
+          first_listing_at?: string | null
+          first_message_at?: string | null
           id: string
+          last_active_at?: string | null
+          listings_count?: number
+          messages_sent_count?: number
+          onboarded_at?: string | null
+          onboarding_categories?: string[] | null
+          onboarding_intent?: string | null
           parish?: Database["public"]["Enums"]["parish"] | null
           updated_at?: string
         }
@@ -294,7 +351,16 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string
+          favourites_count?: number
+          first_listing_at?: string | null
+          first_message_at?: string | null
           id?: string
+          last_active_at?: string | null
+          listings_count?: number
+          messages_sent_count?: number
+          onboarded_at?: string | null
+          onboarding_categories?: string[] | null
+          onboarding_intent?: string | null
           parish?: Database["public"]["Enums"]["parish"] | null
           updated_at?: string
         }
@@ -389,6 +455,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_interest_tags: {
+        Args: { _user_id: string }
+        Returns: {
+          top_categories: string[]
+          top_parishes: string[]
+        }[]
+      }
       increment_listing_view: {
         Args: { _listing_id: string }
         Returns: undefined

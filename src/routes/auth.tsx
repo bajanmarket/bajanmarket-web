@@ -29,6 +29,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const safeRedirect = redirect && redirect.startsWith("/") ? redirect : "/";
@@ -52,6 +53,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        if (data.user && marketingOptIn) {
+          await supabase.from("marketing_preferences").upsert({
+            user_id: data.user.id,
+            email_opt_in: true,
+            consented_at: new Date().toISOString(),
+          });
+        }
         if (!data.session) {
           toast.success("Check your email to confirm your account.");
           return;
@@ -131,6 +139,17 @@ function AuthPage() {
                 className="w-full bg-sand rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-teal"
               />
             </Field>
+            {mode === "signup" && (
+              <label className="flex items-start gap-2 text-xs text-navy/70 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={marketingOptIn}
+                  onChange={(e) => setMarketingOptIn(e.target.checked)}
+                  className="mt-0.5 size-4 accent-teal"
+                />
+                <span>Send me occasional tips, updates, and offers from Bajan.market. You can unsubscribe anytime.</span>
+              </label>
+            )}
             <button
               disabled={loading}
               className="mt-2 bg-navy text-white rounded-2xl py-3 text-sm font-medium active:scale-95 transition-transform disabled:opacity-60"

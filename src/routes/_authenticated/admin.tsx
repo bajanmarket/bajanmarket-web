@@ -6,8 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { formatRelative } from "@/lib/format";
-import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3 } from "lucide-react";
+import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3, Users } from "lucide-react";
 import { InsightsPanel } from "@/components/InsightsPanel";
+import { AudiencePanel } from "@/components/AudiencePanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -31,7 +32,7 @@ type ReportRow = {
 };
 
 type Tab = "open" | "reviewing" | "resolved" | "dismissed";
-type Section = "reports" | "insights";
+type Section = "reports" | "insights" | "audience";
 
 function AdminPage() {
   const { data: role, isLoading: roleLoading } = useIsModerator();
@@ -167,10 +168,20 @@ function AdminPage() {
         >
           <BarChart3 className="size-3" /> Insights
         </button>
+        <button
+          onClick={() => setSection("audience")}
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+            section === "audience" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
+          }`}
+        >
+          <Users className="size-3" /> Audience
+        </button>
       </div>
 
       {section === "insights" ? (
         <InsightsPanel />
+      ) : section === "audience" ? (
+        <AudiencePanel />
       ) : (
         <ReportsSection
           tab={tab}

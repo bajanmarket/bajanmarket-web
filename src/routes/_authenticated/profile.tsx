@@ -8,6 +8,7 @@ import { PARISHES } from "@/lib/parishes";
 import { initials } from "@/lib/format";
 import { LogOut, Settings, Package, Heart, Shield } from "lucide-react";
 import { useIsModerator } from "@/lib/useIsModerator";
+import { MarketingPrefs } from "@/components/MarketingPrefs";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -154,6 +155,8 @@ function Profile() {
             <span className="font-medium text-sm">Saved</span>
           </Link>
         </div>
+
+        <MarketingPrefs />
 
         <ModeratorLink />
 
