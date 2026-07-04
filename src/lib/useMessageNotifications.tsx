@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
 
@@ -14,7 +15,21 @@ import { useAuth } from "@/lib/useAuth";
 export function useMessageNotifications() {
   const { user } = useAuth();
   const router = useRouter();
+  const qc = useQueryClient();
   const seen = useRef<Set<string>>(new Set());
+
+  const openThread = (conversationId: string) => {
+    if (typeof window !== "undefined") window.focus();
+    // Prime caches so the thread + inbox render fresh state immediately
+    qc.invalidateQueries({ queryKey: ["messages", conversationId] });
+    if (user) qc.invalidateQueries({ queryKey: ["conversations", user.id] });
+    router.navigate({
+      to: "/messages/$id",
+      params: { id: conversationId },
+    });
+  };
+
+
 
   // Ask for permission once, on the first mount after sign-in
   useEffect(() => {
