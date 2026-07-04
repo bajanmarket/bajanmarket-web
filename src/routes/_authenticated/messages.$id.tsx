@@ -111,9 +111,23 @@ function Thread() {
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto flex flex-col gap-3">
-        <Link to="/messages" className="inline-flex items-center gap-1 text-sm text-navy/60 hover:text-navy">
-          <ArrowLeft className="size-4" /> Back to inbox
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link to="/messages" className="inline-flex items-center gap-1 text-sm text-navy/60 hover:text-navy">
+            <ArrowLeft className="size-4" /> Back to inbox
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm("Delete this conversation? All messages will be removed for both you and the other person.")) {
+                deleteConversation.mutate();
+              }
+            }}
+            disabled={deleteConversation.isPending}
+            className="inline-flex items-center gap-1 text-xs text-coral hover:bg-coral/10 rounded-lg px-2 py-1 disabled:opacity-40"
+          >
+            <Trash2 className="size-3.5" /> Delete
+          </button>
+        </div>
 
         {listing && (
           <Link
