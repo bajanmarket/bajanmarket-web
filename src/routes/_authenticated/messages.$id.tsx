@@ -7,7 +7,15 @@ import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/useAuth";
 import { formatRelative } from "@/lib/format";
 import { formatBBD } from "@/lib/format";
-import { Send, ArrowLeft, Trash2 } from "lucide-react";
+import { Send, ArrowLeft, Trash2, EyeOff } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 import { markConversationRead } from "@/lib/markConversationRead";
 
 export const Route = createFileRoute("/_authenticated/messages/$id")({
@@ -98,7 +106,25 @@ function Thread() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Conversation deleted");
+      toast.success("Conversation deleted for both people");
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+      nav({ to: "/messages" });
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
+  const hideConversation = useMutation({
+    mutationFn: async () => {
+      if (!user || !conv) return;
+      const patch =
+        conv.buyer_id === user.id
+          ? { buyer_hidden_at: new Date().toISOString() }
+          : { seller_hidden_at: new Date().toISOString() };
+      const { error } = await supabase.from("conversations").update(patch).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Hidden from your inbox");
       qc.invalidateQueries({ queryKey: ["conversations"] });
       nav({ to: "/messages" });
     },
@@ -115,18 +141,43 @@ function Thread() {
           <Link to="/messages" className="inline-flex items-center gap-1 text-sm text-navy/60 hover:text-navy">
             <ArrowLeft className="size-4" /> Back to inbox
           </Link>
-          <button
-            type="button"
-            onClick={() => {
-              if (confirm("Delete this conversation? All messages will be removed for both you and the other person.")) {
-                deleteConversation.mutate();
-              }
-            }}
-            disabled={deleteConversation.isPending}
-            className="inline-flex items-center gap-1 text-xs text-coral hover:bg-coral/10 rounded-lg px-2 py-1 disabled:opacity-40"
-          >
-            <Trash2 className="size-3.5" /> Delete
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                aria-label="Conversation options"
+                className="inline-flex items-center gap-1 text-xs text-navy/60 hover:text-navy hover:bg-sand rounded-lg px-2 py-1"
+              >
+                <MoreVertical className="size-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem
+                onClick={() => hideConversation.mutate()}
+                disabled={hideConversation.isPending}
+              >
+                <EyeOff className="size-3.5 mr-2" />
+                Hide from my inbox
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  if (
+                    confirm(
+                      "Delete for both people? All messages will be removed for you and the other person. This cannot be undone.",
+                    )
+                  ) {
+                    deleteConversation.mutate();
+                  }
+                }}
+                disabled={deleteConversation.isPending}
+                className="text-coral focus:text-coral"
+              >
+                <Trash2 className="size-3.5 mr-2" />
+                Delete for both
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {listing && (

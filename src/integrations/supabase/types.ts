@@ -46,27 +46,33 @@ export type Database = {
       }
       conversations: {
         Row: {
+          buyer_hidden_at: string | null
           buyer_id: string
           created_at: string
           id: string
           last_message_at: string
           listing_id: string
+          seller_hidden_at: string | null
           seller_id: string
         }
         Insert: {
+          buyer_hidden_at?: string | null
           buyer_id: string
           created_at?: string
           id?: string
           last_message_at?: string
           listing_id: string
+          seller_hidden_at?: string | null
           seller_id: string
         }
         Update: {
+          buyer_hidden_at?: string | null
           buyer_id?: string
           created_at?: string
           id?: string
           last_message_at?: string
           listing_id?: string
+          seller_hidden_at?: string | null
           seller_id?: string
         }
         Relationships: [
