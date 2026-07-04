@@ -177,6 +177,14 @@ function AdminPage() {
         >
           <Users className="size-3" /> Audience
         </button>
+        <button
+          onClick={() => setSection("admins")}
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+            section === "admins" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
+          }`}
+        >
+          <ShieldCheck className="size-3" /> Admins
+        </button>
         <Link
           to="/campaigns"
           className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 text-navy/60 hover:text-navy"
@@ -190,6 +198,8 @@ function AdminPage() {
         <InsightsPanel />
       ) : section === "audience" ? (
         <AudiencePanel />
+      ) : section === "admins" ? (
+        <AdminsPanel />
       ) : (
         <ReportsSection
           tab={tab}
