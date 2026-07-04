@@ -176,7 +176,14 @@ function AdminPage() {
         >
           <Users className="size-3" /> Audience
         </button>
+        <Link
+          to="/campaigns"
+          className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 text-navy/60 hover:text-navy"
+        >
+          <Megaphone className="size-3" /> Campaigns
+        </Link>
       </div>
+
 
       {section === "insights" ? (
         <InsightsPanel />
