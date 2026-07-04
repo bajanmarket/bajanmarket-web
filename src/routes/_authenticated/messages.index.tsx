@@ -31,8 +31,8 @@ function Inbox() {
         // A new message after the hide time brings the thread back
         return new Date(c.last_message_at).getTime() > new Date(hiddenAt).getTime();
       });
-      const convIds = (convs ?? []).map((c) => c.id);
-      const ids = Array.from(new Set((convs ?? []).flatMap((c) => [c.buyer_id, c.seller_id])));
+      const convIds = visible.map((c) => c.id);
+      const ids = Array.from(new Set(visible.flatMap((c) => [c.buyer_id, c.seller_id])));
       const [{ data: profs }, unreadRes] = await Promise.all([
         ids.length
           ? supabase.from("profiles").select("id, display_name, avatar_url").in("id", ids)
@@ -51,7 +51,7 @@ function Inbox() {
       for (const m of unreadRes.data ?? []) {
         unreadCounts.set(m.conversation_id, (unreadCounts.get(m.conversation_id) ?? 0) + 1);
       }
-      return (convs ?? []).map((c) => ({
+      return visible.map((c) => ({
         ...c,
         buyer: byId.get(c.buyer_id) ?? null,
         seller: byId.get(c.seller_id) ?? null,
