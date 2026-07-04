@@ -64,21 +64,13 @@ function Thread() {
     return () => { supabase.removeChannel(ch); };
   }, [id, qc]);
 
-  // Mark incoming unread messages as read
+  // Mark the whole conversation read immediately on open, and again whenever
+  // new incoming messages arrive while the thread is visible.
   useEffect(() => {
-    if (!user || !messages?.length) return;
-    const unreadIds = messages
-      .filter((m) => m.sender_id !== user.id && !m.read_at)
-      .map((m) => m.id);
-    if (unreadIds.length === 0) return;
-    void supabase
-      .from("messages")
-      .update({ read_at: new Date().toISOString() })
-      .in("id", unreadIds)
-      .then(({ error }) => {
-        if (!error) qc.invalidateQueries({ queryKey: ["messages", id] });
-      });
-  }, [messages, user, id, qc]);
+    if (!user) return;
+    void markConversationRead(id, user.id, qc);
+  }, [id, user, qc, messages?.length]);
+
 
 
   useEffect(() => {
