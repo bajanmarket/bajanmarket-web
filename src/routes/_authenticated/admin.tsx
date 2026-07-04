@@ -33,7 +33,7 @@ type ReportRow = {
 };
 
 type Tab = "open" | "reviewing" | "resolved" | "dismissed";
-type Section = "reports" | "insights" | "audience";
+type Section = "reports" | "insights" | "audience" | "admins";
 
 function AdminPage() {
   const { data: role, isLoading: roleLoading } = useIsModerator();
