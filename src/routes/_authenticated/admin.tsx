@@ -147,9 +147,67 @@ function AdminPage() {
     <AppShell>
       <div className="flex items-center gap-2 mb-4">
         <Shield className="size-5 text-teal" />
-        <h1 className="text-2xl font-medium">Moderation</h1>
+        <h1 className="text-2xl font-medium">Admin</h1>
       </div>
 
+      <div className="flex gap-1 mb-4 bg-white rounded-xl p-1 ring-1 ring-hairline w-fit">
+        <button
+          onClick={() => setSection("reports")}
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+            section === "reports" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
+          }`}
+        >
+          <Shield className="size-3" /> Reports
+        </button>
+        <button
+          onClick={() => setSection("insights")}
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+            section === "insights" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
+          }`}
+        >
+          <BarChart3 className="size-3" /> Insights
+        </button>
+      </div>
+
+      {section === "insights" ? (
+        <InsightsPanel />
+      ) : (
+        <ReportsSection
+          tab={tab}
+          setTab={setTab}
+          tabs={tabs}
+          reports={reports}
+          isLoading={isLoading}
+          listings={listings}
+          profiles={profiles}
+          setReportStatus={setReportStatus}
+          setListingStatus={setListingStatus}
+          setUserBan={setUserBan}
+        />
+      )}
+    </AppShell>
+  );
+}
+
+type ReportsSectionProps = {
+  tab: Tab;
+  setTab: (t: Tab) => void;
+  tabs: { key: Tab; label: string }[];
+  reports: ReportRow[] | undefined;
+  isLoading: boolean;
+  listings: Map<string, { id: string; title: string; status: string; seller_id: string; cover_image_url: string | null }> | undefined;
+  profiles: Map<string, { id: string; display_name: string; banned_at: string | null }> | undefined;
+  setReportStatus: { mutate: (v: { id: string; status: Tab }) => void };
+  setListingStatus: { mutate: (v: { id: string; status: "active" | "paused" | "deleted" }) => void };
+  setUserBan: { mutate: (v: { id: string; banned: boolean }) => void };
+};
+
+function ReportsSection({
+  tab, setTab, tabs, reports, isLoading, listings, profiles,
+  setReportStatus, setListingStatus, setUserBan,
+}: ReportsSectionProps) {
+  return (
+    <>
       <div className="flex gap-1 mb-4 bg-white rounded-xl p-1 ring-1 ring-hairline w-fit">
         {tabs.map((t) => (
           <button
@@ -163,6 +221,7 @@ function AdminPage() {
           </button>
         ))}
       </div>
+
 
       {isLoading ? (
         <div className="text-navy/40 text-sm">Loading…</div>
