@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { formatRelative } from "@/lib/format";
 import { PARISHES } from "@/lib/parishes";
+import { sendCampaign } from "@/lib/campaigns.functions";
 import { Megaphone, Send, Users, Mail, Shield, ChevronRight, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/campaigns")({
