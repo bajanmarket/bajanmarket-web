@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,7 @@ import { AppShell } from "@/components/AppShell";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { formatRelative } from "@/lib/format";
 import { PARISHES } from "@/lib/parishes";
+import { sendCampaign } from "@/lib/campaigns.functions";
 import { Megaphone, Send, Users, Mail, Shield, ChevronRight, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/campaigns")({
@@ -138,12 +140,25 @@ function CampaignsPage() {
       return campaign;
     },
     onSuccess: (campaign) => {
-      toast.success("Campaign saved as draft — sending is disabled until an email provider is connected.");
+      toast.success(`Draft saved — ${campaign.recipients_count} recipients queued. Click Send to deliver.`);
       qc.invalidateQueries({ queryKey: ["campaigns_list"] });
       setName("");
       setSubject("");
       setBodyText("");
       setSelectedId(campaign.id);
+    },
+    onError: (e) => toast.error((e as Error).message),
+  });
+
+  const sendFn = useServerFn(sendCampaign);
+  const sendMutation = useMutation({
+    mutationFn: async (campaignId: string) => {
+      return await sendFn({ data: { campaign_id: campaignId, origin: window.location.origin } });
+    },
+    onSuccess: (r) => {
+      toast.success(`Sent ${r.sent} · Failed ${r.failed} · Skipped ${r.skipped}`);
+      qc.invalidateQueries({ queryKey: ["campaigns_list"] });
+      qc.invalidateQueries({ queryKey: ["campaign_sends"] });
     },
     onError: (e) => toast.error((e as Error).message),
   });
@@ -169,7 +184,7 @@ function CampaignsPage() {
       </div>
 
       <div className="rounded-2xl bg-sand ring-1 ring-hairline p-3 text-xs text-navy/70 mb-4">
-        Email provider isn't connected yet. Campaigns save as <b>draft</b> with the recipient list snapshotted — nothing is sent until Resend (or similar) is wired in.
+        Sending via Resend from <b>marketing@bajanmarket.app</b>. Drafts snapshot the recipient list — click <b>Send</b> on a draft below to deliver. Cap: {CAP} recipients per campaign.
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -274,6 +289,32 @@ function CampaignsPage() {
               ))}
             </div>
           )}
+          {selectedId && (() => {
+            const c = (campaigns ?? []).find((x) => x.id === selectedId);
+            if (!c) return null;
+            const canSend = c.status === "draft" || c.status === "failed";
+            return (
+              <div className="flex items-center justify-between gap-2 border-t border-hairline pt-3">
+                <div className="text-[11px] text-navy/50">
+                  {c.sent_count ?? 0} sent · {c.failed_count ?? 0} failed
+                </div>
+                {canSend && (
+                  <button
+                    onClick={() => {
+                      if (confirm(`Send this campaign to ${c.recipients_count} recipients?`)) {
+                        sendMutation.mutate(c.id);
+                      }
+                    }}
+                    disabled={sendMutation.isPending}
+                    className="inline-flex items-center gap-1.5 bg-teal text-white rounded-full px-3 py-1.5 text-xs font-medium disabled:opacity-40"
+                  >
+                    <Send className="size-3" />
+                    {sendMutation.isPending ? "Sending…" : "Send now"}
+                  </button>
+                )}
+              </div>
+            );
+          })()}
           {selectedId && <CampaignDetail campaignId={selectedId} />}
         </div>
       </div>
