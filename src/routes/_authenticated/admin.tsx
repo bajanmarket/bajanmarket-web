@@ -375,6 +375,6 @@ function ReportsSection({
           <p className="text-sm text-navy/60 mt-2">No {tab} reports.</p>
         </div>
       )}
-    </AppShell>
+    </>
   );
 }
