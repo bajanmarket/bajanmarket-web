@@ -16,19 +16,28 @@ import { Toaster } from "sonner";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-sand text-navy px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-semibold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-medium text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+        <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full bg-white ring-1 ring-hairline px-4 py-1.5 text-xs font-semibold tracking-wide text-navy/70">
+          BAJAN.MARKET
+        </div>
+        <h1 className="text-6xl font-semibold text-coral">404</h1>
+        <h2 className="mt-3 text-xl font-medium">This page took a swim.</h2>
+        <p className="mt-2 text-sm text-navy/60">
+          We can't find what you're looking for. It might've been sold, moved, or never existed.
         </p>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-2xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-transform active:scale-95"
+            className="inline-flex items-center justify-center rounded-2xl bg-coral px-5 py-2.5 text-sm font-medium text-white transition-transform active:scale-95"
           >
             Back to marketplace
+          </Link>
+          <Link
+            to="/browse"
+            className="inline-flex items-center justify-center rounded-2xl border border-hairline bg-white px-5 py-2.5 text-sm font-medium text-navy"
+          >
+            Browse listings
           </Link>
         </div>
       </div>
@@ -44,24 +53,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-sand text-navy px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-medium tracking-tight text-foreground">
-          Something didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Try again, or head back to the marketplace.
+        <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full bg-white ring-1 ring-hairline px-4 py-1.5 text-xs font-semibold tracking-wide text-navy/70">
+          BAJAN.MARKET
+        </div>
+        <h1 className="text-xl font-medium">Something didn't load</h1>
+        <p className="mt-2 text-sm text-navy/60">
+          There was a hiccup on our end. Try again, or head back to the marketplace.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => { router.invalidate(); reset(); }}
-            className="inline-flex items-center justify-center rounded-2xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-transform active:scale-95"
+            className="inline-flex items-center justify-center rounded-2xl bg-coral px-5 py-2.5 text-sm font-medium text-white transition-transform active:scale-95"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-2xl border border-input bg-background px-5 py-2.5 text-sm font-medium text-foreground"
+            className="inline-flex items-center justify-center rounded-2xl border border-hairline bg-white px-5 py-2.5 text-sm font-medium text-navy"
           >
             Home
           </a>
