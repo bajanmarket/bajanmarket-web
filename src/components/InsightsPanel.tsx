@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { PARISHES } from "@/lib/parishes";
-import { formatPrice } from "@/lib/format";
+import { formatBBD } from "@/lib/format";
 import { TrendingUp, Search, AlertCircle, MapPin, Tag, Eye } from "lucide-react";
 
 type Days = 7 | 30;
