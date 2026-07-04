@@ -4,13 +4,15 @@ import { useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
+import { markConversationRead } from "@/lib/markConversationRead";
 
 /**
  * While the app is open (any tab), alert on new incoming messages:
  * - In-app toast (always)
  * - System notification via the Notification API (when permission granted
  *   and the tab isn't currently focused on the matching thread)
- * Clicking the system notification focuses the tab and opens the thread.
+ * Clicking the system notification focuses the tab, marks the conversation
+ * read immediately, and opens the thread.
  */
 export function useMessageNotifications() {
   const { user } = useAuth();
@@ -20,14 +22,14 @@ export function useMessageNotifications() {
 
   const openThread = (conversationId: string) => {
     if (typeof window !== "undefined") window.focus();
-    // Prime caches so the thread + inbox render fresh state immediately
-    qc.invalidateQueries({ queryKey: ["messages", conversationId] });
-    if (user) qc.invalidateQueries({ queryKey: ["conversations", user.id] });
+    // Optimistically mark read + invalidate caches so inbox badges clear now
+    if (user) void markConversationRead(conversationId, user.id, qc);
     router.navigate({
       to: "/messages/$id",
       params: { id: conversationId },
     });
   };
+
 
 
 
