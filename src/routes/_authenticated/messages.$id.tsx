@@ -141,7 +141,9 @@ function Thread() {
                     <div className="text-[10px] text-navy/50 mt-0.5 pr-1">Read {formatRelative(m.read_at!)}</div>
                   )}
                   {mine && i === (messages?.length ?? 0) - 1 && !m.read_at && (
-                    <div className="text-[10px] text-navy/40 mt-0.5 pr-1">Sent</div>
+                    <div className="text-[10px] text-navy/40 mt-0.5 pr-1">
+                      {m.delivered_at ? `Delivered ${formatRelative(m.delivered_at)}` : "Sent"}
+                    </div>
                   )}
                 </div>
               );
