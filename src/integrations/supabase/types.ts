@@ -327,6 +327,36 @@ export type Database = {
         }
         Relationships: []
       }
+      search_events: {
+        Row: {
+          category_slug: string | null
+          created_at: string
+          id: string
+          parish: Database["public"]["Enums"]["parish"] | null
+          query: string
+          result_count: number
+          user_id: string | null
+        }
+        Insert: {
+          category_slug?: string | null
+          created_at?: string
+          id?: string
+          parish?: Database["public"]["Enums"]["parish"] | null
+          query: string
+          result_count?: number
+          user_id?: string | null
+        }
+        Update: {
+          category_slug?: string | null
+          created_at?: string
+          id?: string
+          parish?: Database["public"]["Enums"]["parish"] | null
+          query?: string
+          result_count?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
