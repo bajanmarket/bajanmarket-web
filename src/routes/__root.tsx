@@ -96,8 +96,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Bajan.market — Barbados' cleaner marketplace" },
       { name: "twitter:description", content: "Buy and sell across Barbados. Vehicles, property, electronics, furniture, jobs, road tennis and more — cleaner, safer, faster than the Facebook groups." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0d88b43b-b3b3-4b30-9493-dbec904b1b84/id-preview-7fb59a06--8db25fba-f4e5-4a57-9041-b44f430d1c99.lovable.app-1783100307101.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0d88b43b-b3b3-4b30-9493-dbec904b1b84/id-preview-7fb59a06--8db25fba-f4e5-4a57-9041-b44f430d1c99.lovable.app-1783100307101.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -107,6 +105,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Bajan.market",
+          url: "https://bajanmarketplacetest.lovable.app",
+          description: "Barbados' cleaner marketplace — buy and sell across the island.",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://bajanmarketplacetest.lovable.app/browse?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
       },
     ],
   }),
