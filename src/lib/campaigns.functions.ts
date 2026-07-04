@@ -85,6 +85,7 @@ export const sendCampaign = createServerFn({ method: "POST" })
     let skipped = 0;
 
     for (const row of sends) {
+      if (!row.user_id) { skipped++; continue; }
       const pref = prefMap.get(row.user_id);
       if (!pref || !pref.email_opt_in) {
         await supabaseAdmin.from("campaign_sends").update({ status: "skipped", error: "opted out", sent_at: new Date().toISOString() }).eq("id", row.id);
