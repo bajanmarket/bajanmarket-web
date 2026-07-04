@@ -186,3 +186,18 @@ function F({ label, children }: { label: string; children: React.ReactNode }) {
     </label>
   );
 }
+
+function ModeratorLink() {
+  const { data } = useIsModerator();
+  if (!data?.isModerator) return null;
+  return (
+    <Link
+      to="/admin"
+      className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3"
+    >
+      <Shield className="size-5 text-navy" />
+      <span className="font-medium text-sm">Moderation panel</span>
+    </Link>
+  );
+}
+
