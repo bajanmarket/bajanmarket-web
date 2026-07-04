@@ -53,6 +53,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        if (data.user && marketingOptIn) {
+          await supabase.from("marketing_preferences").upsert({
+            user_id: data.user.id,
+            email_opt_in: true,
+            consented_at: new Date().toISOString(),
+          });
+        }
         if (!data.session) {
           toast.success("Check your email to confirm your account.");
           return;
