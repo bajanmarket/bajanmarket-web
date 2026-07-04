@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-type TargetType = "listing" | "profile";
+type TargetType = "listing" | "user";
 
 const REASONS: Record<TargetType, { value: string; label: string }[]> = {
   listing: [
