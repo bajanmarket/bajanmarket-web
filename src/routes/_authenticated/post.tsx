@@ -5,7 +5,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { PARISHES, CONDITIONS } from "@/lib/parishes";
-import { uploadImage } from "@/lib/uploadImage";
+import { uploadImage, validateImage } from "@/lib/uploadImage";
 import { useAuth } from "@/lib/useAuth";
 import { ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
