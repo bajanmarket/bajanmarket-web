@@ -115,7 +115,7 @@ function CampaignsPage() {
           body_text: bodyText,
           body_html: bodyText.replace(/\n/g, "<br/>"),
           channel: "email",
-          filters: filters as unknown as Record<string, unknown>,
+          filters: filters as unknown as never,
           status: "draft",
           recipients_count: recipientsToUse.length,
         })
