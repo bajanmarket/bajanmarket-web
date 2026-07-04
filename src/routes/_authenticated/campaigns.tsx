@@ -184,7 +184,7 @@ function CampaignsPage() {
       </div>
 
       <div className="rounded-2xl bg-sand ring-1 ring-hairline p-3 text-xs text-navy/70 mb-4">
-        Sending via Resend from <b>marketing@bajanmarket.app</b>. Drafts snapshot the recipient list — click <b>Send</b> on a draft below to deliver. Cap: {CAP} recipients per campaign.
+        Sending via Resend from <b>bajanmarket@bajmarket.app</b>. Drafts snapshot the recipient list — click <b>Send</b> on a draft below to deliver. Cap: {CAP} recipients per campaign.
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
