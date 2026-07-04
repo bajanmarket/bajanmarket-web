@@ -19,6 +19,7 @@ function Thread() {
   const { id } = Route.useParams();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const nav = useNavigate();
   const [text, setText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
