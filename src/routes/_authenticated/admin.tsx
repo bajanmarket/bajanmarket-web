@@ -6,9 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { formatRelative } from "@/lib/format";
-import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3, Users, Megaphone } from "lucide-react";
+import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3, Users, Megaphone, ShieldCheck } from "lucide-react";
 import { InsightsPanel } from "@/components/InsightsPanel";
 import { AudiencePanel } from "@/components/AudiencePanel";
+import { AdminsPanel } from "@/components/AdminsPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -32,7 +33,7 @@ type ReportRow = {
 };
 
 type Tab = "open" | "reviewing" | "resolved" | "dismissed";
-type Section = "reports" | "insights" | "audience";
+type Section = "reports" | "insights" | "audience" | "admins";
 
 function AdminPage() {
   const { data: role, isLoading: roleLoading } = useIsModerator();
@@ -176,6 +177,14 @@ function AdminPage() {
         >
           <Users className="size-3" /> Audience
         </button>
+        <button
+          onClick={() => setSection("admins")}
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+            section === "admins" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
+          }`}
+        >
+          <ShieldCheck className="size-3" /> Admins
+        </button>
         <Link
           to="/campaigns"
           className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 text-navy/60 hover:text-navy"
@@ -189,6 +198,8 @@ function AdminPage() {
         <InsightsPanel />
       ) : section === "audience" ? (
         <AudiencePanel />
+      ) : section === "admins" ? (
+        <AdminsPanel />
       ) : (
         <ReportsSection
           tab={tab}
