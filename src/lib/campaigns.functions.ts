@@ -60,14 +60,17 @@ export const sendCampaign = createServerFn({ method: "POST" })
       throw new Error(`Campaign already ${campaign.status}`);
     }
 
+    const retryableStatuses = campaign.status === "failed" ? ["queued", "failed"] : ["queued"];
     const { data: sends, error: sErr } = await supabaseAdmin
       .from("campaign_sends")
       .select("id, user_id, email, status")
       .eq("campaign_id", data.campaign_id)
-      .eq("status", "queued")
+      .in("status", retryableStatuses)
       .limit(CAP);
     if (sErr) throw new Error(sErr.message);
-    if (!sends || sends.length === 0) throw new Error("No queued recipients");
+    if (!sends || sends.length === 0) {
+      throw new Error("No recipients available to send. Save a new draft to snapshot the current audience.");
+    }
 
     // Fetch unsub tokens + names for personalization
     const userIds = Array.from(new Set(sends.map((s) => s.user_id).filter((v): v is string => !!v)));
