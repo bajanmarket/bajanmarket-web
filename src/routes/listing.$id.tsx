@@ -263,13 +263,14 @@ function ListingDetail() {
               <button onClick={share} className="bg-white ring-1 ring-hairline text-navy p-3 rounded-2xl" aria-label="Share">
                 <Share2 className="size-4" />
               </button>
-              <button onClick={report} className="bg-white ring-1 ring-hairline text-navy/60 p-3 rounded-2xl" aria-label="Report">
+              <button onClick={openReport} className="bg-white ring-1 ring-hairline text-navy/60 p-3 rounded-2xl" aria-label="Report">
                 <Flag className="size-4" />
               </button>
             </div>
           </div>
         </div>
       </div>
+      <ReportDialog open={reportOpen} onOpenChange={setReportOpen} targetType="listing" targetId={id} redirectPath={`/listing/${id}`} />
     </AppShell>
   );
 }
