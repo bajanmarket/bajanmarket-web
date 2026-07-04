@@ -14,6 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
+      campaign_sends: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          email: string
+          error: string | null
+          id: string
+          sent_at: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          email: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          email?: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          body_html: string
+          body_text: string
+          channel: string
+          created_at: string
+          created_by: string
+          failed_count: number
+          filters: Json
+          id: string
+          name: string
+          recipients_count: number
+          sent_at: string | null
+          sent_count: number
+          status: string
+          subject: string
+        }
+        Insert: {
+          body_html?: string
+          body_text?: string
+          channel?: string
+          created_at?: string
+          created_by: string
+          failed_count?: number
+          filters?: Json
+          id?: string
+          name: string
+          recipients_count?: number
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          subject: string
+        }
+        Update: {
+          body_html?: string
+          body_text?: string
+          channel?: string
+          created_at?: string
+          created_by?: string
+          failed_count?: number
+          filters?: Json
+          id?: string
+          name?: string
+          recipients_count?: number
+          sent_at?: string | null
+          sent_count?: number
+          status?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           active: boolean
