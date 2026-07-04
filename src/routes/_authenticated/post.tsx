@@ -129,7 +129,7 @@ function PostListing() {
               {files.length < 10 && (
                 <label className="aspect-square rounded-xl border-2 border-dashed border-hairline grid place-items-center cursor-pointer hover:bg-sand transition-colors">
                   <ImagePlus className="size-5 text-navy/40" />
-                  <input type="file" accept="image/*" multiple hidden onChange={(e) => addFiles(e.target.files)} />
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden onChange={(e) => addFiles(e.target.files)} />
                 </label>
               )}
             </div>
