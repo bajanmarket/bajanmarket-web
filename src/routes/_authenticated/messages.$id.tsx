@@ -44,7 +44,7 @@ function Thread() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("messages")
-        .select("id, sender_id, body, created_at, read_at")
+        .select("id, sender_id, body, created_at, read_at, delivered_at")
         .eq("conversation_id", id)
         .order("created_at");
       if (error) throw error;
