@@ -6,10 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { formatRelative } from "@/lib/format";
-import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3, Users, Megaphone, ShieldCheck } from "lucide-react";
+import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3, Users, Megaphone, ShieldCheck, Store } from "lucide-react";
 import { InsightsPanel } from "@/components/InsightsPanel";
 import { AudiencePanel } from "@/components/AudiencePanel";
 import { AdminsPanel } from "@/components/AdminsPanel";
+import { BusinessesPanel } from "@/components/BusinessesPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -33,7 +34,7 @@ type ReportRow = {
 };
 
 type Tab = "open" | "reviewing" | "resolved" | "dismissed";
-type Section = "reports" | "insights" | "audience" | "admins";
+type Section = "reports" | "insights" | "audience" | "admins" | "businesses";
 
 function AdminPage() {
   const { data: role, isLoading: roleLoading } = useIsModerator();
@@ -185,6 +186,14 @@ function AdminPage() {
         >
           <ShieldCheck className="size-3" /> Admins
         </button>
+        <button
+          onClick={() => setSection("businesses")}
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+            section === "businesses" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
+          }`}
+        >
+          <Store className="size-3" /> Businesses
+        </button>
         <Link
           to="/campaigns"
           className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 text-navy/60 hover:text-navy"
@@ -200,6 +209,8 @@ function AdminPage() {
         <AudiencePanel />
       ) : section === "admins" ? (
         <AdminsPanel />
+      ) : section === "businesses" ? (
+        <BusinessesPanel />
       ) : (
         <ReportsSection
           tab={tab}

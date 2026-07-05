@@ -14,6 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_reviews: {
+        Row: {
+          body: string | null
+          business_id: string
+          created_at: string
+          id: string
+          rating: number
+          reviewer_id: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          business_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          reviewer_id: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          business_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewer_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          address: string | null
+          banner_url: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          hours: Json | null
+          id: string
+          logo_url: string | null
+          name: string
+          owner_id: string
+          parish: string | null
+          rejection_reason: string | null
+          slug: string
+          status: string
+          tagline: string | null
+          updated_at: string
+          website: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          banner_url?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          hours?: Json | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          parish?: string | null
+          rejection_reason?: string | null
+          slug: string
+          status?: string
+          tagline?: string | null
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          banner_url?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          hours?: Json | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          parish?: string | null
+          rejection_reason?: string | null
+          slug?: string
+          status?: string
+          tagline?: string | null
+          updated_at?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       campaign_sends: {
         Row: {
           campaign_id: string
