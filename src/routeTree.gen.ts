@@ -20,12 +20,14 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyListingsRouteImport } from './routes/_authenticated/my-listings'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedFavouritesRouteImport } from './routes/_authenticated/favourites'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
+import { Route as AuthenticatedBusinessRouteImport } from './routes/_authenticated/business'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
 import { Route as AuthenticatedMessagesIdRouteImport } from './routes/_authenticated/messages.$id'
@@ -84,6 +86,11 @@ const ListingIdRoute = ListingIdRouteImport.update({
   path: '/listing/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BusinessSlugRoute = BusinessSlugRouteImport.update({
+  id: '/business/$slug',
+  path: '/business/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -114,6 +121,11 @@ const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
   path: '/campaigns',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBusinessRoute = AuthenticatedBusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -141,12 +153,14 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/business': typeof AuthenticatedBusinessRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
   '/favourites': typeof AuthenticatedFavouritesRoute
   '/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/my-listings': typeof AuthenticatedMyListingsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
@@ -162,11 +176,13 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/business': typeof AuthenticatedBusinessRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
   '/favourites': typeof AuthenticatedFavouritesRoute
   '/my-listings': typeof AuthenticatedMyListingsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
@@ -184,12 +200,14 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/business': typeof AuthenticatedBusinessRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
   '/_authenticated/favourites': typeof AuthenticatedFavouritesRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/_authenticated/my-listings': typeof AuthenticatedMyListingsRoute
   '/_authenticated/post': typeof AuthenticatedPostRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/_authenticated/messages/$id': typeof AuthenticatedMessagesIdRoute
@@ -207,12 +225,14 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/admin'
+    | '/business'
     | '/campaigns'
     | '/favourites'
     | '/messages'
     | '/my-listings'
     | '/post'
     | '/profile'
+    | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/messages/$id'
@@ -228,11 +248,13 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/admin'
+    | '/business'
     | '/campaigns'
     | '/favourites'
     | '/my-listings'
     | '/post'
     | '/profile'
+    | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/messages/$id'
@@ -249,12 +271,14 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/_authenticated/admin'
+    | '/_authenticated/business'
     | '/_authenticated/campaigns'
     | '/_authenticated/favourites'
     | '/_authenticated/messages'
     | '/_authenticated/my-listings'
     | '/_authenticated/post'
     | '/_authenticated/profile'
+    | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/_authenticated/messages/$id'
@@ -271,6 +295,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  BusinessSlugRoute: typeof BusinessSlugRoute
   ListingIdRoute: typeof ListingIdRoute
   SellerIdRoute: typeof SellerIdRoute
 }
@@ -354,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/business/$slug': {
+      id: '/business/$slug'
+      path: '/business/$slug'
+      fullPath: '/business/$slug'
+      preLoaderRoute: typeof BusinessSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -394,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/campaigns'
       fullPath: '/campaigns'
       preLoaderRoute: typeof AuthenticatedCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/business': {
+      id: '/_authenticated/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof AuthenticatedBusinessRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
@@ -437,6 +476,7 @@ const AuthenticatedMessagesRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedBusinessRoute: typeof AuthenticatedBusinessRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
   AuthenticatedFavouritesRoute: typeof AuthenticatedFavouritesRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRouteWithChildren
@@ -447,6 +487,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedBusinessRoute: AuthenticatedBusinessRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
   AuthenticatedFavouritesRoute: AuthenticatedFavouritesRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRouteWithChildren,
@@ -468,6 +509,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  BusinessSlugRoute: BusinessSlugRoute,
   ListingIdRoute: ListingIdRoute,
   SellerIdRoute: SellerIdRoute,
 }

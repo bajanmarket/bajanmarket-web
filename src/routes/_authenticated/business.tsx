@@ -73,7 +73,7 @@ function BusinessManager() {
         parish: biz.parish ?? "",
         logo_url: biz.logo_url,
         banner_url: biz.banner_url,
-        hours: { ...DEFAULT_HOURS, ...(biz.hours ?? {}) } as HoursMap,
+        hours: { ...DEFAULT_HOURS, ...((biz.hours as Partial<HoursMap> | null) ?? {}) } as HoursMap,
       });
       setSlugTouched(true);
     }
