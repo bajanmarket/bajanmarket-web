@@ -6,9 +6,11 @@ import { AppShell } from "@/components/AppShell";
 import { formatBBD, formatRelative, initials } from "@/lib/format";
 import { parishLabel, conditionLabel } from "@/lib/parishes";
 import { useAuth } from "@/lib/useAuth";
-import { Heart, Share2, Flag, MessageCircle, Eye, ImageOff } from "lucide-react";
+import { Heart, Flag, MessageCircle, Eye, ImageOff } from "lucide-react";
 import { toast } from "sonner";
 import { ReportDialog } from "@/components/ReportDialog";
+import { ShareMenu } from "@/components/ShareMenu";
+import { sharePrefill } from "@/lib/share";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
