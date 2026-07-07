@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
+import { captureShareVisit } from "@/lib/shareVisit";
 
 function NotFoundComponent() {
   return (
@@ -140,6 +141,11 @@ function RootComponent() {
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+
+  useEffect(() => {
+    captureShareVisit();
+    return router.subscribe("onResolved", () => captureShareVisit());
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
