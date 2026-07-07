@@ -1,6 +1,24 @@
 import { useState, type ReactNode } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Share2, Link2, MessageCircle, Facebook as FacebookIcon, Twitter as TwitterIcon, Instagram as InstagramIcon, Share } from "lucide-react";
+import { Share2, Link2, MessageCircle, Share } from "lucide-react";
+
+const FacebookIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.3-1.5 1.6-1.5h1.7V4.6c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.7V14h2.7v8h3.1z" />
+  </svg>
+);
+const TwitterIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+    <path d="M17.5 3h3.1l-6.8 7.7L22 21h-6.3l-4.9-6.5L5 21H1.9l7.3-8.3L1.6 3H8l4.5 5.9L17.5 3zm-1.1 16.2h1.7L7.7 4.7H5.9l10.5 14.5z" />
+  </svg>
+);
+const InstagramIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+  </svg>
+);
 import { toast } from "sonner";
 import { shareLinks, withUtm, type ShareSource, type ShareChannel } from "@/lib/share";
 
