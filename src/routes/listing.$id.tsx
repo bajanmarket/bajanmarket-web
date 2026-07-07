@@ -166,13 +166,8 @@ function ListingDetail() {
   const currentUrl = gallery[activeImg]?.url;
   const seller = data.seller;
 
-  const share = async () => {
-    const url = window.location.href;
-    try {
-      if (navigator.share) await navigator.share({ title: data.title, url });
-      else { await navigator.clipboard.writeText(url); toast.success("Link copied"); }
-    } catch { /* dismissed */ }
-  };
+  const shareUrl = `${SITE_URL}/listing/${id}`;
+  const shareText = sharePrefill("listing", { title: data.title, price: formatBBD(data.price, data.currency) });
 
   const openReport = () => {
     if (!user) { nav({ to: "/auth", search: { redirect: `/listing/${id}` } }); return; }
@@ -271,9 +266,7 @@ function ListingDetail() {
                 <MessageCircle className="size-4" />
                 {data.status === "sold" ? "Sold" : "Message seller"}
               </button>
-              <button onClick={share} className="bg-white ring-1 ring-hairline text-navy p-3 rounded-2xl" aria-label="Share">
-                <Share2 className="size-4" />
-              </button>
+              <ShareMenu url={shareUrl} title={data.title} text={shareText} source="listing" />
               <button onClick={openReport} className="bg-white ring-1 ring-hairline text-navy/60 p-3 rounded-2xl" aria-label="Report">
                 <Flag className="size-4" />
               </button>
