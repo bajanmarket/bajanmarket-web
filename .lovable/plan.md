@@ -1,107 +1,84 @@
-## Marketing & outreach data collection
+## Social sharing for buyers & sellers
 
-Add four capabilities so you can legally and effectively promote to your users. Everything is opt-in and admin-only for reading in aggregate.
+Add first-class sharing to WhatsApp, Facebook, Instagram Stories, and X across the four highest-leverage surfaces. Include branded auto-generated preview images and UTM tags so we can see which channel drives traffic.
 
-### 1. Marketing consent + channel preferences
+### 1. Reusable `<ShareMenu />` component
 
-New table `public.marketing_preferences` (one row per user):
-- `user_id` (PK, references auth.users)
-- `email_opt_in` bool, default false
-- `sms_opt_in` bool, default false
-- `whatsapp_opt_in` bool, default false
-- `whatsapp_number` text (nullable, distinct from `profile_private.phone`)
-- `marketing_email` text (nullable — lets users route promos to a different address than their login email)
-- `unsubscribe_token` uuid, default `gen_random_uuid()` (for one-click unsubscribe links)
-- `consented_at`, `updated_at`
+New `src/components/ShareMenu.tsx` — a popover (shadcn `Popover`) triggered by any share button. Props: `url`, `title`, `text`, `image?`, `source` ("listing" | "storefront" | "seller" | "my_listings" | "post_success").
 
-RLS: user reads/writes own row; admin/moderator can SELECT all.
+Buttons inside:
+- **WhatsApp** → `https://wa.me/?text=<encoded title + url>` (opens WhatsApp Web / app deep link, works on Bajan mobile).
+- **Facebook** → `https://www.facebook.com/sharer/sharer.php?u=<url>`.
+- **X** → `https://twitter.com/intent/tweet?text=<title>&url=<url>`.
+- **Instagram Stories** → mobile: attempt `instagram-stories://share?...` deep link with the OG image; desktop / fallback: copy link + toast "Open Instagram and paste in your story" (Instagram has no public web share intent).
+- **Copy link** (always).
+- **Native share** button when `navigator.share` exists (mobile OS sheet — covers everything else).
 
-UI:
-- New "Communication preferences" card on `/profile` (below the settings form) with three toggles + WhatsApp number + alt email fields.
-- Signup form on `/auth` gets an unchecked "Send me tips and promos from Bajan.market" checkbox that seeds `email_opt_in`.
+Every outbound URL is built through a `withUtm(url, source, medium)` helper that appends `utm_source=<whatsapp|facebook|x|instagram|copy|native>`, `utm_medium=share`, `utm_campaign=<source>` (e.g. `listing_share`).
 
-### 2. Engagement snapshot on profile
+### 2. Where the share menu appears
 
-Extend `public.profiles` with cached counters + activity timestamps so admins can segment without heavy joins:
-- `last_active_at` timestamptz (bumped on any listing/message/favourite write via triggers, plus on session refresh)
-- `listings_count` int default 0
-- `favourites_count` int default 0
-- `messages_sent_count` int default 0
-- `first_listing_at`, `first_message_at` timestamptz (nullable)
+- **Listing detail (`src/routes/listing.$id.tsx`)** — replace the current `Share2` icon-only button with the `ShareMenu` trigger. Passes listing title, price-included text, and the auto-generated OG image URL.
+- **My Listings (`src/routes/_authenticated/my-listings.tsx`)** — add a small share icon on each listing card row so sellers can re-share anytime.
+- **Post-listing success** — after a successful publish in `src/routes/_authenticated/post.tsx`, instead of navigating straight away, show a success screen ("Your listing is live") with the new listing's cover, a prominent `ShareMenu` inline (not a popover — buttons laid out), plus "View listing" and "Post another" actions.
+- **Seller profile (`src/routes/seller.$id.tsx`)** and **Business storefront (`src/routes/business.$slug.tsx`)** — add a share button in the header area next to the follow/contact controls.
 
-Maintained by three simple AFTER INSERT triggers on `listings`, `favourites`, `messages` that increment counters and set the "first_*" timestamps on first write. `last_active_at` also bumped by a lightweight client ping (already have session state).
+### 3. Auto-generated share images (OG)
 
-### 3. Interest tags (auto-derived, no user input)
+Serve a per-entity PNG at stable URLs:
+- `/api/public/og/listing/$id.png`
+- `/api/public/og/business/$slug.png`
+- `/api/public/og/seller/$id.png`
 
-New view (or materialised view refreshed nightly) `public.user_interest_tags`:
-- Aggregates each user's top 3 categories across favourites, search_events, and their own listings.
-- Columns: `user_id`, `top_categories text[]`, `top_parishes text[]`, `computed_at`.
+Implementation: new server routes under `src/routes/api/public/og.*.ts` that render a 1200x630 branded PNG using `satori` + `@resvg/resvg-js` (both Worker-compatible, pure JS/WASM). Card layout:
+- Left: entity photo (listing cover / business banner or logo / seller avatar) fetched via `fetch` and inlined.
+- Right: title, price (listing) or business name / seller name, parish chip, small "bajan.market" wordmark bottom-right, coral accent bar.
+- Cache: `Cache-Control: public, max-age=3600, s-maxage=86400` and set `ETag` from a hash of the source fields so refreshes are cheap.
+- Errors → fall back to a static branded `/og-default.png` so crawlers never see a broken image.
 
-Admin-only SELECT. Feeds segmentation like "users interested in Electronics in St. Michael".
+The route `head()` on listing/business/seller pages sets `og:image` and `twitter:image` to the absolute `https://bajan.market/api/public/og/...png` URL (built server-side using existing `getRequestOrigin` pattern, hardcoded to bajan.market in production).
 
-### 4. Onboarding survey
+Tell the user: crawlers cache previews — they can force a refresh in Facebook Sharing Debugger / WhatsApp by re-sharing after ~24h.
 
-Single lightweight step shown once after first signup (before landing on `/`):
-- "What brings you to Bajan.market?" — Buying / Selling / Both (radio)
-- "Which categories interest you?" — multiselect chips from existing `categories` table (max 3)
+### 4. UTM tracking, lightly
 
-Stored on `profiles`:
-- `onboarding_intent text` (`buyer` | `seller` | `both` | null)
-- `onboarding_categories text[]` (category slugs)
-- `onboarded_at timestamptz`
+- `withUtm()` helper in `src/lib/share.ts` — used by every share URL.
+- Extend the existing `search_events` / analytics path: on any page load where `utm_source` is present in the URL, fire `logShareVisit({ path, utm_source, utm_medium, utm_campaign })` into a new small table `public.share_visits` (columns: path, utm_source, utm_medium, utm_campaign, referrer, created_at). Admin/moderator-only SELECT; anon INSERT via a `log_share_visit` SECURITY DEFINER RPC to avoid exposing the table.
+- No admin dashboard in this pass — just capture the data so we can query it later. (Optional follow-up: add a "Share attribution" card to the Insights panel.)
 
-Skippable. Presence of `onboarded_at` gates the modal.
+### 5. Copy tone
 
-### 5. Admin: Audience tab
-
-Extend `/admin` with a new **Audience** tab (moderator/admin only) showing:
-- Total users, opt-in counts per channel
-- Segment builder: filter by parish, intent, top category, activity (last 7/30d), opt-in channel
-- Export selected segment as CSV (email + display_name + parish + top_categories) — for pasting into your ESP
-
-Uses a new `getAudienceSegment` server fn (`requireSupabaseAuth` + `has_role('moderator')` check) that joins profiles + marketing_preferences + user_interest_tags with the chosen filters.
+Prefilled share text per source:
+- Listing: `"{title} — {price} on Bajan.market"`
+- Business: `"Check out {name} on Bajan.market"`
+- Seller: `"{name}'s listings on Bajan.market"`
 
 ### Technical section
 
-**Migrations (single SQL, in order):**
+**Packages to add:** `satori`, `@resvg/resvg-js` (WASM build works on Cloudflare Workers).
 
-```text
-1. CREATE TABLE public.marketing_preferences (...)
-   GRANT SELECT, INSERT, UPDATE ON public.marketing_preferences TO authenticated;
-   GRANT ALL ON public.marketing_preferences TO service_role;
-   ALTER TABLE ... ENABLE RLS;
-   Policies:
-     - own_read: user_id = auth.uid()
-     - own_write: user_id = auth.uid()
-     - admin_read: has_role(auth.uid(), 'moderator')
+**New files:**
+- `src/components/ShareMenu.tsx`
+- `src/lib/share.ts` (URL builders, `withUtm`, prefill text helpers)
+- `src/lib/shareVisit.ts` (client-side UTM capture, called from `__root.tsx` on route change)
+- `src/routes/api/public/og.listing.$id[.]png.ts`
+- `src/routes/api/public/og.business.$slug[.]png.ts`
+- `src/routes/api/public/og.seller.$id[.]png.ts`
+- `src/lib/og-render.server.ts` (shared satori/resvg renderer + font loading)
+- `public/og-default.png` (agent-generated branded fallback)
 
-2. ALTER TABLE public.profiles ADD COLUMN last_active_at, listings_count,
-   favourites_count, messages_sent_count, first_listing_at, first_message_at,
-   onboarding_intent, onboarding_categories, onboarded_at.
+**Edited files:**
+- `src/routes/listing.$id.tsx` — swap share icon → `<ShareMenu />`, point `og:image` at `/api/public/og/listing/$id.png`.
+- `src/routes/business.$slug.tsx` — add share button in header, set `og:image` to `/api/public/og/business/$slug.png` (and set proper per-route `head()` if not already).
+- `src/routes/seller.$id.tsx` — add share button in header, set `og:image` to `/api/public/og/seller/$id.png`.
+- `src/routes/_authenticated/my-listings.tsx` — add per-row share button.
+- `src/routes/_authenticated/post.tsx` — success step with inline share UI.
+- `src/routes/__root.tsx` — mount UTM capture on route changes.
 
-3. CREATE OR REPLACE FUNCTION bump_profile_counters_* (three functions,
-   SECURITY DEFINER, search_path=public) + AFTER INSERT triggers on
-   listings/favourites/messages.
+**Migration:**
+1. `CREATE TABLE public.share_visits (id, path text, utm_source text, utm_medium text, utm_campaign text, referrer text, created_at timestamptz default now())` + GRANTs (`SELECT` to authenticated for admin panel; no direct INSERT), RLS enabled, admin/moderator SELECT policy via `has_role`.
+2. `CREATE FUNCTION public.log_share_visit(...) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public` — inserts a row; `GRANT EXECUTE ... TO anon, authenticated`.
 
-4. CREATE VIEW public.user_interest_tags AS <aggregate query>;
-   GRANT SELECT ON public.user_interest_tags TO authenticated;
-   (View inherits RLS from underlying tables; wrap access behind the
-   admin-only server fn.)
-```
+**Instagram note:** true Stories sharing requires the native app — the deep-link attempt + copy-to-clipboard fallback is the standard web pattern; no OAuth or Meta app needed.
 
-**Files:**
-- New: `src/components/MarketingPrefs.tsx`, `src/components/OnboardingModal.tsx`, `src/components/AudiencePanel.tsx`, `src/lib/audience.functions.ts`, `src/lib/lastActive.ts` (client heartbeat).
-- Edit: `src/routes/_authenticated/profile.tsx` (add prefs card), `src/routes/auth.tsx` (opt-in checkbox on signup + write to `marketing_preferences` after account creation), `src/routes/_authenticated/route.tsx` or `__root.tsx` (mount onboarding modal when `onboarded_at is null`), `src/routes/_authenticated/admin.tsx` (add Audience tab).
-
-**Consent + privacy:**
-- Defaults are all `false`. No pre-checked marketing boxes.
-- Signup checkbox stores explicit `consented_at`.
-- Unsubscribe tokens allow one-click opt-out links in future emails.
-- Update `/privacy` page copy to disclose the new fields, purposes, and retention. (Copy edit only, listed under files above once approved.)
-
-### Out of scope for this plan
-- Actual email/SMS sending (needs an ESP + custom sender domain — separate step).
-- Campaign builder / scheduling.
-- Listing view tracking per user (item 5 from the earlier suggestions).
-- Referral / UTM capture (item 6).
-- Neighbourhood-level location (item 7).
+**Out of scope:** admin analytics dashboard for share_visits, Pinterest / LinkedIn / Reddit, sharing individual reviews, referral rewards.
