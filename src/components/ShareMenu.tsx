@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Share2, Copy, Link2, MessageCircle, Facebook, Twitter, Instagram, Share } from "lucide-react";
+import { Share2, Link2, MessageCircle, Facebook as FacebookIcon, Twitter as TwitterIcon, Instagram as InstagramIcon, Share } from "lucide-react";
 import { toast } from "sonner";
 import { shareLinks, withUtm, type ShareSource, type ShareChannel } from "@/lib/share";
 
@@ -59,9 +59,9 @@ export function ShareMenu({ url, title, text, source, inline, trigger, className
   const buttons = (
     <div className="grid grid-cols-4 gap-2">
       <ChannelButton icon={<MessageCircle className="size-5" />} label="WhatsApp" onClick={() => openChannel("whatsapp", links.whatsapp)} tint="bg-[#25D366]/10 text-[#128C7E]" />
-      <ChannelButton icon={<Facebook className="size-5" />} label="Facebook" onClick={() => openChannel("facebook", links.facebook)} tint="bg-[#1877F2]/10 text-[#1877F2]" />
-      <ChannelButton icon={<Instagram className="size-5" />} label="Instagram" onClick={instagram} tint="bg-gradient-to-br from-[#F58529]/15 to-[#DD2A7B]/15 text-[#C13584]" />
-      <ChannelButton icon={<Twitter className="size-5" />} label="X" onClick={() => openChannel("x", links.x)} tint="bg-navy/5 text-navy" />
+      <ChannelButton icon={<FacebookIcon className="size-5" />} label="Facebook" onClick={() => openChannel("facebook", links.facebook)} tint="bg-[#1877F2]/10 text-[#1877F2]" />
+      <ChannelButton icon={<InstagramIcon className="size-5" />} label="Instagram" onClick={instagram} tint="bg-gradient-to-br from-[#F58529]/15 to-[#DD2A7B]/15 text-[#C13584]" />
+      <ChannelButton icon={<TwitterIcon className="size-5" />} label="X" onClick={() => openChannel("x", links.x)} tint="bg-navy/5 text-navy" />
       <ChannelButton icon={<Link2 className="size-5" />} label="Copy" onClick={copy} tint="bg-sand text-navy/70" />
       {hasNative && (
         <ChannelButton icon={<Share className="size-5" />} label="More" onClick={native} tint="bg-sand text-navy/70" />

@@ -13,8 +13,8 @@ export function captureShareVisit() {
     if (SEEN.has(key)) return;
     SEEN.add(key);
 
-    const medium = url.searchParams.get("utm_medium");
-    const campaign = url.searchParams.get("utm_campaign");
+    const medium = url.searchParams.get("utm_medium") ?? "";
+    const campaign = url.searchParams.get("utm_campaign") ?? "";
     const referrer = typeof document !== "undefined" ? document.referrer : "";
 
     supabase.rpc("log_share_visit", {
