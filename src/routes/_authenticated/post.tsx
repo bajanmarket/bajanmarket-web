@@ -12,6 +12,10 @@ import { ImagePlus, X, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { SellerOnboarding } from "@/components/SellerOnboarding";
 import { suggestListingFromImage } from "@/lib/ai-listing.functions";
+import { ShareMenu } from "@/components/ShareMenu";
+import { sharePrefill, SITE_URL } from "@/lib/share";
+import { formatBBD } from "@/lib/format";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/post")({
   head: () => ({ meta: [{ title: "Post a listing — Bajan.market" }] }),
@@ -57,6 +61,7 @@ function PostListing() {
   const [formKey, setFormKey] = useState(0);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiHint, setAiHint] = useState("");
+  const [posted, setPosted] = useState<{ id: string; title: string; price: number; cover_url: string | null } | null>(null);
   const suggest = useServerFn(suggestListingFromImage);
 
   const { data: cats } = useQuery({
@@ -138,7 +143,12 @@ function PostListing() {
         );
       }
       toast.success("Listing posted!");
-      nav({ to: "/listing/$id", params: { id: listing.id } });
+      setPosted({ id: listing.id, title: parsed.data.title, price: parsed.data.price, cover_url: urls[0] });
+      // Reset the form so "Post another" starts clean
+      setFiles([]);
+      setDefaults(EMPTY);
+      setFormKey((k) => k + 1);
+      if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
