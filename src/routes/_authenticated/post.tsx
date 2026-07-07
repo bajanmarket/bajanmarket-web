@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -53,7 +53,7 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 function PostListing() {
-  const nav = useNavigate();
+  
   const { user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
