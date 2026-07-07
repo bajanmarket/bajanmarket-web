@@ -168,6 +168,56 @@ function PostListing() {
     setFiles((prev) => [...prev, ...accepted].slice(0, 10));
   };
 
+  if (posted) {
+    return (
+      <AppShell>
+        <div className="max-w-xl mx-auto">
+          <div className="bg-white rounded-3xl ring-1 ring-hairline p-6 sm:p-8 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full bg-teal-soft text-teal px-3 py-1 text-[11px] font-semibold uppercase tracking-wider">Live</div>
+            <h1 className="text-2xl font-medium mt-3">Your listing is live</h1>
+            <p className="text-sm text-navy/60 mt-1">Share it around — the more eyes, the faster it sells.</p>
+
+            <div className="mt-5 flex items-center gap-3 p-3 bg-sand rounded-2xl text-left">
+              <div className="size-14 rounded-xl bg-sand-deep overflow-hidden shrink-0">
+                {posted.cover_url && <img src={posted.cover_url} alt="" className="w-full h-full object-cover" />}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium truncate">{posted.title}</div>
+                <div className="text-xs text-navy/60">{formatBBD(posted.price, "BBD")}</div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <ShareMenu
+                inline
+                url={`${SITE_URL}/listing/${posted.id}`}
+                title={posted.title}
+                text={sharePrefill("post_success", { title: posted.title, price: formatBBD(posted.price, "BBD") })}
+                source="post_success"
+              />
+            </div>
+
+            <div className="mt-6 flex gap-2">
+              <Link
+                to="/listing/$id"
+                params={{ id: posted.id }}
+                className="flex-1 bg-navy text-white rounded-2xl py-3 text-sm font-semibold"
+              >
+                View listing
+              </Link>
+              <button
+                onClick={() => setPosted(null)}
+                className="flex-1 bg-white ring-1 ring-hairline text-navy rounded-2xl py-3 text-sm font-semibold"
+              >
+                Post another
+              </button>
+            </div>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto">
