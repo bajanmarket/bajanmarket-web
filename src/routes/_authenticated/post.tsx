@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -12,6 +12,10 @@ import { ImagePlus, X, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { SellerOnboarding } from "@/components/SellerOnboarding";
 import { suggestListingFromImage } from "@/lib/ai-listing.functions";
+import { ShareMenu } from "@/components/ShareMenu";
+import { sharePrefill, SITE_URL } from "@/lib/share";
+import { formatBBD } from "@/lib/format";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/post")({
   head: () => ({ meta: [{ title: "Post a listing — Bajan.market" }] }),
@@ -49,7 +53,7 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 function PostListing() {
-  const nav = useNavigate();
+  
   const { user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
@@ -57,6 +61,7 @@ function PostListing() {
   const [formKey, setFormKey] = useState(0);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiHint, setAiHint] = useState("");
+  const [posted, setPosted] = useState<{ id: string; title: string; price: number; cover_url: string | null } | null>(null);
   const suggest = useServerFn(suggestListingFromImage);
 
   const { data: cats } = useQuery({
@@ -138,7 +143,12 @@ function PostListing() {
         );
       }
       toast.success("Listing posted!");
-      nav({ to: "/listing/$id", params: { id: listing.id } });
+      setPosted({ id: listing.id, title: parsed.data.title, price: parsed.data.price, cover_url: urls[0] });
+      // Reset the form so "Post another" starts clean
+      setFiles([]);
+      setDefaults(EMPTY);
+      setFormKey((k) => k + 1);
+      if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -157,6 +167,56 @@ function PostListing() {
     }
     setFiles((prev) => [...prev, ...accepted].slice(0, 10));
   };
+
+  if (posted) {
+    return (
+      <AppShell>
+        <div className="max-w-xl mx-auto">
+          <div className="bg-white rounded-3xl ring-1 ring-hairline p-6 sm:p-8 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full bg-teal-soft text-teal px-3 py-1 text-[11px] font-semibold uppercase tracking-wider">Live</div>
+            <h1 className="text-2xl font-medium mt-3">Your listing is live</h1>
+            <p className="text-sm text-navy/60 mt-1">Share it around — the more eyes, the faster it sells.</p>
+
+            <div className="mt-5 flex items-center gap-3 p-3 bg-sand rounded-2xl text-left">
+              <div className="size-14 rounded-xl bg-sand-deep overflow-hidden shrink-0">
+                {posted.cover_url && <img src={posted.cover_url} alt="" className="w-full h-full object-cover" />}
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium truncate">{posted.title}</div>
+                <div className="text-xs text-navy/60">{formatBBD(posted.price, "BBD")}</div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <ShareMenu
+                inline
+                url={`${SITE_URL}/listing/${posted.id}`}
+                title={posted.title}
+                text={sharePrefill("post_success", { title: posted.title, price: formatBBD(posted.price, "BBD") })}
+                source="post_success"
+              />
+            </div>
+
+            <div className="mt-6 flex gap-2">
+              <Link
+                to="/listing/$id"
+                params={{ id: posted.id }}
+                className="flex-1 bg-navy text-white rounded-2xl py-3 text-sm font-semibold"
+              >
+                View listing
+              </Link>
+              <button
+                onClick={() => setPosted(null)}
+                className="flex-1 bg-white ring-1 ring-hairline text-navy rounded-2xl py-3 text-sm font-semibold"
+              >
+                Post another
+              </button>
+            </div>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>

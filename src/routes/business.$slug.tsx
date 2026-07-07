@@ -8,6 +8,8 @@ import { useAuth } from "@/lib/useAuth";
 import { parishLabel } from "@/lib/parishes";
 import { Mail, Phone, MessageCircle, Globe, MapPin, Clock, Star, Store } from "lucide-react";
 import { toast } from "sonner";
+import { ShareMenu } from "@/components/ShareMenu";
+import { sharePrefill } from "@/lib/share";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
@@ -154,11 +156,19 @@ function BusinessPage() {
               {business.parish && <span>{parishLabel(business.parish)}</span>}
             </div>
           </div>
-          {isOwner && (
-            <Link to="/business" className="text-xs bg-sand ring-1 ring-hairline rounded-full px-3 py-1.5">
-              Edit storefront
-            </Link>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            <ShareMenu
+              url={`${SITE_URL}/business/${slug}`}
+              title={business.name}
+              text={sharePrefill("storefront", { title: business.name, name: business.name })}
+              source="storefront"
+            />
+            {isOwner && (
+              <Link to="/business" className="text-xs bg-sand ring-1 ring-hairline rounded-full px-3 py-1.5">
+                Edit storefront
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 

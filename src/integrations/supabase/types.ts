@@ -625,6 +625,36 @@ export type Database = {
         }
         Relationships: []
       }
+      share_visits: {
+        Row: {
+          created_at: string
+          id: string
+          path: string
+          referrer: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path: string
+          referrer?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path?: string
+          referrer?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -660,6 +690,16 @@ export type Database = {
       }
       increment_listing_view: {
         Args: { _listing_id: string }
+        Returns: undefined
+      }
+      log_share_visit: {
+        Args: {
+          _path: string
+          _referrer: string
+          _utm_campaign: string
+          _utm_medium: string
+          _utm_source: string
+        }
         Returns: undefined
       }
     }

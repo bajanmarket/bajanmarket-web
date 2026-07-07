@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Trash2, CheckCircle2 } from "lucide-react";
+import { Trash2, CheckCircle2, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/useAuth";
 import { formatBBD } from "@/lib/format";
 import { toast } from "sonner";
+import { ShareMenu } from "@/components/ShareMenu";
+import { sharePrefill } from "@/lib/share";
+import { SITE_URL } from "@/lib/share";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -94,6 +97,17 @@ function MyListings() {
                 <option value="paused">Paused</option>
                 <option value="sold">Sold</option>
               </select>
+              <ShareMenu
+                url={`${SITE_URL}/listing/${l.id}`}
+                title={l.title}
+                text={sharePrefill("my_listings", { title: l.title, price: formatBBD(l.price, l.currency) })}
+                source="my_listings"
+                trigger={
+                  <button className="p-1.5 rounded-full text-navy/60 hover:bg-sand" aria-label="Share listing" title="Share">
+                    <Share2 className="size-4" />
+                  </button>
+                }
+              />
               {l.status !== "sold" && (
                 <button
                   onClick={() => setStatus(l.id, "sold")}

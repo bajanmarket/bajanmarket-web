@@ -9,6 +9,8 @@ import { parishLabel } from "@/lib/parishes";
 import { useAuth } from "@/lib/useAuth";
 import { ReportDialog } from "@/components/ReportDialog";
 import { Flag } from "lucide-react";
+import { ShareMenu } from "@/components/ShareMenu";
+import { sharePrefill } from "@/lib/share";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
@@ -90,19 +92,27 @@ function Seller() {
           </div>
           {profile.bio && <p className="text-sm text-navy/70 mt-2 max-w-md">{profile.bio}</p>}
         </div>
-        {user?.id !== profile.id && (
-          <button
-            onClick={() => {
-              if (!user) { nav({ to: "/auth", search: { redirect: `/seller/${id}` } }); return; }
-              setReportOpen(true);
-            }}
-            className="ring-1 ring-hairline text-navy/60 hover:text-navy p-2.5 rounded-2xl shrink-0"
-            aria-label="Report seller"
-            title="Report seller"
-          >
-            <Flag className="size-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          <ShareMenu
+            url={`${SITE_URL}/seller/${id}`}
+            title={profile.display_name ?? "Seller"}
+            text={sharePrefill("seller", { title: profile.display_name ?? "Seller", name: profile.display_name ?? undefined })}
+            source="seller"
+          />
+          {user?.id !== profile.id && (
+            <button
+              onClick={() => {
+                if (!user) { nav({ to: "/auth", search: { redirect: `/seller/${id}` } }); return; }
+                setReportOpen(true);
+              }}
+              className="ring-1 ring-hairline text-navy/60 hover:text-navy p-3 rounded-2xl"
+              aria-label="Report seller"
+              title="Report seller"
+            >
+              <Flag className="size-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <ReportDialog open={reportOpen} onOpenChange={setReportOpen} targetType="user" targetId={id} redirectPath={`/seller/${id}`} />
