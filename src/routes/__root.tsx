@@ -145,7 +145,11 @@ function RootComponent() {
 
   useEffect(() => {
     captureShareVisit();
-    return router.subscribe("onResolved", () => captureShareVisit());
+    emitEvent("PageViewed");
+    return router.subscribe("onResolved", () => {
+      captureShareVisit();
+      emitEvent("PageViewed");
+    });
   }, [router]);
 
   return (
