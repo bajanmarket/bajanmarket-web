@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      attribution_campaigns: {
+        Row: {
+          archived_at: string | null
+          channel: string
+          code: string
+          cost_cents: number
+          created_at: string
+          destination_path: string
+          id: string
+          name: string
+          notes: string | null
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          channel: string
+          code: string
+          cost_cents?: number
+          created_at?: string
+          destination_path?: string
+          id?: string
+          name: string
+          notes?: string | null
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          channel?: string
+          code?: string
+          cost_cents?: number
+          created_at?: string
+          destination_path?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       business_reviews: {
         Row: {
           body: string | null
@@ -237,6 +279,266 @@ export type Database = {
           name?: string
           slug?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      ci_category_stats: {
+        Row: {
+          active_inventory: number
+          avg_price_cents: number | null
+          avg_time_to_sell_hours: number | null
+          category_id: string
+          median_price_cents: number | null
+          recommended_post_dow: number | null
+          recommended_post_hour: number | null
+          recommended_price_cents: number | null
+          trending_score: number
+          updated_at: string
+        }
+        Insert: {
+          active_inventory?: number
+          avg_price_cents?: number | null
+          avg_time_to_sell_hours?: number | null
+          category_id: string
+          median_price_cents?: number | null
+          recommended_post_dow?: number | null
+          recommended_post_hour?: number | null
+          recommended_price_cents?: number | null
+          trending_score?: number
+          updated_at?: string
+        }
+        Update: {
+          active_inventory?: number
+          avg_price_cents?: number | null
+          avg_time_to_sell_hours?: number | null
+          category_id?: string
+          median_price_cents?: number | null
+          recommended_post_dow?: number | null
+          recommended_post_hour?: number | null
+          recommended_price_cents?: number | null
+          trending_score?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ci_daily_stats: {
+        Row: {
+          day: string
+          favourites: number
+          messages: number
+          orders: number
+          revenue_cents: number
+          seller_id: string
+          shares: number
+          unique_visitors: number
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          day: string
+          favourites?: number
+          messages?: number
+          orders?: number
+          revenue_cents?: number
+          seller_id: string
+          shares?: number
+          unique_visitors?: number
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          day?: string
+          favourites?: number
+          messages?: number
+          orders?: number
+          revenue_cents?: number
+          seller_id?: string
+          shares?: number
+          unique_visitors?: number
+          updated_at?: string
+          views?: number
+        }
+        Relationships: []
+      }
+      ci_events: {
+        Row: {
+          actor_id: string | null
+          browser: string | null
+          business_id: string | null
+          campaign_code: string | null
+          campaign_id: string | null
+          category_id: string | null
+          created_at: string
+          device: string | null
+          event_type: string
+          id: string
+          listing_id: string | null
+          medium: string | null
+          metadata: Json
+          occurred_at: string
+          parish: string | null
+          path: string | null
+          referrer: string | null
+          seller_id: string | null
+          session_id: string | null
+          source: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          browser?: string | null
+          business_id?: string | null
+          campaign_code?: string | null
+          campaign_id?: string | null
+          category_id?: string | null
+          created_at?: string
+          device?: string | null
+          event_type: string
+          id?: string
+          listing_id?: string | null
+          medium?: string | null
+          metadata?: Json
+          occurred_at?: string
+          parish?: string | null
+          path?: string | null
+          referrer?: string | null
+          seller_id?: string | null
+          session_id?: string | null
+          source?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          browser?: string | null
+          business_id?: string | null
+          campaign_code?: string | null
+          campaign_id?: string | null
+          category_id?: string | null
+          created_at?: string
+          device?: string | null
+          event_type?: string
+          id?: string
+          listing_id?: string | null
+          medium?: string | null
+          metadata?: Json
+          occurred_at?: string
+          parish?: string | null
+          path?: string | null
+          referrer?: string | null
+          seller_id?: string | null
+          session_id?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
+      ci_listing_stats: {
+        Row: {
+          favourites: number
+          first_sold_at: string | null
+          listing_id: string
+          messages: number
+          seller_id: string
+          shares: number
+          time_to_sale_hours: number | null
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          favourites?: number
+          first_sold_at?: string | null
+          listing_id: string
+          messages?: number
+          seller_id: string
+          shares?: number
+          time_to_sale_hours?: number | null
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          favourites?: number
+          first_sold_at?: string | null
+          listing_id?: string
+          messages?: number
+          seller_id?: string
+          shares?: number
+          time_to_sale_hours?: number | null
+          updated_at?: string
+          views?: number
+        }
+        Relationships: []
+      }
+      ci_orders: {
+        Row: {
+          amount_cents: number
+          attribution_campaign_id: string | null
+          buyer_id: string | null
+          conversation_id: string | null
+          created_at: string
+          currency: string
+          id: string
+          listing_id: string | null
+          notes: string | null
+          seller_id: string
+          sold_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          attribution_campaign_id?: string | null
+          buyer_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_id?: string | null
+          notes?: string | null
+          seller_id: string
+          sold_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          attribution_campaign_id?: string | null
+          buyer_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_id?: string | null
+          notes?: string | null
+          seller_id?: string
+          sold_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ci_orders_attribution_campaign_id_fkey"
+            columns: ["attribution_campaign_id"]
+            isOneToOne: false
+            referencedRelation: "attribution_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ci_trust_scores: {
+        Row: {
+          breakdown: Json
+          computed_at: string
+          score: number
+          seller_id: string
+        }
+        Insert: {
+          breakdown?: Json
+          computed_at?: string
+          score?: number
+          seller_id: string
+        }
+        Update: {
+          breakdown?: Json
+          computed_at?: string
+          score?: number
+          seller_id?: string
         }
         Relationships: []
       }
@@ -681,6 +983,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ci_compute_trust_score: { Args: { _seller_id: string }; Returns: number }
+      ci_log_event: {
+        Args: {
+          _browser?: string
+          _business_id?: string
+          _campaign_code?: string
+          _category_id?: string
+          _device?: string
+          _event_type: string
+          _listing_id?: string
+          _medium?: string
+          _metadata?: Json
+          _parish?: string
+          _path?: string
+          _referrer?: string
+          _seller_id?: string
+          _session_id?: string
+          _source?: string
+        }
+        Returns: undefined
+      }
+      ci_refresh_category_stats: { Args: never; Returns: undefined }
+      ci_refresh_rollups: { Args: never; Returns: undefined }
+      ci_refresh_trust_scores: { Args: never; Returns: undefined }
       get_user_interest_tags: {
         Args: { _user_id: string }
         Returns: {
