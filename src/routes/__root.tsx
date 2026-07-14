@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
 import { captureShareVisit } from "@/lib/shareVisit";
+import { emitEvent } from "@/lib/ci/track";
 
 function NotFoundComponent() {
   return (
