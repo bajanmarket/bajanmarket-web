@@ -26,11 +26,20 @@ import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedMyListingsRouteImport } from './routes/_authenticated/my-listings'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedFavouritesRouteImport } from './routes/_authenticated/favourites'
+import { Route as AuthenticatedExecutiveRouteImport } from './routes/_authenticated/executive'
 import { Route as AuthenticatedCampaignsRouteImport } from './routes/_authenticated/campaigns'
 import { Route as AuthenticatedBusinessRouteImport } from './routes/_authenticated/business'
+import { Route as AuthenticatedBiRouteImport } from './routes/_authenticated/bi'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
+import { Route as AuthenticatedBiIndexRouteImport } from './routes/_authenticated/bi.index'
 import { Route as AuthenticatedMessagesIdRouteImport } from './routes/_authenticated/messages.$id'
+import { Route as AuthenticatedBiTrustRouteImport } from './routes/_authenticated/bi.trust'
+import { Route as AuthenticatedBiReportsRouteImport } from './routes/_authenticated/bi.reports'
+import { Route as AuthenticatedBiInsightsRouteImport } from './routes/_authenticated/bi.insights'
+import { Route as AuthenticatedBiCampaignsRouteImport } from './routes/_authenticated/bi.campaigns'
+import { Route as ApiPublicCiRollupRouteImport } from './routes/api/public/ci/rollup'
+import { Route as ApiPublicCiCCodeRouteImport } from './routes/api/public/ci/c.$code'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -116,6 +125,11 @@ const AuthenticatedFavouritesRoute = AuthenticatedFavouritesRouteImport.update({
   path: '/favourites',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedExecutiveRoute = AuthenticatedExecutiveRouteImport.update({
+  id: '/executive',
+  path: '/executive',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
   id: '/campaigns',
   path: '/campaigns',
@@ -124,6 +138,11 @@ const AuthenticatedCampaignsRoute = AuthenticatedCampaignsRouteImport.update({
 const AuthenticatedBusinessRoute = AuthenticatedBusinessRouteImport.update({
   id: '/business',
   path: '/business',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBiRoute = AuthenticatedBiRouteImport.update({
+  id: '/bi',
+  path: '/bi',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -137,10 +156,46 @@ const AuthenticatedMessagesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedMessagesRoute,
   } as any)
+const AuthenticatedBiIndexRoute = AuthenticatedBiIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedBiRoute,
+} as any)
 const AuthenticatedMessagesIdRoute = AuthenticatedMessagesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => AuthenticatedMessagesRoute,
+} as any)
+const AuthenticatedBiTrustRoute = AuthenticatedBiTrustRouteImport.update({
+  id: '/trust',
+  path: '/trust',
+  getParentRoute: () => AuthenticatedBiRoute,
+} as any)
+const AuthenticatedBiReportsRoute = AuthenticatedBiReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedBiRoute,
+} as any)
+const AuthenticatedBiInsightsRoute = AuthenticatedBiInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AuthenticatedBiRoute,
+} as any)
+const AuthenticatedBiCampaignsRoute =
+  AuthenticatedBiCampaignsRouteImport.update({
+    id: '/campaigns',
+    path: '/campaigns',
+    getParentRoute: () => AuthenticatedBiRoute,
+  } as any)
+const ApiPublicCiRollupRoute = ApiPublicCiRollupRouteImport.update({
+  id: '/api/public/ci/rollup',
+  path: '/api/public/ci/rollup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCiCCodeRoute = ApiPublicCiCCodeRouteImport.update({
+  id: '/api/public/ci/c/$code',
+  path: '/api/public/ci/c/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -153,8 +208,10 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/bi': typeof AuthenticatedBiRouteWithChildren
   '/business': typeof AuthenticatedBusinessRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
+  '/executive': typeof AuthenticatedExecutiveRoute
   '/favourites': typeof AuthenticatedFavouritesRoute
   '/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/my-listings': typeof AuthenticatedMyListingsRoute
@@ -163,8 +220,15 @@ export interface FileRoutesByFullPath {
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
+  '/bi/campaigns': typeof AuthenticatedBiCampaignsRoute
+  '/bi/insights': typeof AuthenticatedBiInsightsRoute
+  '/bi/reports': typeof AuthenticatedBiReportsRoute
+  '/bi/trust': typeof AuthenticatedBiTrustRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/bi/': typeof AuthenticatedBiIndexRoute
   '/messages/': typeof AuthenticatedMessagesIndexRoute
+  '/api/public/ci/rollup': typeof ApiPublicCiRollupRoute
+  '/api/public/ci/c/$code': typeof ApiPublicCiCCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -178,6 +242,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/business': typeof AuthenticatedBusinessRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
+  '/executive': typeof AuthenticatedExecutiveRoute
   '/favourites': typeof AuthenticatedFavouritesRoute
   '/my-listings': typeof AuthenticatedMyListingsRoute
   '/post': typeof AuthenticatedPostRoute
@@ -185,8 +250,15 @@ export interface FileRoutesByTo {
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
+  '/bi/campaigns': typeof AuthenticatedBiCampaignsRoute
+  '/bi/insights': typeof AuthenticatedBiInsightsRoute
+  '/bi/reports': typeof AuthenticatedBiReportsRoute
+  '/bi/trust': typeof AuthenticatedBiTrustRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/bi': typeof AuthenticatedBiIndexRoute
   '/messages': typeof AuthenticatedMessagesIndexRoute
+  '/api/public/ci/rollup': typeof ApiPublicCiRollupRoute
+  '/api/public/ci/c/$code': typeof ApiPublicCiCCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -200,8 +272,10 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/bi': typeof AuthenticatedBiRouteWithChildren
   '/_authenticated/business': typeof AuthenticatedBusinessRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
+  '/_authenticated/executive': typeof AuthenticatedExecutiveRoute
   '/_authenticated/favourites': typeof AuthenticatedFavouritesRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/_authenticated/my-listings': typeof AuthenticatedMyListingsRoute
@@ -210,8 +284,15 @@ export interface FileRoutesById {
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
+  '/_authenticated/bi/campaigns': typeof AuthenticatedBiCampaignsRoute
+  '/_authenticated/bi/insights': typeof AuthenticatedBiInsightsRoute
+  '/_authenticated/bi/reports': typeof AuthenticatedBiReportsRoute
+  '/_authenticated/bi/trust': typeof AuthenticatedBiTrustRoute
   '/_authenticated/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/_authenticated/bi/': typeof AuthenticatedBiIndexRoute
   '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
+  '/api/public/ci/rollup': typeof ApiPublicCiRollupRoute
+  '/api/public/ci/c/$code': typeof ApiPublicCiCCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -225,8 +306,10 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/admin'
+    | '/bi'
     | '/business'
     | '/campaigns'
+    | '/executive'
     | '/favourites'
     | '/messages'
     | '/my-listings'
@@ -235,8 +318,15 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
+    | '/bi/campaigns'
+    | '/bi/insights'
+    | '/bi/reports'
+    | '/bi/trust'
     | '/messages/$id'
+    | '/bi/'
     | '/messages/'
+    | '/api/public/ci/rollup'
+    | '/api/public/ci/c/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -250,6 +340,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/business'
     | '/campaigns'
+    | '/executive'
     | '/favourites'
     | '/my-listings'
     | '/post'
@@ -257,8 +348,15 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
+    | '/bi/campaigns'
+    | '/bi/insights'
+    | '/bi/reports'
+    | '/bi/trust'
     | '/messages/$id'
+    | '/bi'
     | '/messages'
+    | '/api/public/ci/rollup'
+    | '/api/public/ci/c/$code'
   id:
     | '__root__'
     | '/'
@@ -271,8 +369,10 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/_authenticated/admin'
+    | '/_authenticated/bi'
     | '/_authenticated/business'
     | '/_authenticated/campaigns'
+    | '/_authenticated/executive'
     | '/_authenticated/favourites'
     | '/_authenticated/messages'
     | '/_authenticated/my-listings'
@@ -281,8 +381,15 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
+    | '/_authenticated/bi/campaigns'
+    | '/_authenticated/bi/insights'
+    | '/_authenticated/bi/reports'
+    | '/_authenticated/bi/trust'
     | '/_authenticated/messages/$id'
+    | '/_authenticated/bi/'
     | '/_authenticated/messages/'
+    | '/api/public/ci/rollup'
+    | '/api/public/ci/c/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -298,6 +405,8 @@ export interface RootRouteChildren {
   BusinessSlugRoute: typeof BusinessSlugRoute
   ListingIdRoute: typeof ListingIdRoute
   SellerIdRoute: typeof SellerIdRoute
+  ApiPublicCiRollupRoute: typeof ApiPublicCiRollupRoute
+  ApiPublicCiCCodeRoute: typeof ApiPublicCiCCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -421,6 +530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFavouritesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/executive': {
+      id: '/_authenticated/executive'
+      path: '/executive'
+      fullPath: '/executive'
+      preLoaderRoute: typeof AuthenticatedExecutiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/campaigns': {
       id: '/_authenticated/campaigns'
       path: '/campaigns'
@@ -433,6 +549,13 @@ declare module '@tanstack/react-router' {
       path: '/business'
       fullPath: '/business'
       preLoaderRoute: typeof AuthenticatedBusinessRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bi': {
+      id: '/_authenticated/bi'
+      path: '/bi'
+      fullPath: '/bi'
+      preLoaderRoute: typeof AuthenticatedBiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
@@ -449,6 +572,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesIndexRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
     }
+    '/_authenticated/bi/': {
+      id: '/_authenticated/bi/'
+      path: '/'
+      fullPath: '/bi/'
+      preLoaderRoute: typeof AuthenticatedBiIndexRouteImport
+      parentRoute: typeof AuthenticatedBiRoute
+    }
     '/_authenticated/messages/$id': {
       id: '/_authenticated/messages/$id'
       path: '/$id'
@@ -456,8 +586,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesIdRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
     }
+    '/_authenticated/bi/trust': {
+      id: '/_authenticated/bi/trust'
+      path: '/trust'
+      fullPath: '/bi/trust'
+      preLoaderRoute: typeof AuthenticatedBiTrustRouteImport
+      parentRoute: typeof AuthenticatedBiRoute
+    }
+    '/_authenticated/bi/reports': {
+      id: '/_authenticated/bi/reports'
+      path: '/reports'
+      fullPath: '/bi/reports'
+      preLoaderRoute: typeof AuthenticatedBiReportsRouteImport
+      parentRoute: typeof AuthenticatedBiRoute
+    }
+    '/_authenticated/bi/insights': {
+      id: '/_authenticated/bi/insights'
+      path: '/insights'
+      fullPath: '/bi/insights'
+      preLoaderRoute: typeof AuthenticatedBiInsightsRouteImport
+      parentRoute: typeof AuthenticatedBiRoute
+    }
+    '/_authenticated/bi/campaigns': {
+      id: '/_authenticated/bi/campaigns'
+      path: '/campaigns'
+      fullPath: '/bi/campaigns'
+      preLoaderRoute: typeof AuthenticatedBiCampaignsRouteImport
+      parentRoute: typeof AuthenticatedBiRoute
+    }
+    '/api/public/ci/rollup': {
+      id: '/api/public/ci/rollup'
+      path: '/api/public/ci/rollup'
+      fullPath: '/api/public/ci/rollup'
+      preLoaderRoute: typeof ApiPublicCiRollupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ci/c/$code': {
+      id: '/api/public/ci/c/$code'
+      path: '/api/public/ci/c/$code'
+      fullPath: '/api/public/ci/c/$code'
+      preLoaderRoute: typeof ApiPublicCiCCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface AuthenticatedBiRouteChildren {
+  AuthenticatedBiCampaignsRoute: typeof AuthenticatedBiCampaignsRoute
+  AuthenticatedBiInsightsRoute: typeof AuthenticatedBiInsightsRoute
+  AuthenticatedBiReportsRoute: typeof AuthenticatedBiReportsRoute
+  AuthenticatedBiTrustRoute: typeof AuthenticatedBiTrustRoute
+  AuthenticatedBiIndexRoute: typeof AuthenticatedBiIndexRoute
+}
+
+const AuthenticatedBiRouteChildren: AuthenticatedBiRouteChildren = {
+  AuthenticatedBiCampaignsRoute: AuthenticatedBiCampaignsRoute,
+  AuthenticatedBiInsightsRoute: AuthenticatedBiInsightsRoute,
+  AuthenticatedBiReportsRoute: AuthenticatedBiReportsRoute,
+  AuthenticatedBiTrustRoute: AuthenticatedBiTrustRoute,
+  AuthenticatedBiIndexRoute: AuthenticatedBiIndexRoute,
+}
+
+const AuthenticatedBiRouteWithChildren = AuthenticatedBiRoute._addFileChildren(
+  AuthenticatedBiRouteChildren,
+)
 
 interface AuthenticatedMessagesRouteChildren {
   AuthenticatedMessagesIdRoute: typeof AuthenticatedMessagesIdRoute
@@ -476,8 +668,10 @@ const AuthenticatedMessagesRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedBiRoute: typeof AuthenticatedBiRouteWithChildren
   AuthenticatedBusinessRoute: typeof AuthenticatedBusinessRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
+  AuthenticatedExecutiveRoute: typeof AuthenticatedExecutiveRoute
   AuthenticatedFavouritesRoute: typeof AuthenticatedFavouritesRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRouteWithChildren
   AuthenticatedMyListingsRoute: typeof AuthenticatedMyListingsRoute
@@ -487,8 +681,10 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedBiRoute: AuthenticatedBiRouteWithChildren,
   AuthenticatedBusinessRoute: AuthenticatedBusinessRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
+  AuthenticatedExecutiveRoute: AuthenticatedExecutiveRoute,
   AuthenticatedFavouritesRoute: AuthenticatedFavouritesRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRouteWithChildren,
   AuthenticatedMyListingsRoute: AuthenticatedMyListingsRoute,
@@ -512,17 +708,9 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessSlugRoute: BusinessSlugRoute,
   ListingIdRoute: ListingIdRoute,
   SellerIdRoute: SellerIdRoute,
+  ApiPublicCiRollupRoute: ApiPublicCiRollupRoute,
+  ApiPublicCiCCodeRoute: ApiPublicCiCCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
