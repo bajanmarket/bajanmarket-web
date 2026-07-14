@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
+import { emitEvent } from "@/lib/ci/track";
+import { TrustBadge } from "@/components/ci/TrustBadge";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
