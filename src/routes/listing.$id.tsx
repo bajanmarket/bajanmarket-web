@@ -92,13 +92,21 @@ function ListingDetail() {
   // Increment view count once per session per listing
   useEffect(() => {
     if (typeof window === "undefined" || !id) return;
+    if (data?.seller_id) {
+      emitEvent("ListingViewed", {
+        listingId: id,
+        sellerId: data.seller_id,
+        categoryId: (data as { category_id?: string | null }).category_id ?? null,
+        parish: data.parish ?? null,
+      });
+    }
     const key = `viewed:${id}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
     supabase.rpc("increment_listing_view", { _listing_id: id }).then(() => {
       // silent; don't refetch — counts are eventually consistent
     });
-  }, [id]);
+  }, [id, data?.seller_id, data?.parish]);
 
   const { data: isFav } = useQuery({
     queryKey: ["fav", id, user?.id],
