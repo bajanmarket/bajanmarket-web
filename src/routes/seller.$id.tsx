@@ -11,6 +11,9 @@ import { ReportDialog } from "@/components/ReportDialog";
 import { Flag } from "lucide-react";
 import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
+import { TrustBadge } from "@/components/ci/TrustBadge";
+import { emitEvent } from "@/lib/ci/track";
+import { useEffect } from "react";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
@@ -56,6 +59,7 @@ function Seller() {
   const { user } = useAuth();
   const nav = useNavigate();
   const [reportOpen, setReportOpen] = useState(false);
+  useEffect(() => { emitEvent("SellerProfileViewed", { sellerId: id }); }, [id]);
 
   const { data: profile } = useQuery({
     queryKey: ["seller-profile", id],
@@ -86,7 +90,7 @@ function Seller() {
             : initials(profile.display_name)}
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-medium">{profile.display_name}</h1>
+          <h1 className="text-xl font-medium flex items-center gap-2">{profile.display_name} <TrustBadge sellerId={id} /></h1>
           <div className="text-xs text-navy/50">
             {parishLabel(profile.parish)} · Joined {new Date(profile.created_at).toLocaleDateString("en-BB", { month: "short", year: "numeric" })}
           </div>

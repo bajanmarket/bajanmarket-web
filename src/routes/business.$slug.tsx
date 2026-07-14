@@ -10,6 +10,9 @@ import { Mail, Phone, MessageCircle, Globe, MapPin, Clock, Star, Store } from "l
 import { toast } from "sonner";
 import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
+import { TrustBadge } from "@/components/ci/TrustBadge";
+import { emitEvent } from "@/lib/ci/track";
+import { useEffect } from "react";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
@@ -73,6 +76,10 @@ function BusinessPage() {
       return data;
     },
   });
+
+  useEffect(() => {
+    if (business?.id) emitEvent("BusinessViewed", { businessId: business.id, sellerId: business.owner_id ?? null });
+  }, [business?.id, business?.owner_id]);
 
   const { data: listings } = useQuery({
     queryKey: ["business-listings", business?.owner_id],
@@ -145,7 +152,7 @@ function BusinessPage() {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-semibold">{business.name}</h1>
+            <h1 className="text-2xl font-semibold flex items-center gap-2 flex-wrap">{business.name} <TrustBadge sellerId={business.owner_id} /></h1>
             {business.tagline && <p className="text-sm text-navy/60 mt-1">{business.tagline}</p>}
             <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-navy/50">
               {avgRating !== null && (
