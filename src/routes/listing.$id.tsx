@@ -257,7 +257,10 @@ function ListingDetail() {
                       : initials(seller.display_name)}
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-sm font-medium">{seller.display_name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{seller.display_name}</span>
+                      <TrustBadge sellerId={seller.id} />
+                    </div>
                     <span className="text-[11px] text-navy/40">
                       Joined {new Date(seller.created_at).toLocaleDateString("en-BB", { month: "short", year: "numeric" })}
                     </span>
