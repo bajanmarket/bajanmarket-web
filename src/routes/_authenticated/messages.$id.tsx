@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
 import { markConversationRead } from "@/lib/markConversationRead";
-import { emitEvent } from "@/lib/ci/track";
 
 export const Route = createFileRoute("/_authenticated/messages/$id")({
   head: () => ({ meta: [{ title: "Conversation — Bajan.market" }] }),
@@ -98,14 +97,7 @@ function Thread() {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["messages", id] });
-      if (conv) {
-        const sellerId = conv.seller_id;
-        const listingId = (conv.listing as { id?: string } | null)?.id ?? null;
-        emitEvent("MessageSent", { sellerId, listingId });
-      }
-    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["messages", id] }),
   });
 
   const deleteConversation = useMutation({

@@ -17,14 +17,6 @@ export function TopHeader() {
           >
             Browse
           </Link>
-          {user && (
-            <Link
-              to="/bi"
-              className="hidden sm:inline-flex text-sm font-medium text-navy/70 hover:text-navy px-3 py-2"
-            >
-              Business Intelligence
-            </Link>
-          )}
           {user ? (
             <Link
               to="/profile"

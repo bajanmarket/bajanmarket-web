@@ -11,8 +11,6 @@ import { toast } from "sonner";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
-import { emitEvent } from "@/lib/ci/track";
-import { TrustBadge } from "@/components/ci/TrustBadge";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
@@ -92,21 +90,13 @@ function ListingDetail() {
   // Increment view count once per session per listing
   useEffect(() => {
     if (typeof window === "undefined" || !id) return;
-    if (data?.seller_id) {
-      emitEvent("ListingViewed", {
-        listingId: id,
-        sellerId: data.seller_id,
-        categoryId: (data as { category_id?: string | null }).category_id ?? null,
-        parish: data.parish ?? null,
-      });
-    }
     const key = `viewed:${id}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
     supabase.rpc("increment_listing_view", { _listing_id: id }).then(() => {
       // silent; don't refetch — counts are eventually consistent
     });
-  }, [id, data?.seller_id, data?.parish]);
+  }, [id]);
 
   const { data: isFav } = useQuery({
     queryKey: ["fav", id, user?.id],
@@ -257,10 +247,7 @@ function ListingDetail() {
                       : initials(seller.display_name)}
                   </div>
                   <div className="flex flex-col text-left">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{seller.display_name}</span>
-                      <TrustBadge sellerId={seller.id} />
-                    </div>
+                    <span className="text-sm font-medium">{seller.display_name}</span>
                     <span className="text-[11px] text-navy/40">
                       Joined {new Date(seller.created_at).toLocaleDateString("en-BB", { month: "short", year: "numeric" })}
                     </span>

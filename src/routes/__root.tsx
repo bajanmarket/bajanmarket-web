@@ -14,7 +14,6 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
 import { captureShareVisit } from "@/lib/shareVisit";
-import { emitEvent } from "@/lib/ci/track";
 
 function NotFoundComponent() {
   return (
@@ -145,11 +144,7 @@ function RootComponent() {
 
   useEffect(() => {
     captureShareVisit();
-    emitEvent("PageViewed");
-    return router.subscribe("onResolved", () => {
-      captureShareVisit();
-      emitEvent("PageViewed");
-    });
+    return router.subscribe("onResolved", () => captureShareVisit());
   }, [router]);
 
   return (
