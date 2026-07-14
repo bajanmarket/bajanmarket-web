@@ -42,7 +42,7 @@ function Reports() {
   const dailyMut = useMutation({
     mutationFn: async () => {
       const data = await fetchDaily({ data: { days: 365 } });
-      download("daily-stats.csv", toCsv(data.series));
+      download("daily-stats.csv", toCsv(data.series as unknown as Record<string, unknown>[]));
       toast.success(`Exported ${data.series.length} days`);
     },
   });
