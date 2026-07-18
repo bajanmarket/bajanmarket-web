@@ -19,16 +19,16 @@ export default defineTool({
     const uid = ctx.getUserId()!;
     const { data, error } = await sb
       .from("conversations")
-      .select("id, listing_id, buyer_id, seller_id, updated_at, listings(title)")
+      .select("id, listing_id, buyer_id, seller_id, last_message_at, listings(title)")
       .or(`buyer_id.eq.${uid},seller_id.eq.${uid}`)
-      .order("updated_at", { ascending: false })
+      .order("last_message_at", { ascending: false })
       .limit(50);
     if (error) return { content: [{ type: "text", text: error.message }], isError: true };
     const rows = (data ?? []).map((c) => ({
       id: c.id,
       listing_title: c.listings?.title,
       role: c.buyer_id === uid ? "buyer" : "seller",
-      updated_at: c.updated_at,
+      last_message_at: c.last_message_at,
       url: `https://bajanmarket.app/messages/${c.id}`,
     }));
     return {
