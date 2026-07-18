@@ -6,9 +6,9 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { PARISHES, CONDITIONS } from "@/lib/parishes";
-import { uploadImage, validateImage } from "@/lib/uploadImage";
+import { uploadImage, validateImage, IMAGE_ACCEPT } from "@/lib/uploadImage";
 import { useAuth } from "@/lib/useAuth";
-import { ImagePlus, X, Sparkles } from "lucide-react";
+import { ImagePlus, X, Sparkles, Camera, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { SellerOnboarding } from "@/components/SellerOnboarding";
 import { suggestListingFromImage } from "@/lib/ai-listing.functions";
@@ -57,10 +57,13 @@ function PostListing() {
   const { user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
+  const [uploadPct, setUploadPct] = useState(0);
+  const [uploadIndex, setUploadIndex] = useState(0);
   const [defaults, setDefaults] = useState<Defaults>(EMPTY);
   const [formKey, setFormKey] = useState(0);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiHint, setAiHint] = useState("");
+  const [dragOver, setDragOver] = useState(false);
   const [posted, setPosted] = useState<{ id: string; title: string; price: number; cover_url: string | null } | null>(null);
   const suggest = useServerFn(suggestListingFromImage);
 
@@ -119,9 +122,15 @@ function PostListing() {
     if (files.length === 0) { toast.error("Add at least one photo"); return; }
 
     setBusy(true);
+    setUploadPct(0);
+    setUploadIndex(0);
     try {
       const urls: string[] = [];
-      for (const f of files) urls.push(await uploadImage("listings", user.id, f));
+      for (let i = 0; i < files.length; i++) {
+        setUploadIndex(i);
+        setUploadPct(0);
+        urls.push(await uploadImage("listings", user.id, files[i], (p) => setUploadPct(p)));
+      }
 
       const { data: listing, error } = await supabase
         .from("listings")
@@ -150,9 +159,10 @@ function PostListing() {
       setFormKey((k) => k + 1);
       if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      toast.error((err as Error).message);
+      toast.error((err as Error).message || "Upload failed. Check your connection and try again.");
     } finally {
       setBusy(false);
+      setUploadPct(0);
     }
   };
 
@@ -165,8 +175,31 @@ function PostListing() {
       if (err) { toast.error(`${f.name}: ${err}`); continue; }
       accepted.push(f);
     }
-    setFiles((prev) => [...prev, ...accepted].slice(0, 10));
+    if (accepted.length === 0) return;
+    setFiles((prev) => {
+      const next = [...prev, ...accepted];
+      if (next.length > 10) toast.info("Only the first 10 photos were kept.");
+      return next.slice(0, 10);
+    });
   };
+
+  const moveFile = (from: number, dir: -1 | 1) => {
+    setFiles((prev) => {
+      const to = from + dir;
+      if (to < 0 || to >= prev.length) return prev;
+      const next = [...prev];
+      const [item] = next.splice(from, 1);
+      next.splice(to, 0, item);
+      return next;
+    });
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    addFiles(e.dataTransfer.files);
+  };
+
 
   if (posted) {
     return (
@@ -227,29 +260,108 @@ function PostListing() {
         <SellerOnboarding variant="steps" />
 
         <form key={formKey} onSubmit={onSubmit} className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-5">
-          <div>
-            <Label>Photos ({files.length}/10)</Label>
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={onDrop}
+            className={`rounded-2xl transition-colors ${dragOver ? "bg-teal/5 ring-2 ring-teal ring-dashed" : ""}`}
+          >
+            <div className="flex items-center justify-between">
+              <Label>Photos ({files.length}/10)</Label>
+              {files.length > 0 && <span className="text-[11px] text-navy/50">First photo is the cover · tap arrows to reorder</span>}
+            </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
               {files.map((f, i) => (
-                <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-sand-deep">
+                <div key={`${f.name}-${i}`} className="relative aspect-square rounded-xl overflow-hidden bg-sand-deep group">
                   <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
+                  {i === 0 && (
+                    <span className="absolute bottom-1 left-1 text-[10px] font-semibold uppercase tracking-wider bg-navy text-white rounded-full px-2 py-0.5">Cover</span>
+                  )}
                   <button
                     type="button"
+                    aria-label="Remove photo"
                     onClick={() => setFiles(files.filter((_, j) => j !== i))}
                     className="absolute top-1 right-1 size-6 rounded-full bg-black/60 text-white grid place-items-center"
                   >
                     <X className="size-3" />
                   </button>
+                  {files.length > 1 && (
+                    <div className="absolute inset-x-1 top-1/2 -translate-y-1/2 flex justify-between opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                      <button
+                        type="button"
+                        aria-label="Move left"
+                        disabled={i === 0}
+                        onClick={() => moveFile(i, -1)}
+                        className="size-7 rounded-full bg-black/60 text-white grid place-items-center disabled:opacity-30"
+                      >
+                        <ChevronLeft className="size-4" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Move right"
+                        disabled={i === files.length - 1}
+                        onClick={() => moveFile(i, 1)}
+                        className="size-7 rounded-full bg-black/60 text-white grid place-items-center disabled:opacity-30"
+                      >
+                        <ChevronRight className="size-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
               {files.length < 10 && (
                 <label className="aspect-square rounded-xl border-2 border-dashed border-hairline grid place-items-center cursor-pointer hover:bg-sand transition-colors">
                   <ImagePlus className="size-5 text-navy/40" />
-                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden onChange={(e) => addFiles(e.target.files)} />
+                  <input
+                    type="file"
+                    accept={IMAGE_ACCEPT}
+                    multiple
+                    hidden
+                    onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = ""; }}
+                  />
                 </label>
               )}
             </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <label className="inline-flex items-center justify-center gap-2 bg-sand hover:bg-sand-deep rounded-xl px-3 py-2.5 text-sm font-medium cursor-pointer">
+                <Upload className="size-4" />
+                Choose photos
+                <input
+                  type="file"
+                  accept={IMAGE_ACCEPT}
+                  multiple
+                  hidden
+                  onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = ""; }}
+                />
+              </label>
+              <label className="inline-flex items-center justify-center gap-2 bg-sand hover:bg-sand-deep rounded-xl px-3 py-2.5 text-sm font-medium cursor-pointer">
+                <Camera className="size-4" />
+                Take photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  hidden
+                  onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = ""; }}
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-[11px] text-navy/50 hidden sm:block">Tip: drag &amp; drop images anywhere in this box.</p>
+
+            {busy && (
+              <div className="mt-3">
+                <div className="flex items-center justify-between text-[11px] text-navy/60 mb-1">
+                  <span>Uploading photo {uploadIndex + 1} of {files.length}</span>
+                  <span>{uploadPct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-sand overflow-hidden">
+                  <div className="h-full bg-teal transition-all" style={{ width: `${uploadPct}%` }} />
+                </div>
+              </div>
+            )}
           </div>
+
 
           <div className="rounded-2xl bg-gradient-to-br from-teal/10 to-coral/10 ring-1 ring-teal/20 p-4 flex flex-col gap-3">
             <div className="flex items-center gap-2">

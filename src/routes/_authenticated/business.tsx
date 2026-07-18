@@ -155,7 +155,7 @@ function BusinessManager() {
               ) : (
                 <span className="text-navy/40 text-sm inline-flex items-center gap-2"><Upload className="size-4" /> Upload banner (3:1)</span>
               )}
-              <input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => onUpload("banner_url", e.target.files?.[0] ?? null)} />
+              <input type="file" accept="image/*,.heic,.heif" hidden onChange={(e) => onUpload("banner_url", e.target.files?.[0] ?? null)} />
             </label>
           </div>
           <div>
@@ -166,7 +166,7 @@ function BusinessManager() {
               ) : (
                 <Upload className="size-5 text-navy/40" />
               )}
-              <input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => onUpload("logo_url", e.target.files?.[0] ?? null)} />
+              <input type="file" accept="image/*,.heic,.heif" hidden onChange={(e) => onUpload("logo_url", e.target.files?.[0] ?? null)} />
             </label>
           </div>
         </section>
