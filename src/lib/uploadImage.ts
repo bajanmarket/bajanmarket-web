@@ -81,8 +81,9 @@ async function compress(file: File): Promise<File> {
       // Library reads EXIF orientation and re-encodes upright.
     });
     // imageCompression returns a Blob in some browsers — normalize to File.
-    if (out instanceof File) return out;
-    return new File([out], file.name, { type: out.type || file.type, lastModified: Date.now() });
+    const blob = out as Blob;
+    if (blob instanceof File) return blob;
+    return new File([blob], file.name, { type: blob.type || file.type, lastModified: Date.now() });
   } catch {
     return file;
   }
