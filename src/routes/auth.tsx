@@ -122,7 +122,7 @@ function AuthPage() {
             Bajan<span className="text-teal">.market</span>
           </Link>
           <h1 className="text-navy/60 text-sm mt-2 font-normal">
-            {mode === "signup" ? "Create your Bajan.market account" : "Welcome back to Bajan.market"}
+            {mode === "signup" ? "Create your Bajan.market account" : mode === "forgot" ? "Reset your password" : "Welcome back to Bajan.market"}
           </h1>
         </div>
 
