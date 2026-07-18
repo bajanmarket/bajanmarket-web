@@ -260,29 +260,108 @@ function PostListing() {
         <SellerOnboarding variant="steps" />
 
         <form key={formKey} onSubmit={onSubmit} className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-5">
-          <div>
-            <Label>Photos ({files.length}/10)</Label>
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={onDrop}
+            className={`rounded-2xl transition-colors ${dragOver ? "bg-teal/5 ring-2 ring-teal ring-dashed" : ""}`}
+          >
+            <div className="flex items-center justify-between">
+              <Label>Photos ({files.length}/10)</Label>
+              {files.length > 0 && <span className="text-[11px] text-navy/50">First photo is the cover · tap arrows to reorder</span>}
+            </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-2">
               {files.map((f, i) => (
-                <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-sand-deep">
+                <div key={`${f.name}-${i}`} className="relative aspect-square rounded-xl overflow-hidden bg-sand-deep group">
                   <img src={URL.createObjectURL(f)} alt="" className="w-full h-full object-cover" />
+                  {i === 0 && (
+                    <span className="absolute bottom-1 left-1 text-[10px] font-semibold uppercase tracking-wider bg-navy text-white rounded-full px-2 py-0.5">Cover</span>
+                  )}
                   <button
                     type="button"
+                    aria-label="Remove photo"
                     onClick={() => setFiles(files.filter((_, j) => j !== i))}
                     className="absolute top-1 right-1 size-6 rounded-full bg-black/60 text-white grid place-items-center"
                   >
                     <X className="size-3" />
                   </button>
+                  {files.length > 1 && (
+                    <div className="absolute inset-x-1 top-1/2 -translate-y-1/2 flex justify-between opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                      <button
+                        type="button"
+                        aria-label="Move left"
+                        disabled={i === 0}
+                        onClick={() => moveFile(i, -1)}
+                        className="size-7 rounded-full bg-black/60 text-white grid place-items-center disabled:opacity-30"
+                      >
+                        <ChevronLeft className="size-4" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Move right"
+                        disabled={i === files.length - 1}
+                        onClick={() => moveFile(i, 1)}
+                        className="size-7 rounded-full bg-black/60 text-white grid place-items-center disabled:opacity-30"
+                      >
+                        <ChevronRight className="size-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
               {files.length < 10 && (
                 <label className="aspect-square rounded-xl border-2 border-dashed border-hairline grid place-items-center cursor-pointer hover:bg-sand transition-colors">
                   <ImagePlus className="size-5 text-navy/40" />
-                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden onChange={(e) => addFiles(e.target.files)} />
+                  <input
+                    type="file"
+                    accept={IMAGE_ACCEPT}
+                    multiple
+                    hidden
+                    onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = ""; }}
+                  />
                 </label>
               )}
             </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <label className="inline-flex items-center justify-center gap-2 bg-sand hover:bg-sand-deep rounded-xl px-3 py-2.5 text-sm font-medium cursor-pointer">
+                <Upload className="size-4" />
+                Choose photos
+                <input
+                  type="file"
+                  accept={IMAGE_ACCEPT}
+                  multiple
+                  hidden
+                  onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = ""; }}
+                />
+              </label>
+              <label className="inline-flex items-center justify-center gap-2 bg-sand hover:bg-sand-deep rounded-xl px-3 py-2.5 text-sm font-medium cursor-pointer">
+                <Camera className="size-4" />
+                Take photo
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  hidden
+                  onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = ""; }}
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-[11px] text-navy/50 hidden sm:block">Tip: drag &amp; drop images anywhere in this box.</p>
+
+            {busy && (
+              <div className="mt-3">
+                <div className="flex items-center justify-between text-[11px] text-navy/60 mb-1">
+                  <span>Uploading photo {uploadIndex + 1} of {files.length}</span>
+                  <span>{uploadPct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-sand overflow-hidden">
+                  <div className="h-full bg-teal transition-all" style={{ width: `${uploadPct}%` }} />
+                </div>
+              </div>
+            )}
           </div>
+
 
           <div className="rounded-2xl bg-gradient-to-br from-teal/10 to-coral/10 ring-1 ring-teal/20 p-4 flex flex-col gap-3">
             <div className="flex items-center gap-2">
