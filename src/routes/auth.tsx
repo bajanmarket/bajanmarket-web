@@ -80,7 +80,16 @@ function AuthPage() {
       }
       nav({ to: safeRedirect });
     } catch (err) {
-      toast.error((err as Error).message);
+      const msg = (err as Error).message || "Something went wrong";
+      const lower = msg.toLowerCase();
+      if (lower.includes("weak") || lower.includes("pwned") || lower.includes("compromis")) {
+        toast.error(
+          "That password has appeared in a known data breach. Please choose a different, unique password (try adding extra words, numbers, or symbols).",
+          { duration: 8000 }
+        );
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
