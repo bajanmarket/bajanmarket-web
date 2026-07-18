@@ -57,10 +57,13 @@ function PostListing() {
   const { user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
+  const [uploadPct, setUploadPct] = useState(0);
+  const [uploadIndex, setUploadIndex] = useState(0);
   const [defaults, setDefaults] = useState<Defaults>(EMPTY);
   const [formKey, setFormKey] = useState(0);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiHint, setAiHint] = useState("");
+  const [dragOver, setDragOver] = useState(false);
   const [posted, setPosted] = useState<{ id: string; title: string; price: number; cover_url: string | null } | null>(null);
   const suggest = useServerFn(suggestListingFromImage);
 
