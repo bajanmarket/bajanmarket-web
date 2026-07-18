@@ -122,9 +122,15 @@ function PostListing() {
     if (files.length === 0) { toast.error("Add at least one photo"); return; }
 
     setBusy(true);
+    setUploadPct(0);
+    setUploadIndex(0);
     try {
       const urls: string[] = [];
-      for (const f of files) urls.push(await uploadImage("listings", user.id, f));
+      for (let i = 0; i < files.length; i++) {
+        setUploadIndex(i);
+        setUploadPct(0);
+        urls.push(await uploadImage("listings", user.id, files[i], (p) => setUploadPct(p)));
+      }
 
       const { data: listing, error } = await supabase
         .from("listings")
@@ -153,9 +159,10 @@ function PostListing() {
       setFormKey((k) => k + 1);
       if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      toast.error((err as Error).message);
+      toast.error((err as Error).message || "Upload failed. Check your connection and try again.");
     } finally {
       setBusy(false);
+      setUploadPct(0);
     }
   };
 
@@ -168,8 +175,31 @@ function PostListing() {
       if (err) { toast.error(`${f.name}: ${err}`); continue; }
       accepted.push(f);
     }
-    setFiles((prev) => [...prev, ...accepted].slice(0, 10));
+    if (accepted.length === 0) return;
+    setFiles((prev) => {
+      const next = [...prev, ...accepted];
+      if (next.length > 10) toast.info("Only the first 10 photos were kept.");
+      return next.slice(0, 10);
+    });
   };
+
+  const moveFile = (from: number, dir: -1 | 1) => {
+    setFiles((prev) => {
+      const to = from + dir;
+      if (to < 0 || to >= prev.length) return prev;
+      const next = [...prev];
+      const [item] = next.splice(from, 1);
+      next.splice(to, 0, item);
+      return next;
+    });
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    addFiles(e.dataTransfer.files);
+  };
+
 
   if (posted) {
     return (
