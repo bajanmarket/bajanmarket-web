@@ -26,13 +26,14 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const nav = useNavigate();
   const { redirect } = Route.useSearch();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const passwordChecks = {
     length: password.length >= 8,
@@ -53,6 +54,15 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setResetSent(true);
+        toast.success("If that email exists, a reset link is on its way.");
+        return;
+      }
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
           email, password,
@@ -112,22 +122,31 @@ function AuthPage() {
             Bajan<span className="text-teal">.market</span>
           </Link>
           <h1 className="text-navy/60 text-sm mt-2 font-normal">
-            {mode === "signup" ? "Create your Bajan.market account" : "Welcome back to Bajan.market"}
+            {mode === "signup" ? "Create your Bajan.market account" : mode === "forgot" ? "Reset your password" : "Welcome back to Bajan.market"}
           </h1>
         </div>
 
         <div className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-4">
-          <button
-            onClick={google}
-            className="w-full bg-white ring-1 ring-hairline rounded-2xl py-3 text-sm font-medium text-navy hover:bg-sand transition-colors"
-          >
-            Continue with Google
-          </button>
+          {mode !== "forgot" && (
+            <>
+              <button
+                onClick={google}
+                className="w-full bg-white ring-1 ring-hairline rounded-2xl py-3 text-sm font-medium text-navy hover:bg-sand transition-colors"
+              >
+                Continue with Google
+              </button>
 
-          <div className="flex items-center gap-3 text-[11px] text-navy/40 uppercase tracking-wider">
-            <div className="flex-1 h-px bg-hairline" /> or <div className="flex-1 h-px bg-hairline" />
-          </div>
+              <div className="flex items-center gap-3 text-[11px] text-navy/40 uppercase tracking-wider">
+                <div className="flex-1 h-px bg-hairline" /> or <div className="flex-1 h-px bg-hairline" />
+              </div>
+            </>
+          )}
 
+          {mode === "forgot" && resetSent ? (
+            <div className="text-sm text-navy/70 leading-relaxed">
+              If an account exists for <span className="font-medium text-navy">{email}</span>, we've sent a link to reset your password. Check your inbox (and spam folder).
+            </div>
+          ) : (
           <form onSubmit={submit} className="flex flex-col gap-3">
             {mode === "signup" && (
               <Field label="Your name" htmlFor="auth-name">
@@ -148,6 +167,7 @@ function AuthPage() {
                 className="w-full bg-sand rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-teal"
               />
             </Field>
+            {mode !== "forgot" && (
             <Field label="Password" htmlFor="auth-password">
               <div className="relative">
                 <input
@@ -183,6 +203,16 @@ function AuthPage() {
                 </ul>
               )}
             </Field>
+            )}
+            {mode === "signin" && (
+              <button
+                type="button"
+                onClick={() => { setResetSent(false); setMode("forgot"); }}
+                className="text-xs text-navy/60 hover:text-navy self-start -mt-1"
+              >
+                Forgot password?
+              </button>
+            )}
             {mode === "signup" && (
               <label className="flex items-start gap-2 text-xs text-navy/70 cursor-pointer">
                 <input
@@ -198,16 +228,17 @@ function AuthPage() {
               disabled={loading || (mode === "signup" && !passwordValid)}
               className="mt-2 bg-navy text-white rounded-2xl py-3 text-sm font-medium active:scale-95 transition-transform disabled:opacity-60"
             >
-              {loading ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
+              {loading ? "Please wait…" : mode === "signup" ? "Create account" : mode === "forgot" ? "Send reset link" : "Sign in"}
             </button>
           </form>
+          )}
 
           <button
             type="button"
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            onClick={() => { setResetSent(false); setMode(mode === "signin" ? "signup" : "signin"); }}
             className="text-xs text-navy/60 hover:text-navy"
           >
-            {mode === "signin" ? "New to Bajan.market? Create an account" : "Already have an account? Sign in"}
+            {mode === "signup" ? "Already have an account? Sign in" : mode === "forgot" ? "Back to sign in" : "New to Bajan.market? Create an account"}
           </button>
         </div>
 
