@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
@@ -31,6 +32,14 @@ function AuthPage() {
   const [displayName, setDisplayName] = useState("");
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const passwordChecks = {
+    length: password.length >= 8,
+    letter: /[a-zA-Z]/.test(password),
+    number: /\d/.test(password),
+  };
+  const passwordValid = passwordChecks.length && passwordChecks.letter && passwordChecks.number;
 
   const safeRedirect = redirect && redirect.startsWith("/") ? redirect : "/";
 
@@ -71,7 +80,16 @@ function AuthPage() {
       }
       nav({ to: safeRedirect });
     } catch (err) {
-      toast.error((err as Error).message);
+      const msg = (err as Error).message || "Something went wrong";
+      const lower = msg.toLowerCase();
+      if (lower.includes("weak") || lower.includes("pwned") || lower.includes("compromis")) {
+        toast.error(
+          "That password has appeared in a known data breach. Please choose a different, unique password (try adding extra words, numbers, or symbols).",
+          { duration: 8000 }
+        );
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -131,13 +149,39 @@ function AuthPage() {
               />
             </Field>
             <Field label="Password" htmlFor="auth-password">
-              <input
-                id="auth-password"
-                required type="password" minLength={8}
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                value={password} onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-sand rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-teal"
-              />
+              <div className="relative">
+                <input
+                  id="auth-password"
+                  required type={showPassword ? "text" : "password"} minLength={8}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                  value={password} onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-sand rounded-xl px-4 py-2.5 pr-11 text-sm outline-none focus:ring-2 focus:ring-teal"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-navy/50 hover:text-navy"
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+              {mode === "signup" && (
+                <ul className="mt-1.5 text-[11px] text-navy/60 space-y-0.5">
+                  <li className={passwordChecks.length ? "text-teal" : ""}>
+                    {passwordChecks.length ? "✓" : "○"} At least 8 characters
+                  </li>
+                  <li className={passwordChecks.letter ? "text-teal" : ""}>
+                    {passwordChecks.letter ? "✓" : "○"} Contains a letter
+                  </li>
+                  <li className={passwordChecks.number ? "text-teal" : ""}>
+                    {passwordChecks.number ? "✓" : "○"} Contains a number
+                  </li>
+                  <li className="text-navy/50">
+                    Avoid common passwords (like "password123") — they're blocked for your safety.
+                  </li>
+                </ul>
+              )}
             </Field>
             {mode === "signup" && (
               <label className="flex items-start gap-2 text-xs text-navy/70 cursor-pointer">
@@ -151,7 +195,7 @@ function AuthPage() {
               </label>
             )}
             <button
-              disabled={loading}
+              disabled={loading || (mode === "signup" && !passwordValid)}
               className="mt-2 bg-navy text-white rounded-2xl py-3 text-sm font-medium active:scale-95 transition-transform disabled:opacity-60"
             >
               {loading ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
