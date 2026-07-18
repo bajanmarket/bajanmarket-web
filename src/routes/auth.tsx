@@ -195,7 +195,7 @@ function AuthPage() {
               </label>
             )}
             <button
-              disabled={loading}
+              disabled={loading || (mode === "signup" && !passwordValid)}
               className="mt-2 bg-navy text-white rounded-2xl py-3 text-sm font-medium active:scale-95 transition-transform disabled:opacity-60"
             >
               {loading ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
