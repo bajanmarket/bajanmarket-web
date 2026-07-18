@@ -32,6 +32,14 @@ function AuthPage() {
   const [displayName, setDisplayName] = useState("");
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const passwordChecks = {
+    length: password.length >= 8,
+    letter: /[a-zA-Z]/.test(password),
+    number: /\d/.test(password),
+  };
+  const passwordValid = passwordChecks.length && passwordChecks.letter && passwordChecks.number;
 
   const safeRedirect = redirect && redirect.startsWith("/") ? redirect : "/";
 
