@@ -4,6 +4,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const PlanEnum = z.enum(["free", "premium", "business"]);
 
+async function assertAdmin(supabase: { from: (t: string) => { select: (c: string) => { eq: (col: string, v: string) => { eq: (col: string, v: string) => { maybeSingle: () => Promise<{ data: unknown }> } } } } }, userId: string) {
+  const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+  if (!data) throw new Error("Forbidden");
+}
+
 export const updatePlanSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) =>
@@ -15,13 +20,14 @@ export const updatePlanSettings = createServerFn({ method: "POST" })
     }).parse(raw),
   )
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId, _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
+    await assertAdmin(context.supabase as never, context.userId);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      enabled?: boolean;
+      price_bbd_cents?: number;
+      featured_days?: number;
+    } = {};
     if (data.enabled !== undefined) patch.enabled = data.enabled;
     if (data.price_bbd_cents !== undefined) patch.price_bbd_cents = data.price_bbd_cents;
     if (data.featured_days !== undefined) patch.featured_days = data.featured_days;
