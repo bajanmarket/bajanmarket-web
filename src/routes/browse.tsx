@@ -9,6 +9,7 @@ import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { PARISHES } from "@/lib/parishes";
 import { logSearchEvent } from "@/lib/logSearchEvent";
 import type { Database } from "@/integrations/supabase/types";
+import { track, deviceType } from "@/lib/analytics";
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -78,6 +79,14 @@ function Browse() {
           categorySlug: search.category ?? null,
           resultCount: rows.length,
         });
+        track("search_performed", {
+          query: search.q, parish: search.parish ?? null,
+          category: search.category ?? null, result_count: rows.length,
+          device: deviceType(),
+        });
+      }
+      if (search.category) {
+        track("category_viewed", { category: search.category, parish: search.parish ?? null });
       }
 
       return rows;

@@ -152,6 +152,13 @@ function PostListing() {
           urls.slice(1).map((url, i) => ({ listing_id: listing.id, url, sort_order: i + 1 })),
         );
       }
+      track("listing_created", {
+        listing_id: listing.id,
+        category_id: parsed.data.category_id,
+        parish: parsed.data.parish,
+        price: parsed.data.price,
+        device: deviceType(),
+      });
       toast.success("Listing posted!");
       setPosted({ id: listing.id, title: parsed.data.title, price: parsed.data.price, cover_url: urls[0] });
       // Reset the form so "Post another" starts clean

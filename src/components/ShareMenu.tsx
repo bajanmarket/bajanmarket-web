@@ -21,6 +21,7 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 );
 import { toast } from "sonner";
 import { shareLinks, withUtm, type ShareSource, type ShareChannel } from "@/lib/share";
+import { track } from "@/lib/analytics";
 
 type Props = {
   url: string;
@@ -39,7 +40,7 @@ export function ShareMenu({ url, title, text, source, inline, trigger, className
   const hasNative = typeof navigator !== "undefined" && "share" in navigator;
 
   const openChannel = (channel: ShareChannel, href: string) => {
-    void channel;
+    track("listing_shared", { source, channel });
     window.open(href, "_blank", "noopener,noreferrer");
     setOpen(false);
   };
