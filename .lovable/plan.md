@@ -1,84 +1,101 @@
-## Social sharing for buyers & sellers
 
-Add first-class sharing to WhatsApp, Facebook, Instagram Stories, and X across the four highest-leverage surfaces. Include branded auto-generated preview images and UTM tags so we can see which channel drives traffic.
+# Analytics, Plans & Admin Controls Foundation
 
-### 1. Reusable `<ShareMenu />` component
+Purely additive — no changes to existing marketplace flows, tables, UI, or auth. Existing `ci_events` / `ci_daily_stats` / `search_events` telemetry stays as-is; this layers external analytics + monetization scaffolding on top.
 
-New `src/components/ShareMenu.tsx` — a popover (shadcn `Popover`) triggered by any share button. Props: `url`, `title`, `text`, `image?`, `source` ("listing" | "storefront" | "seller" | "my_listings" | "post_success").
+## Part 1 — Analytics Tracking
 
-Buttons inside:
-- **WhatsApp** → `https://wa.me/?text=<encoded title + url>` (opens WhatsApp Web / app deep link, works on Bajan mobile).
-- **Facebook** → `https://www.facebook.com/sharer/sharer.php?u=<url>`.
-- **X** → `https://twitter.com/intent/tweet?text=<title>&url=<url>`.
-- **Instagram Stories** → mobile: attempt `instagram-stories://share?...` deep link with the OG image; desktop / fallback: copy link + toast "Open Instagram and paste in your story" (Instagram has no public web share intent).
-- **Copy link** (always).
-- **Native share** button when `navigator.share` exists (mobile OS sheet — covers everything else).
+**GA4** (ID `G-7M59V1QNZS`, hardcoded — publishable):
+- Inject GA4 gtag snippet via `<script>` tags in `src/routes/__root.tsx` head, using `async` so it doesn't block render.
+- Send SPA `page_view` on router location changes.
 
-Every outbound URL is built through a `withUtm(url, source, medium)` helper that appends `utm_source=<whatsapp|facebook|x|instagram|copy|native>`, `utm_medium=share`, `utm_campaign=<source>` (e.g. `listing_share`).
+**Meta Pixel** (ID deferred):
+- Add `VITE_META_PIXEL_ID` env var; loader is a no-op until set. User can add it later without a redeploy of logic.
 
-### 2. Where the share menu appears
+**Unified tracker** `src/lib/analytics.ts`:
+- `track(event, params)` — fans out to `gtag('event', …)` and `fbq('trackCustom', …)` if loaded.
+- Wraps standard Meta events where they map (`PageView`, `CompleteRegistration`, `ViewContent`, `Search`, `Contact`).
+- Silent no-op in SSR / when scripts aren't loaded.
 
-- **Listing detail (`src/routes/listing.$id.tsx`)** — replace the current `Share2` icon-only button with the `ShareMenu` trigger. Passes listing title, price-included text, and the auto-generated OG image URL.
-- **My Listings (`src/routes/_authenticated/my-listings.tsx`)** — add a small share icon on each listing card row so sellers can re-share anytime.
-- **Post-listing success** — after a successful publish in `src/routes/_authenticated/post.tsx`, instead of navigating straight away, show a success screen ("Your listing is live") with the new listing's cover, a prominent `ShareMenu` inline (not a popover — buttons laid out), plus "View listing" and "Post another" actions.
-- **Seller profile (`src/routes/seller.$id.tsx`)** and **Business storefront (`src/routes/business.$slug.tsx`)** — add a share button in the header area next to the follow/contact controls.
+**Event wiring** (single-line calls at existing call sites; no logic changes):
 
-### 3. Auto-generated share images (OG)
+| Event | Where |
+|---|---|
+| `account_created` | `auth.tsx` after successful signup |
+| `login_completed` | `auth.tsx` after signin |
+| `profile_completed` | `profile.tsx` on save |
+| `listing_created` | `post.tsx` after insert |
+| `listing_viewed` | `listing.$id.tsx` mount |
+| `listing_shared` | `ShareMenu.tsx` |
+| `listing_saved` | favourite toggle |
+| `seller_contacted` | message thread create |
+| `search_performed` | `browse.tsx` / `SearchBar` |
+| `category_viewed` | `browse.tsx` when category filter set |
 
-Serve a per-entity PNG at stable URLs:
-- `/api/public/og/listing/$id.png`
-- `/api/public/og/business/$slug.png`
-- `/api/public/og/seller/$id.png`
+Params captured: `category`, `parish`, `device` (mobile/desktop from viewport), `user_type` (buyer if no listings, seller otherwise, from profile), timestamp auto by GA.
 
-Implementation: new server routes under `src/routes/api/public/og.*.ts` that render a 1200x630 branded PNG using `satori` + `@resvg/resvg-js` (both Worker-compatible, pure JS/WASM). Card layout:
-- Left: entity photo (listing cover / business banner or logo / seller avatar) fetched via `fetch` and inlined.
-- Right: title, price (listing) or business name / seller name, parish chip, small "bajan.market" wordmark bottom-right, coral accent bar.
-- Cache: `Cache-Control: public, max-age=3600, s-maxage=86400` and set `ETag` from a hash of the source fields so refreshes are cheap.
-- Errors → fall back to a static branded `/og-default.png` so crawlers never see a broken image.
+## Part 2 — Admin Analytics Dashboard
 
-The route `head()` on listing/business/seller pages sets `og:image` and `twitter:image` to the absolute `https://bajan.market/api/public/og/...png` URL (built server-side using existing `getRequestOrigin` pattern, hardcoded to bajan.market in production).
+New component `src/components/AnalyticsPanel.tsx`, added as a new tab in `/admin` alongside existing Insights/Audience/etc. Reads from **existing** tables via `supabase.rpc` / selects:
 
-Tell the user: crawlers cache previews — they can force a refresh in Facebook Sharing Debugger / WhatsApp by re-sharing after ~24h.
+- **Users**: count `profiles`; new today/week from `created_at`; active from `last_active_at`.
+- **Marketplace**: total `listings`; new today; group by `category_id`; top viewed (order by `views`).
+- **Engagement**: counts from `messages`, `share_visits`/`ci_events`, `favourites`, `search_events`.
+- **Growth charts**: bucket `profiles.created_at` and `listings.created_at` by day for last 30d; render with a lightweight inline SVG (no new chart lib — matches existing Insights panel style).
 
-### 4. UTM tracking, lightly
+Queries batched via TanStack Query; admin-only via existing `useIsModerator` guard.
 
-- `withUtm()` helper in `src/lib/share.ts` — used by every share URL.
-- Extend the existing `search_events` / analytics path: on any page load where `utm_source` is present in the URL, fire `logShareVisit({ path, utm_source, utm_medium, utm_campaign })` into a new small table `public.share_visits` (columns: path, utm_source, utm_medium, utm_campaign, referrer, created_at). Admin/moderator-only SELECT; anon INSERT via a `log_share_visit` SECURITY DEFINER RPC to avoid exposing the table.
-- No admin dashboard in this pass — just capture the data so we can query it later. (Optional follow-up: add a "Share attribution" card to the Insights panel.)
+## Part 3 — Plan & Featured Foundation (backend only, inactive)
 
-### 5. Copy tone
+Migration adds NEW tables + nullable columns (existing rows unaffected, defaults keep everyone Free):
 
-Prefilled share text per source:
-- Listing: `"{title} — {price} on Bajan.market"`
-- Business: `"Check out {name} on Bajan.market"`
-- Seller: `"{name}'s listings on Bajan.market"`
+```sql
+CREATE TYPE public.seller_plan AS ENUM ('free','premium','business');
 
-### Technical section
+CREATE TABLE public.subscriptions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  plan seller_plan NOT NULL DEFAULT 'free',
+  status text NOT NULL DEFAULT 'active',   -- active|cancelled|expired
+  started_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE (user_id)
+);
+-- GRANTs (authenticated select-own, service_role all) + RLS: users read own, admin manages.
 
-**Packages to add:** `satori`, `@resvg/resvg-js` (WASM build works on Cloudflare Workers).
+CREATE TABLE public.plan_settings (
+  plan seller_plan PRIMARY KEY,
+  enabled boolean NOT NULL DEFAULT false,
+  price_bbd_cents integer NOT NULL DEFAULT 0,
+  featured_days integer NOT NULL DEFAULT 7,
+  updated_at timestamptz DEFAULT now()
+);
+-- Seed: free (enabled, $0), premium (disabled, $15 BBD, 7d), business (disabled, $50 BBD, 7d).
+-- GRANTs: anon+authenticated SELECT (public read); admin write via has_role check.
 
-**New files:**
-- `src/components/ShareMenu.tsx`
-- `src/lib/share.ts` (URL builders, `withUtm`, prefill text helpers)
-- `src/lib/shareVisit.ts` (client-side UTM capture, called from `__root.tsx` on route change)
-- `src/routes/api/public/og.listing.$id[.]png.ts`
-- `src/routes/api/public/og.business.$slug[.]png.ts`
-- `src/routes/api/public/og.seller.$id[.]png.ts`
-- `src/lib/og-render.server.ts` (shared satori/resvg renderer + font loading)
-- `public/og-default.png` (agent-generated branded fallback)
+ALTER TABLE public.listings
+  ADD COLUMN featured_until timestamptz,   -- null = not featured
+  ADD COLUMN is_featured boolean GENERATED ALWAYS AS (featured_until > now()) STORED;
+```
 
-**Edited files:**
-- `src/routes/listing.$id.tsx` — swap share icon → `<ShareMenu />`, point `og:image` at `/api/public/og/listing/$id.png`.
-- `src/routes/business.$slug.tsx` — add share button in header, set `og:image` to `/api/public/og/business/$slug.png` (and set proper per-route `head()` if not already).
-- `src/routes/seller.$id.tsx` — add share button in header, set `og:image` to `/api/public/og/seller/$id.png`.
-- `src/routes/_authenticated/my-listings.tsx` — add per-row share button.
-- `src/routes/_authenticated/post.tsx` — success step with inline share UI.
-- `src/routes/__root.tsx` — mount UTM capture on route changes.
+No frontend changes to listing display yet — surfacing "featured" visually is future work. Existing seller/buyer flows keep working exactly as today.
 
-**Migration:**
-1. `CREATE TABLE public.share_visits (id, path text, utm_source text, utm_medium text, utm_campaign text, referrer text, created_at timestamptz default now())` + GRANTs (`SELECT` to authenticated for admin panel; no direct INSERT), RLS enabled, admin/moderator SELECT policy via `has_role`.
-2. `CREATE FUNCTION public.log_share_visit(...) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public` — inserts a row; `GRANT EXECUTE ... TO anon, authenticated`.
+## Part 4 — Admin Marketplace Controls
 
-**Instagram note:** true Stories sharing requires the native app — the deep-link attempt + copy-to-clipboard fallback is the standard web pattern; no OAuth or Meta app needed.
+New panel `src/components/MarketplaceControlsPanel.tsx` (Admin tab):
+- Toggle `plan_settings.enabled` per plan (Premium / Business).
+- Edit `price_bbd_cents` and `featured_days`.
+- Toggle a global "featured listings enabled" flag (stored in `plan_settings` for `business`/`premium`).
+- Read-only summary counts (users on each plan, currently featured listings).
 
-**Out of scope:** admin analytics dashboard for share_visits, Pinterest / LinkedIn / Reddit, sharing individual reviews, referral rewards.
+All writes via a new `createServerFn` in `src/lib/plans.functions.ts` guarded by `has_role(auth.uid(),'admin')`.
+
+## Files touched
+
+**New**: `src/lib/analytics.ts`, `src/components/AnalyticsPanel.tsx`, `src/components/MarketplaceControlsPanel.tsx`, `src/lib/plans.functions.ts`, one migration.
+
+**Additive edits** (single-line tracker calls + nav tab + head scripts): `src/routes/__root.tsx`, `src/routes/auth.tsx`, `src/routes/_authenticated/post.tsx`, `src/routes/_authenticated/profile.tsx`, `src/routes/listing.$id.tsx`, `src/routes/browse.tsx`, `src/components/ShareMenu.tsx`, `src/routes/_authenticated/admin.tsx`, `.env` (add `VITE_META_PIXEL_ID` placeholder).
+
+**Not touched**: any existing DB column semantics, RLS on existing tables, auth flow, listing/messaging/upload/search logic, UI layouts.
