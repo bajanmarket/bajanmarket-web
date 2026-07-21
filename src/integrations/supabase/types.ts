@@ -651,6 +651,7 @@ export type Database = {
           deleted_at: string | null
           description: string
           favourite_count: number
+          featured_until: string | null
           id: string
           negotiable: boolean
           parish: Database["public"]["Enums"]["parish"]
@@ -670,6 +671,7 @@ export type Database = {
           deleted_at?: string | null
           description: string
           favourite_count?: number
+          featured_until?: string | null
           id?: string
           negotiable?: boolean
           parish: Database["public"]["Enums"]["parish"]
@@ -689,6 +691,7 @@ export type Database = {
           deleted_at?: string | null
           description?: string
           favourite_count?: number
+          featured_until?: string | null
           id?: string
           negotiable?: boolean
           parish?: Database["public"]["Enums"]["parish"]
@@ -785,6 +788,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      plan_settings: {
+        Row: {
+          enabled: boolean
+          featured_days: number
+          plan: Database["public"]["Enums"]["seller_plan"]
+          price_bbd_cents: number
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          featured_days?: number
+          plan: Database["public"]["Enums"]["seller_plan"]
+          price_bbd_cents?: number
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          featured_days?: number
+          plan?: Database["public"]["Enums"]["seller_plan"]
+          price_bbd_cents?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       profile_private: {
         Row: {
@@ -957,6 +984,39 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan: Database["public"]["Enums"]["seller_plan"]
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["seller_plan"]
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["seller_plan"]
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1047,6 +1107,7 @@ export type Database = {
         | "saint_thomas"
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
       report_target: "listing" | "user" | "message"
+      seller_plan: "free" | "premium" | "business"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1192,6 +1253,7 @@ export const Constants = {
       ],
       report_status: ["open", "reviewing", "resolved", "dismissed"],
       report_target: ["listing", "user", "message"],
+      seller_plan: ["free", "premium", "business"],
     },
   },
 } as const

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
+import { track, deviceType } from "@/lib/analytics";
 
 const SITE_URL = "https://bajanmarketplacetest.lovable.app";
 
@@ -96,6 +97,7 @@ function ListingDetail() {
     supabase.rpc("increment_listing_view", { _listing_id: id }).then(() => {
       // silent; don't refetch — counts are eventually consistent
     });
+    track("listing_viewed", { listing_id: id, device: deviceType() });
   }, [id]);
 
   const { data: isFav } = useQuery({
@@ -119,6 +121,7 @@ function ListingDetail() {
         await supabase.from("favourites").delete().eq("listing_id", id).eq("user_id", user.id);
       } else {
         await supabase.from("favourites").insert({ listing_id: id, user_id: user.id });
+        track("listing_saved", { listing_id: id });
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["fav", id] }),
@@ -146,6 +149,7 @@ function ListingDetail() {
         if (error) throw error;
         convId = created.id;
       }
+      track("seller_contacted", { listing_id: id, seller_id: data.seller_id });
       nav({ to: "/messages/$id", params: { id: convId! } });
     },
     onError: (e: Error) => toast.error(e.message),

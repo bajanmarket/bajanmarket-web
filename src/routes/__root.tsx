@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
 import { captureShareVisit } from "@/lib/shareVisit";
+import { GA4_ID, META_PIXEL_ID, trackPageView } from "@/lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -82,6 +83,18 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+const GA4_SCRIPTS = [
+  { src: `https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`, async: true },
+  {
+    children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${GA4_ID}',{send_page_view:false});`,
+  },
+  ...(META_PIXEL_ID
+    ? [{
+        children: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${META_PIXEL_ID}');`,
+      }]
+    : []),
+];
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -108,6 +121,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap",
       },
     ],
+    scripts: GA4_SCRIPTS,
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -144,7 +158,11 @@ function RootComponent() {
 
   useEffect(() => {
     captureShareVisit();
-    return router.subscribe("onResolved", () => captureShareVisit());
+    trackPageView(window.location.pathname);
+    return router.subscribe("onResolved", () => {
+      captureShareVisit();
+      trackPageView(window.location.pathname);
+    });
   }, [router]);
 
   return (
