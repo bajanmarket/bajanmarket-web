@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
+import { track } from "@/lib/analytics";
 
 const searchSchema = z.object({ redirect: z.string().optional() });
 
