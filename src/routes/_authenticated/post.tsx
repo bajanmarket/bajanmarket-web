@@ -16,6 +16,7 @@ import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill, SITE_URL } from "@/lib/share";
 import { formatBBD } from "@/lib/format";
 import { Link } from "@tanstack/react-router";
+import { track, deviceType } from "@/lib/analytics";
 
 export const Route = createFileRoute("/_authenticated/post")({
   head: () => ({ meta: [{ title: "Post a listing — Bajan.market" }] }),
