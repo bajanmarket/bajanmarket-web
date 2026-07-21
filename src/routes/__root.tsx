@@ -157,6 +157,7 @@ function RootComponent() {
   }, [router, queryClient]);
 
   useEffect(() => {
+    captureShareVisit();
     trackPageView(window.location.pathname);
     return router.subscribe("onResolved", () => {
       captureShareVisit();
