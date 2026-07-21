@@ -155,47 +155,26 @@ function AdminPage() {
         <h1 className="text-2xl font-medium">Admin</h1>
       </div>
 
-      <div className="flex gap-1 mb-4 bg-white rounded-xl p-1 ring-1 ring-hairline w-fit">
-        <button
-          onClick={() => setSection("reports")}
-          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
-            section === "reports" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
-          }`}
-        >
-          <Shield className="size-3" /> Reports
-        </button>
-        <button
-          onClick={() => setSection("insights")}
-          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
-            section === "insights" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
-          }`}
-        >
-          <BarChart3 className="size-3" /> Insights
-        </button>
-        <button
-          onClick={() => setSection("audience")}
-          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
-            section === "audience" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
-          }`}
-        >
-          <Users className="size-3" /> Audience
-        </button>
-        <button
-          onClick={() => setSection("admins")}
-          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
-            section === "admins" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
-          }`}
-        >
-          <ShieldCheck className="size-3" /> Admins
-        </button>
-        <button
-          onClick={() => setSection("businesses")}
-          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
-            section === "businesses" ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
-          }`}
-        >
-          <Store className="size-3" /> Businesses
-        </button>
+      <div className="flex gap-1 mb-4 bg-white rounded-xl p-1 ring-1 ring-hairline w-fit flex-wrap">
+        {([
+          ["reports", "Reports", Shield],
+          ["analytics", "Analytics", LineChart],
+          ["insights", "Insights", BarChart3],
+          ["audience", "Audience", Users],
+          ["admins", "Admins", ShieldCheck],
+          ["businesses", "Businesses", Store],
+          ["marketplace", "Marketplace", Settings2],
+        ] as [Section, string, typeof Shield][]).map(([key, label, Icon]) => (
+          <button
+            key={key}
+            onClick={() => setSection(key)}
+            className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 ${
+              section === key ? "bg-navy text-white" : "text-navy/60 hover:text-navy"
+            }`}
+          >
+            <Icon className="size-3" /> {label}
+          </button>
+        ))}
         <Link
           to="/campaigns"
           className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 text-navy/60 hover:text-navy"
@@ -205,7 +184,9 @@ function AdminPage() {
       </div>
 
 
-      {section === "insights" ? (
+      {section === "analytics" ? (
+        <AnalyticsPanel />
+      ) : section === "insights" ? (
         <InsightsPanel />
       ) : section === "audience" ? (
         <AudiencePanel />
@@ -213,6 +194,8 @@ function AdminPage() {
         <AdminsPanel />
       ) : section === "businesses" ? (
         <BusinessesPanel />
+      ) : section === "marketplace" ? (
+        <MarketplaceControlsPanel />
       ) : (
         <ReportsSection
           tab={tab}
