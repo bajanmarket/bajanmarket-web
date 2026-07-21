@@ -81,13 +81,16 @@ function AuthPage() {
           });
         }
         if (!data.session) {
+          track("account_created", { method: "email", confirmed: false });
           toast.success("Check your email to confirm your account.");
           return;
         }
+        track("account_created", { method: "email", confirmed: true });
         toast.success("Welcome to Bajan.market!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        track("login_completed", { method: "email" });
       }
       nav({ to: safeRedirect });
     } catch (err) {
