@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
 import { captureShareVisit } from "@/lib/shareVisit";
+import { GA4_ID, META_PIXEL_ID, trackPageView } from "@/lib/analytics";
 
 function NotFoundComponent() {
   return (
