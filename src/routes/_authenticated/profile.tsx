@@ -154,6 +154,14 @@ function Profile() {
             <Heart className="size-5 text-coral" />
             <span className="font-medium text-sm">Saved</span>
           </Link>
+          <Link to="/bookings" className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3">
+            <CalendarCheck className="size-5 text-teal" />
+            <span className="font-medium text-sm">My bookings</span>
+          </Link>
+          <Link to="/provider-services" className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3">
+            <Briefcase className="size-5 text-teal" />
+            <span className="font-medium text-sm">My services</span>
+          </Link>
           <Link to="/business" className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3 col-span-2">
             <Store className="size-5 text-teal" />
             <span className="font-medium text-sm">Business storefront</span>
