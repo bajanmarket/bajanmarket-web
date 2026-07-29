@@ -56,6 +56,179 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_answers: {
+        Row: {
+          booking_id: string
+          created_at: string
+          field_key: string
+          id: string
+          label: string | null
+          sensitive: boolean
+          value: Json
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          field_key: string
+          id?: string
+          label?: string | null
+          sensitive?: boolean
+          value?: Json
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          field_key?: string
+          id?: string
+          label?: string | null
+          sensitive?: boolean
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_answers_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_status_history: {
+        Row: {
+          booking_id: string
+          changed_by: string | null
+          created_at: string
+          from_status: Database["public"]["Enums"]["booking_status"] | null
+          id: string
+          note: string | null
+          to_status: Database["public"]["Enums"]["booking_status"]
+        }
+        Insert: {
+          booking_id: string
+          changed_by?: string | null
+          created_at?: string
+          from_status?: Database["public"]["Enums"]["booking_status"] | null
+          id?: string
+          note?: string | null
+          to_status: Database["public"]["Enums"]["booking_status"]
+        }
+        Update: {
+          booking_id?: string
+          changed_by?: string | null
+          created_at?: string
+          from_status?: Database["public"]["Enums"]["booking_status"] | null
+          id?: string
+          note?: string | null
+          to_status?: Database["public"]["Enums"]["booking_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_status_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          buyer_contact_phone: string | null
+          buyer_id: string
+          buyer_note: string | null
+          cancelled_reason: string | null
+          category_id: string | null
+          completed_at: string | null
+          conversation_id: string | null
+          created_at: string
+          currency: string
+          ends_at: string
+          id: string
+          location: string | null
+          price: number
+          provider_id: string
+          provider_note: string | null
+          reference: string
+          requested_starts_at: string | null
+          service_listing_id: string
+          starts_at: string
+          status: Database["public"]["Enums"]["booking_status"]
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_contact_phone?: string | null
+          buyer_id: string
+          buyer_note?: string | null
+          cancelled_reason?: string | null
+          category_id?: string | null
+          completed_at?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          currency?: string
+          ends_at: string
+          id?: string
+          location?: string | null
+          price?: number
+          provider_id: string
+          provider_note?: string | null
+          reference?: string
+          requested_starts_at?: string | null
+          service_listing_id: string
+          starts_at: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_contact_phone?: string | null
+          buyer_id?: string
+          buyer_note?: string | null
+          cancelled_reason?: string | null
+          category_id?: string | null
+          completed_at?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          currency?: string
+          ends_at?: string
+          id?: string
+          location?: string | null
+          price?: number
+          provider_id?: string
+          provider_note?: string | null
+          reference?: string
+          requested_starts_at?: string | null
+          service_listing_id?: string
+          starts_at?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_service_listing_id_fkey"
+            columns: ["service_listing_id"]
+            isOneToOne: false
+            referencedRelation: "service_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_reviews: {
         Row: {
           body: string | null
@@ -544,36 +717,46 @@ export type Database = {
       }
       conversations: {
         Row: {
+          booking_id: string | null
           buyer_hidden_at: string | null
           buyer_id: string
           created_at: string
           id: string
           last_message_at: string
-          listing_id: string
+          listing_id: string | null
           seller_hidden_at: string | null
           seller_id: string
         }
         Insert: {
+          booking_id?: string | null
           buyer_hidden_at?: string | null
           buyer_id: string
           created_at?: string
           id?: string
           last_message_at?: string
-          listing_id: string
+          listing_id?: string | null
           seller_hidden_at?: string | null
           seller_id: string
         }
         Update: {
+          booking_id?: string | null
           buyer_hidden_at?: string | null
           buyer_id?: string
           created_at?: string
           id?: string
           last_message_at?: string
-          listing_id?: string
+          listing_id?: string | null
           seller_hidden_at?: string | null
           seller_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "conversations_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "conversations_listing_id_fkey"
             columns: ["listing_id"]
@@ -876,6 +1059,137 @@ export type Database = {
           },
         ]
       }
+      notification_deliveries: {
+        Row: {
+          channel: string
+          created_at: string
+          error: string | null
+          id: string
+          notification_id: string | null
+          provider_message_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          notification_id?: string | null
+          provider_message_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          notification_id?: string | null
+          provider_message_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_preferences: {
+        Row: {
+          booking_events: boolean
+          created_at: string
+          email_enabled: boolean
+          in_app_enabled: boolean
+          message_events: boolean
+          reminder_events: boolean
+          updated_at: string
+          user_id: string
+          whatsapp_enabled: boolean
+        }
+        Insert: {
+          booking_events?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          in_app_enabled?: boolean
+          message_events?: boolean
+          reminder_events?: boolean
+          updated_at?: string
+          user_id: string
+          whatsapp_enabled?: boolean
+        }
+        Update: {
+          booking_events?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          in_app_enabled?: boolean
+          message_events?: boolean
+          reminder_events?: boolean
+          updated_at?: string
+          user_id?: string
+          whatsapp_enabled?: boolean
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          booking_id: string | null
+          conversation_id: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          booking_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          booking_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plan_settings: {
         Row: {
           enabled: boolean
@@ -978,6 +1292,109 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_availability: {
+        Row: {
+          active: boolean
+          advance_days: number
+          break_end: string | null
+          break_start: string | null
+          buffer_minutes: number
+          created_at: string
+          end_time: string
+          id: string
+          max_daily_bookings: number
+          min_notice_hours: number
+          provider_id: string
+          service_listing_id: string | null
+          slot_minutes: number
+          start_time: string
+          timezone: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          active?: boolean
+          advance_days?: number
+          break_end?: string | null
+          break_start?: string | null
+          buffer_minutes?: number
+          created_at?: string
+          end_time?: string
+          id?: string
+          max_daily_bookings?: number
+          min_notice_hours?: number
+          provider_id: string
+          service_listing_id?: string | null
+          slot_minutes?: number
+          start_time?: string
+          timezone?: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          active?: boolean
+          advance_days?: number
+          break_end?: string | null
+          break_start?: string | null
+          buffer_minutes?: number
+          created_at?: string
+          end_time?: string
+          id?: string
+          max_daily_bookings?: number
+          min_notice_hours?: number
+          provider_id?: string
+          service_listing_id?: string | null
+          slot_minutes?: number
+          start_time?: string
+          timezone?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_availability_service_listing_id_fkey"
+            columns: ["service_listing_id"]
+            isOneToOne: false
+            referencedRelation: "service_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      provider_blocked_dates: {
+        Row: {
+          blocked_date: string
+          created_at: string
+          id: string
+          provider_id: string
+          reason: string | null
+          service_listing_id: string | null
+        }
+        Insert: {
+          blocked_date: string
+          created_at?: string
+          id?: string
+          provider_id: string
+          reason?: string | null
+          service_listing_id?: string | null
+        }
+        Update: {
+          blocked_date?: string
+          created_at?: string
+          id?: string
+          provider_id?: string
+          reason?: string | null
+          service_listing_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_blocked_dates_service_listing_id_fkey"
+            columns: ["service_listing_id"]
+            isOneToOne: false
+            referencedRelation: "service_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           created_at: string
@@ -1040,6 +1457,244 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      service_categories: {
+        Row: {
+          active: boolean
+          cancellation_policy: string | null
+          created_at: string
+          description: string | null
+          duration_options: number[]
+          icon: string
+          id: string
+          instant_booking_allowed: boolean
+          name: string
+          requires_provider_approval: boolean
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          cancellation_policy?: string | null
+          created_at?: string
+          description?: string | null
+          duration_options?: number[]
+          icon?: string
+          id?: string
+          instant_booking_allowed?: boolean
+          name: string
+          requires_provider_approval?: boolean
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          cancellation_policy?: string | null
+          created_at?: string
+          description?: string | null
+          duration_options?: number[]
+          icon?: string
+          id?: string
+          instant_booking_allowed?: boolean
+          name?: string
+          requires_provider_approval?: boolean
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      service_listing_answers: {
+        Row: {
+          created_at: string
+          field_key: string
+          id: string
+          service_listing_id: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          field_key: string
+          id?: string
+          service_listing_id: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          field_key?: string
+          id?: string
+          service_listing_id?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_listing_answers_service_listing_id_fkey"
+            columns: ["service_listing_id"]
+            isOneToOne: false
+            referencedRelation: "service_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_listings: {
+        Row: {
+          areas_served: string[]
+          business_id: string | null
+          cancellation_policy: string | null
+          category_id: string
+          cover_image_url: string | null
+          created_at: string
+          currency: string
+          description: string
+          duration_minutes: number
+          id: string
+          images: string[]
+          instant_booking: boolean
+          location_note: string | null
+          mobile_service: boolean
+          parish: Database["public"]["Enums"]["parish"] | null
+          price: number
+          price_unit: string
+          provider_id: string
+          rating_avg: number
+          rating_count: number
+          status: Database["public"]["Enums"]["service_listing_status"]
+          title: string
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          areas_served?: string[]
+          business_id?: string | null
+          cancellation_policy?: string | null
+          category_id: string
+          cover_image_url?: string | null
+          created_at?: string
+          currency?: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          images?: string[]
+          instant_booking?: boolean
+          location_note?: string | null
+          mobile_service?: boolean
+          parish?: Database["public"]["Enums"]["parish"] | null
+          price?: number
+          price_unit?: string
+          provider_id: string
+          rating_avg?: number
+          rating_count?: number
+          status?: Database["public"]["Enums"]["service_listing_status"]
+          title: string
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          areas_served?: string[]
+          business_id?: string | null
+          cancellation_policy?: string | null
+          category_id?: string
+          cover_image_url?: string | null
+          created_at?: string
+          currency?: string
+          description?: string
+          duration_minutes?: number
+          id?: string
+          images?: string[]
+          instant_booking?: boolean
+          location_note?: string | null
+          mobile_service?: boolean
+          parish?: Database["public"]["Enums"]["parish"] | null
+          price?: number
+          price_unit?: string
+          provider_id?: string
+          rating_avg?: number
+          rating_count?: number
+          status?: Database["public"]["Enums"]["service_listing_status"]
+          title?: string
+          updated_at?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_listings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_listings_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_template_fields: {
+        Row: {
+          active: boolean
+          audience: Database["public"]["Enums"]["service_field_audience"]
+          category_id: string
+          created_at: string
+          field_key: string
+          field_type: Database["public"]["Enums"]["service_field_type"]
+          help_text: string | null
+          id: string
+          label: string
+          options: string[]
+          required: boolean
+          sensitive: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          audience: Database["public"]["Enums"]["service_field_audience"]
+          category_id: string
+          created_at?: string
+          field_key: string
+          field_type?: Database["public"]["Enums"]["service_field_type"]
+          help_text?: string | null
+          id?: string
+          label: string
+          options?: string[]
+          required?: boolean
+          sensitive?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          audience?: Database["public"]["Enums"]["service_field_audience"]
+          category_id?: string
+          created_at?: string
+          field_key?: string
+          field_type?: Database["public"]["Enums"]["service_field_type"]
+          help_text?: string | null
+          id?: string
+          label?: string
+          options?: string[]
+          required?: boolean
+          sensitive?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_template_fields_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       share_visits: {
         Row: {
@@ -1149,6 +1804,45 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_consent: {
+        Row: {
+          consent_method: string | null
+          consented_at: string | null
+          created_at: string
+          opted_out_at: string | null
+          phone: string
+          updated_at: string
+          user_id: string
+          verification_code: string | null
+          verification_expires_at: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          consent_method?: string | null
+          consented_at?: string | null
+          created_at?: string
+          opted_out_at?: string | null
+          phone: string
+          updated_at?: string
+          user_id: string
+          verification_code?: string | null
+          verification_expires_at?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          consent_method?: string | null
+          consented_at?: string | null
+          created_at?: string
+          opted_out_at?: string | null
+          phone?: string
+          updated_at?: string
+          user_id?: string
+          verification_code?: string | null
+          verification_expires_at?: string | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1225,9 +1919,26 @@ export type Database = {
           read_ct: number
         }[]
       }
+      service_busy_slots: {
+        Args: { _from: string; _provider_id: string; _to: string }
+        Returns: {
+          ends_at: string
+          starts_at: string
+        }[]
+      }
     }
     Enums: {
       app_role: "user" | "moderator" | "admin"
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "declined"
+        | "reschedule_requested"
+        | "cancelled_by_buyer"
+        | "cancelled_by_provider"
+        | "completed"
+        | "no_show"
+        | "disputed"
       listing_condition: "new" | "like_new" | "good" | "fair" | "for_parts"
       listing_status: "active" | "paused" | "sold" | "deleted"
       parish:
@@ -1245,6 +1956,19 @@ export type Database = {
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
       report_target: "listing" | "user" | "message"
       seller_plan: "free" | "premium" | "business"
+      service_field_audience: "provider" | "buyer"
+      service_field_type:
+        | "text"
+        | "textarea"
+        | "number"
+        | "select"
+        | "multiselect"
+        | "boolean"
+        | "date"
+        | "time"
+        | "phone"
+        | "images"
+      service_listing_status: "draft" | "active" | "paused" | "removed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1373,6 +2097,17 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "moderator", "admin"],
+      booking_status: [
+        "pending",
+        "confirmed",
+        "declined",
+        "reschedule_requested",
+        "cancelled_by_buyer",
+        "cancelled_by_provider",
+        "completed",
+        "no_show",
+        "disputed",
+      ],
       listing_condition: ["new", "like_new", "good", "fair", "for_parts"],
       listing_status: ["active", "paused", "sold", "deleted"],
       parish: [
@@ -1391,6 +2126,20 @@ export const Constants = {
       report_status: ["open", "reviewing", "resolved", "dismissed"],
       report_target: ["listing", "user", "message"],
       seller_plan: ["free", "premium", "business"],
+      service_field_audience: ["provider", "buyer"],
+      service_field_type: [
+        "text",
+        "textarea",
+        "number",
+        "select",
+        "multiselect",
+        "boolean",
+        "date",
+        "time",
+        "phone",
+        "images",
+      ],
+      service_listing_status: ["draft", "active", "paused", "removed"],
     },
   },
 } as const
