@@ -92,10 +92,9 @@ function BookingsPage() {
 
   const downloadIcs = (b: BookingRow, title: string) => {
     const ics = buildIcs({
-      uid: `${b.id}@bajanmarket.app`,
       title,
-      description: `Booking ${b.reference} on Bajan.market`,
-      location: b.location ?? undefined,
+      reference: b.reference,
+      location: b.location,
       start: new Date(b.starts_at),
       end: new Date(b.ends_at),
     });
@@ -197,7 +196,7 @@ function BookingsPage() {
                   {(b.status === "pending" || b.status === "confirmed") && (
                     <button
                       onClick={() => {
-                        if (confirm("Cancel this booking?")) setStatus(b, "cancelled", "booking_cancelled");
+                        if (confirm("Cancel this booking?")) setStatus(b, role === "provider" ? "cancelled_by_provider" : "cancelled_by_buyer", "booking_cancelled");
                       }}
                       className="text-xs bg-coral/10 text-coral ring-1 ring-coral/20 rounded-lg px-3 py-2 min-h-[40px]"
                     >
@@ -221,10 +220,9 @@ function BookingsPage() {
                   </button>
                   <a
                     href={googleCalendarUrl({
-                      uid: b.id,
                       title,
-                      description: `Booking ${b.reference} on Bajan.market`,
-                      location: b.location ?? undefined,
+                      reference: b.reference,
+                      location: b.location,
                       start: new Date(b.starts_at),
                       end: new Date(b.ends_at),
                     })}
@@ -236,10 +234,9 @@ function BookingsPage() {
                   </a>
                   <a
                     href={outlookCalendarUrl({
-                      uid: b.id,
                       title,
-                      description: `Booking ${b.reference} on Bajan.market`,
-                      location: b.location ?? undefined,
+                      reference: b.reference,
+                      location: b.location,
                       start: new Date(b.starts_at),
                       end: new Date(b.ends_at),
                     })}
