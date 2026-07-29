@@ -89,19 +89,6 @@ function ServiceDetail() {
     },
   });
 
-  const { data: reviews } = useQuery({
-    queryKey: ["service-reviews", id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("service_reviews")
-        .select("id, rating, body, created_at, reviewer_id")
-        .eq("service_listing_id", id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-      return data ?? [];
-    },
-  });
-
   if (isLoading) return <AppShell><div className="text-navy/40 text-sm">Loading…</div></AppShell>;
   if (!service)
     return (
@@ -375,19 +362,6 @@ function ServiceDetail() {
           </div>
         )}
 
-        {reviews && reviews.length > 0 && (
-          <div className="flex flex-col gap-3">
-            <h2 className="text-base font-medium">Reviews</h2>
-            {reviews.map((r) => (
-              <div key={r.id} className="bg-white rounded-2xl ring-1 ring-hairline p-4">
-                <div className="flex items-center gap-1 text-xs font-semibold">
-                  <Star className="size-3.5 text-teal" /> {r.rating}/5
-                </div>
-                {r.body && <p className="text-sm text-navy/70 mt-1.5 whitespace-pre-wrap">{r.body}</p>}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </AppShell>
   );
