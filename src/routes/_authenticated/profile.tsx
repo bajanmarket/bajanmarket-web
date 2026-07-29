@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/useAuth";
 import { uploadImage } from "@/lib/uploadImage";
 import { PARISHES } from "@/lib/parishes";
 import { initials } from "@/lib/format";
-import { LogOut, Settings, Package, Heart, Shield, Store } from "lucide-react";
+import { LogOut, Settings, Package, Heart, Shield, Store, CalendarCheck, Briefcase } from "lucide-react";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { MarketingPrefs } from "@/components/MarketingPrefs";
 import { toast } from "sonner";
