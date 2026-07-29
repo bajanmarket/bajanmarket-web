@@ -25,6 +25,7 @@ import { Route as ServicesIdRouteImport } from './routes/services.$id'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
+import { Route as AuthenticatedProviderServicesRouteImport } from './routes/_authenticated/provider-services'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
 import { Route as AuthenticatedMyListingsRouteImport } from './routes/_authenticated/my-listings'
@@ -120,6 +121,12 @@ const BusinessSlugRoute = BusinessSlugRouteImport.update({
   path: '/business/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProviderServicesRoute =
+  AuthenticatedProviderServicesRouteImport.update({
+    id: '/provider-services',
+    path: '/provider-services',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/my-listings': typeof AuthenticatedMyListingsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
@@ -253,6 +261,7 @@ export interface FileRoutesByTo {
   '/my-listings': typeof AuthenticatedMyListingsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
@@ -287,6 +296,7 @@ export interface FileRoutesById {
   '/_authenticated/my-listings': typeof AuthenticatedMyListingsRoute
   '/_authenticated/post': typeof AuthenticatedPostRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/my-listings'
     | '/post'
     | '/profile'
+    | '/provider-services'
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/my-listings'
     | '/post'
     | '/profile'
+    | '/provider-services'
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
@@ -385,6 +397,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-listings'
     | '/_authenticated/post'
     | '/_authenticated/profile'
+    | '/_authenticated/provider-services'
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
@@ -535,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BusinessSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/provider-services': {
+      id: '/_authenticated/provider-services'
+      path: '/provider-services'
+      fullPath: '/provider-services'
+      preLoaderRoute: typeof AuthenticatedProviderServicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -667,6 +687,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyListingsRoute: typeof AuthenticatedMyListingsRoute
   AuthenticatedPostRoute: typeof AuthenticatedPostRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedProviderServicesRoute: typeof AuthenticatedProviderServicesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -678,6 +699,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyListingsRoute: AuthenticatedMyListingsRoute,
   AuthenticatedPostRoute: AuthenticatedPostRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedProviderServicesRoute: AuthenticatedProviderServicesRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
