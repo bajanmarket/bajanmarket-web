@@ -183,8 +183,11 @@ function ServiceDetail() {
 
       await notifyEvent({
         data: {
-          event: instant ? "booking_confirmed" : "booking_requested",
-          bookingId: booking.id,
+          event: instant ? "booking_confirmed" : "booking_submitted",
+          booking_id: booking.id,
+          recipient_id: service.provider_id,
+          origin: window.location.origin,
+          detail: `${service.title} — ${booking.reference}`,
         },
       }).catch(() => undefined);
 
