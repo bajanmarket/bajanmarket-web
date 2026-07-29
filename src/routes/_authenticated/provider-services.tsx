@@ -116,7 +116,7 @@ function ServicesTab({ userId, qc }: { userId?: string; qc: QC }) {
             <button
               onClick={async () => {
                 if (!confirm(`Delete "${s.title}"? Existing bookings stay in your history.`)) return;
-                const { error } = await supabase.from("service_listings").update({ status: "deleted" }).eq("id", s.id);
+                const { error } = await supabase.from("service_listings").update({ status: "removed" }).eq("id", s.id);
                 if (error) return toast.error(error.message);
                 qc.invalidateQueries({ queryKey: ["my-services"] });
               }}
@@ -209,7 +209,6 @@ function NewServiceForm({ userId, qc, onDone }: { userId?: string; qc: QC; onDon
         .map((f) => ({
           service_listing_id: created.id,
           field_key: f.field_key,
-          label: f.label,
           value: answers[f.field_key] as never,
         }));
       if (rows.length) {
@@ -388,9 +387,9 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
           <label className="flex flex-col gap-1.5">
             <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">Day</span>
             <select value={weekday} onChange={(e) => setWeekday(Number(e.target.value))} className={inputCls}>
-              {WEEKDAYS.map((d, i) => (
-                <option key={d} value={i}>
-                  {d}
+              {WEEKDAYS.map((d) => (
+                <option key={d.value} value={d.value}>
+                  {d.label}
                 </option>
               ))}
             </select>
@@ -420,7 +419,7 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
       {(rows ?? []).map((r) => (
         <div key={r.id} className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center justify-between">
           <div className="text-sm">
-            <span className="font-medium">{WEEKDAYS[r.weekday]}</span>{" "}
+            <span className="font-medium">{WEEKDAYS[r.weekday]?.label}</span>{" "}
             <span className="text-navy/60">
               {r.start_time.slice(0, 5)}–{r.end_time.slice(0, 5)} · {r.slot_minutes} min slots
             </span>
