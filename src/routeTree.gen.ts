@@ -21,6 +21,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
+import { Route as ServicesIdRouteImport } from './routes/services.$id'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
@@ -97,6 +98,11 @@ const IndexRoute = IndexRouteImport.update({
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
   id: '/services/',
   path: '/services/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesIdRoute = ServicesIdRouteImport.update({
+  id: '/services/$id',
+  path: '/services/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SellerIdRoute = SellerIdRouteImport.update({
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
+  '/services/$id': typeof ServicesIdRoute
   '/services/': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
+  '/services/$id': typeof ServicesIdRoute
   '/services': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/business/$slug': typeof BusinessSlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
+  '/services/$id': typeof ServicesIdRoute
   '/services/': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -315,6 +324,7 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
+    | '/services/$id'
     | '/services/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
+    | '/services/$id'
     | '/services'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/listing/$id'
     | '/seller/$id'
+    | '/services/$id'
     | '/services/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -402,6 +414,7 @@ export interface RootRouteChildren {
   BusinessSlugRoute: typeof BusinessSlugRoute
   ListingIdRoute: typeof ListingIdRoute
   SellerIdRoute: typeof SellerIdRoute
+  ServicesIdRoute: typeof ServicesIdRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -492,6 +505,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services/'
       preLoaderRoute: typeof ServicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/$id': {
+      id: '/services/$id'
+      path: '/services/$id'
+      fullPath: '/services/$id'
+      preLoaderRoute: typeof ServicesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/seller/$id': {
@@ -681,6 +701,7 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessSlugRoute: BusinessSlugRoute,
   ListingIdRoute: ListingIdRoute,
   SellerIdRoute: SellerIdRoute,
+  ServicesIdRoute: ServicesIdRoute,
   ServicesIndexRoute: ServicesIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
