@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Search, Plus, CalendarCheck, UserRound } from "lucide-react";
+import { Home, Search, Plus, MessageSquare, CalendarCheck } from "lucide-react";
 
 const items = [
   { to: "/", label: "Home", icon: Home },
@@ -8,7 +8,7 @@ const items = [
 
 const rightItems = [
   { to: "/services", label: "Services", icon: CalendarCheck },
-  { to: "/profile", label: "Profile", icon: UserRound },
+  { to: "/messages", label: "Inbox", icon: MessageSquare },
 ] as const;
 
 export function BottomNav() {
