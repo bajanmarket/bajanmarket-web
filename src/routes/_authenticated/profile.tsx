@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/useAuth";
 import { uploadImage } from "@/lib/uploadImage";
 import { PARISHES } from "@/lib/parishes";
 import { initials } from "@/lib/format";
-import { LogOut, Settings, Package, Heart, Shield, Store } from "lucide-react";
+import { LogOut, Settings, Package, Heart, Shield, Store, CalendarCheck, Briefcase } from "lucide-react";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { MarketingPrefs } from "@/components/MarketingPrefs";
 import { toast } from "sonner";
@@ -153,6 +153,14 @@ function Profile() {
           <Link to="/favourites" className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3">
             <Heart className="size-5 text-coral" />
             <span className="font-medium text-sm">Saved</span>
+          </Link>
+          <Link to="/bookings" className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3">
+            <CalendarCheck className="size-5 text-teal" />
+            <span className="font-medium text-sm">My bookings</span>
+          </Link>
+          <Link to="/provider-services" className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3">
+            <Briefcase className="size-5 text-teal" />
+            <span className="font-medium text-sm">My services</span>
           </Link>
           <Link to="/business" className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3 col-span-2">
             <Store className="size-5 text-teal" />
