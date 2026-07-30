@@ -110,10 +110,10 @@ type Sendability =
  * production must be explicitly activated by the owner, and while test mode
  * is on only allowlisted numbers can be reached.
  */
-export async function checkSendable(phoneDigits: string, event: WhatsAppEvent): Promise<Sendability> {
+export async function checkSendable(phoneDigits: string, templateEnvName: string): Promise<Sendability> {
   const missing = missingSecrets();
   if (missing.length) return { ok: false, reason: `Missing credentials: ${missing.join(", ")}` };
-  if (!process.env[TEMPLATE_ENV[event]]) return { ok: false, reason: `No approved template configured for ${event}` };
+  if (!process.env[templateEnvName]) return { ok: false, reason: `No approved template configured (${templateEnvName})` };
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: settings } = await supabaseAdmin
@@ -161,7 +161,7 @@ export async function sendWhatsAppTemplate(
   const phone = normalisePhone(rawPhone);
   if (!phone) return { status: "failed", error: "Invalid phone number" };
 
-  const gate = await checkSendable(phone, event);
+  const gate = await checkSendable(phone, TEMPLATE_ENV[event]);
   if (!gate.ok) return { status: "suppressed", reason: gate.reason };
 
   const name = process.env[TEMPLATE_ENV[event]]!;
@@ -217,5 +217,46 @@ export async function testMetaConnection() {
     return { ok: true, detail: "Meta connection verified", templates };
   } catch (e) {
     return { ok: false, detail: (e as Error).message.slice(0, 300), templates: [] };
+  }
+}
+
+export const VERIFICATION_TEMPLATE_ENV = "WHATSAPP_TEMPLATE_VERIFICATION";
+
+/**
+ * Delivers a verification code through the configured provider. If Meta
+ * credentials or an approved authentication template are missing, this
+ * suppresses — it never simulates a successful delivery, so a number can
+ * never be marked verified off the back of an internally generated code.
+ */
+export async function sendVerificationCode(rawPhone: string, code: string): Promise<WhatsAppResult> {
+  const phone = normalisePhone(rawPhone);
+  if (!phone) return { status: "failed", error: "Invalid phone number" };
+
+  const gate = await checkSendable(phone, VERIFICATION_TEMPLATE_ENV);
+  if (!gate.ok) return { status: "suppressed", reason: gate.reason };
+
+  const name = process.env[VERIFICATION_TEMPLATE_ENV]!;
+  const lang = process.env.WHATSAPP_TEMPLATE_LANG ?? "en";
+  try {
+    const r = await postMessage({
+      messaging_product: "whatsapp",
+      to: phone,
+      type: "template",
+      template: {
+        name,
+        language: { code: lang },
+        components: [
+          { type: "body", parameters: [{ type: "text", text: code }] },
+          { type: "button", sub_type: "url", index: "0", parameters: [{ type: "text", text: code }] },
+        ],
+      },
+    });
+    if (!r.ok) {
+      console.error("WhatsApp verification send failed", { to: maskPhone(phone), status: r.status, code: r.json?.error?.code });
+      return { status: "failed", error: String(r.json?.error?.message ?? `HTTP ${r.status}`).slice(0, 300) };
+    }
+    return { status: "sent", providerMessageId: r.json?.messages?.[0]?.id ?? null, isTest: gate.mode === "test" };
+  } catch (e) {
+    return { status: "failed", error: (e as Error).message.slice(0, 300) };
   }
 }
