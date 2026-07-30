@@ -117,6 +117,8 @@ export const notifyEvent = createServerFn({ method: "POST" })
         recipient_id: z.string().uuid(),
         origin: z.string().url(),
         detail: z.string().max(300).optional(),
+        dedupe_key: z.string().max(200).optional(),
+
       })
       .parse(data),
   )
