@@ -271,15 +271,52 @@ export const notifyEvent = createServerFn({ method: "POST" })
         .select("phone, verified_at, consented_at, opted_out_at")
         .eq("user_id", data.recipient_id)
         .maybeSingle();
+      const { WA_EVENT_MAP } = await import("@/lib/whatsapp-events");
+      const waEvent = WA_EVENT_MAP[data.event];
       // Suppression: unverified numbers and withdrawn consent never receive.
-      if (consent?.phone && consent.verified_at && consent.consented_at && !consent.opted_out_at) {
-        const { sendWhatsApp } = await import("@/lib/whatsapp.server");
-        const r = await sendWhatsApp(consent.phone, `${copy.whatsapp}\n${url}`);
+      if (!waEvent) {
+        await settle("whatsapp", {
+          channel: "whatsapp",
+          status: "suppressed",
+          error: "Event is not eligible for WhatsApp delivery",
+        });
+      } else if (consent?.phone && consent.verified_at && consent.consented_at && !consent.opted_out_at) {
+        const { sendWhatsAppTemplate } = await import("@/lib/whatsapp.server");
+        // Template parameters are built server-side from safe fields only:
+        // reference, service name, date, time, Barbados-time label and link.
+        let reference = "";
+        let serviceName: string | undefined;
+        let date: string | undefined;
+        let time: string | undefined;
+        if (data.booking_id) {
+          const { data: b } = await supabaseAdmin
+            .from("bookings")
+            .select("reference, starts_at, service_listings(title)")
+            .eq("id", data.booking_id)
+            .maybeSingle();
+          reference = b?.reference ?? "";
+          serviceName = (b as { service_listings?: { title?: string } } | null)?.service_listings?.title;
+          if (b?.starts_at) {
+            const d = new Date(b.starts_at);
+            date = d.toLocaleDateString("en-GB", { timeZone: "America/Barbados", day: "2-digit", month: "short", year: "numeric" });
+            time = d.toLocaleTimeString("en-GB", { timeZone: "America/Barbados", hour: "2-digit", minute: "2-digit" });
+          }
+        }
+        const r = await sendWhatsAppTemplate(consent.phone, waEvent, {
+          reference,
+          serviceName,
+          date,
+          time,
+          tzLabel: "AST (Barbados time)",
+          link: url,
+        });
         await settle("whatsapp", {
           channel: "whatsapp",
           status: r.status,
-          error: r.status === "failed" ? r.error : r.status === "skipped" ? r.reason : null,
+          error: r.status === "failed" ? r.error : r.status === "suppressed" ? r.reason : null,
           providerMessageId: r.status === "sent" ? r.providerMessageId : null,
+          isTest: r.status === "sent" ? r.isTest : false,
+          errorCode: r.status === "failed" ? (r.errorCode ?? null) : null,
         });
         await supabaseAdmin
           .from("whatsapp_consent")
@@ -293,6 +330,7 @@ export const notifyEvent = createServerFn({ method: "POST" })
         });
       }
     }
+
 
     return { ok: true, deliveries: deliveries.map((d) => ({ channel: d.channel, status: d.status })) };
   });
