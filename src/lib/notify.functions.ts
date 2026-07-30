@@ -219,6 +219,8 @@ export const notifyEvent = createServerFn({ method: "POST" })
       status: string;
       error?: string | null;
       providerMessageId?: string | null;
+      isTest?: boolean;
+      errorCode?: string | null;
     };
     const deliveries: Delivery[] = [];
 
@@ -242,8 +244,13 @@ export const notifyEvent = createServerFn({ method: "POST" })
           status: d.status,
           error: d.error ?? null,
           provider_message_id: d.providerMessageId ?? null,
+          provider_error_code: d.errorCode ?? null,
+          is_test: d.isTest ?? false,
+          status_at: new Date().toISOString(),
+          status_rank: d.status === "sent" ? 1 : 0,
           next_retry_at: d.status === "failed" ? new Date(Date.now() + 5 * 60_000).toISOString() : null,
         })
+
         .eq("idempotency_key", `${data.recipient_id}:${dedupeKey}:${channel}`.slice(0, 300));
       deliveries.push(d);
     };
