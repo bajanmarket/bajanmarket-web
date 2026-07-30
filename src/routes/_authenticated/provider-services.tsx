@@ -332,6 +332,9 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
   const [start, setStart] = useState("09:00");
   const [end, setEnd] = useState("17:00");
   const [slotMinutes, setSlotMinutes] = useState(60);
+  const [breakStart, setBreakStart] = useState("");
+  const [breakEnd, setBreakEnd] = useState("");
+  const [bufferMinutes, setBufferMinutes] = useState(0);
   const [blockDate, setBlockDate] = useState("");
 
   const { data: rows } = useQuery({
@@ -366,12 +369,22 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
         onSubmit={async (e) => {
           e.preventDefault();
           if (!userId) return;
+          if ((breakStart && !breakEnd) || (!breakStart && breakEnd)) {
+            return toast.error("Add both a break start and end time");
+          }
+          if (breakStart && breakEnd && breakEnd <= breakStart) {
+            return toast.error("Break end must be after break start");
+          }
+          if (end <= start) return toast.error("End time must be after start time");
           const { error } = await supabase.from("provider_availability").insert({
             provider_id: userId,
             weekday,
             start_time: start,
             end_time: end,
             slot_minutes: slotMinutes,
+            break_start: breakStart || null,
+            break_end: breakEnd || null,
+            buffer_minutes: bufferMinutes,
           });
           if (error) return toast.error(error.message);
           toast.success("Working hours added");
@@ -412,6 +425,30 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
             <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">End</span>
             <input type="time" value={end} onChange={(e) => setEnd(e.target.value)} className={inputCls} />
           </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">Break start</span>
+            <input type="time" value={breakStart} onChange={(e) => setBreakStart(e.target.value)} className={inputCls} />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">Break end</span>
+            <input type="time" value={breakEnd} onChange={(e) => setBreakEnd(e.target.value)} className={inputCls} />
+          </label>
+          <label className="flex flex-col gap-1.5 col-span-2">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">
+              Buffer between appointments
+            </span>
+            <select
+              value={bufferMinutes}
+              onChange={(e) => setBufferMinutes(Number(e.target.value))}
+              className={inputCls}
+            >
+              {[0, 5, 10, 15, 30, 45, 60].map((m) => (
+                <option key={m} value={m}>
+                  {m === 0 ? "No buffer" : `${m} min`}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         <button className="bg-navy text-white rounded-2xl py-3.5 text-sm font-medium min-h-[48px]">Add hours</button>
       </form>
@@ -422,8 +459,11 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
             <span className="font-medium">{WEEKDAYS[r.weekday]?.label}</span>{" "}
             <span className="text-navy/60">
               {r.start_time.slice(0, 5)}–{r.end_time.slice(0, 5)} · {r.slot_minutes} min slots
+              {r.break_start && r.break_end ? ` · break ${r.break_start.slice(0, 5)}–${r.break_end.slice(0, 5)}` : ""}
+              {r.buffer_minutes ? ` · ${r.buffer_minutes} min buffer` : ""}
             </span>
           </div>
+
           <button
             onClick={async () => {
               const { error } = await supabase.from("provider_availability").delete().eq("id", r.id);

@@ -36,6 +36,7 @@ type BookingRow = {
   location: string | null;
   buyer_note: string | null;
   provider_note: string | null;
+  requested_starts_at: string | null;
   buyer_id: string;
   provider_id: string;
   conversation_id: string | null;
@@ -54,7 +55,7 @@ function BookingsPage() {
       const { data, error } = await supabase
         .from("bookings")
         .select(
-          "id, reference, starts_at, ends_at, status, price, currency, location, buyer_note, provider_note, buyer_id, provider_id, conversation_id, service_listing_id",
+          "id, reference, starts_at, ends_at, status, price, currency, location, buyer_note, provider_note, requested_starts_at, buyer_id, provider_id, conversation_id, service_listing_id",
         )
         .eq(role === "buyer" ? "buyer_id" : "provider_id", user!.id)
         .order("starts_at", { ascending: false })
@@ -88,6 +89,65 @@ function BookingsPage() {
     }).catch(() => undefined);
     qc.invalidateQueries({ queryKey: ["my-bookings"] });
     toast.success("Booking updated");
+  };
+
+  const notify = async (b: BookingRow, event: string) =>
+    notifyEvent({
+      data: {
+        event: event as never,
+        booking_id: b.id,
+        recipient_id: user!.id === b.buyer_id ? b.provider_id : b.buyer_id,
+        origin: window.location.origin,
+        detail: b.reference,
+      },
+    }).catch(() => undefined);
+
+  const requestReschedule = async (b: BookingRow) => {
+    const current = new Date(b.starts_at);
+    const local = new Date(current.getTime() - current.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    const input = window.prompt("Propose a new date and time (YYYY-MM-DDTHH:MM)", local);
+    if (!input) return;
+    const proposed = new Date(input);
+    if (Number.isNaN(proposed.getTime())) return toast.error("That date and time isn't valid.");
+    if (proposed.getTime() <= Date.now()) return toast.error("Choose a time in the future.");
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: "reschedule_requested", requested_starts_at: proposed.toISOString() })
+      .eq("id", b.id);
+    if (error) return toast.error(error.message);
+    await notify(b, "booking_reschedule_requested");
+    qc.invalidateQueries({ queryKey: ["my-bookings"] });
+    toast.success("New time proposed");
+  };
+
+  const respondReschedule = async (b: BookingRow, accept: boolean) => {
+    if (accept) {
+      if (!b.requested_starts_at) return toast.error("No proposed time found.");
+      const duration = new Date(b.ends_at).getTime() - new Date(b.starts_at).getTime();
+      const start = new Date(b.requested_starts_at);
+      const { error } = await supabase
+        .from("bookings")
+        .update({
+          status: "confirmed",
+          starts_at: start.toISOString(),
+          ends_at: new Date(start.getTime() + duration).toISOString(),
+          requested_starts_at: null,
+        })
+        .eq("id", b.id);
+      if (error) return toast.error(error.message);
+      await notify(b, "booking_changed");
+    } else {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: "declined", requested_starts_at: null })
+        .eq("id", b.id);
+      if (error) return toast.error(error.message);
+      await notify(b, "booking_declined");
+    }
+    qc.invalidateQueries({ queryKey: ["my-bookings"] });
+    toast.success(accept ? "New time confirmed" : "New time declined");
   };
 
   const downloadIcs = (b: BookingRow, title: string) => {
@@ -168,6 +228,21 @@ function BookingsPage() {
 
                 {b.buyer_note && <p className="text-sm text-navy/70 whitespace-pre-wrap">{b.buyer_note}</p>}
 
+                {b.status === "reschedule_requested" && b.requested_starts_at && (
+                  <div className="bg-sand rounded-xl px-3 py-2 text-xs text-navy/70">
+                    New time proposed:{" "}
+                    <span className="font-medium text-navy">
+                      {new Date(b.requested_starts_at).toLocaleString([], {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-2">
                   {role === "provider" && b.status === "pending" && (
                     <>
@@ -182,6 +257,30 @@ function BookingsPage() {
                         className="text-xs bg-white ring-1 ring-hairline rounded-lg px-3 py-2 min-h-[40px]"
                       >
                         Decline
+                      </button>
+                    </>
+                  )}
+                  {role === "provider" && (b.status === "pending" || b.status === "confirmed") && (
+                    <button
+                      onClick={() => requestReschedule(b)}
+                      className="text-xs bg-white ring-1 ring-hairline rounded-lg px-3 py-2 min-h-[40px]"
+                    >
+                      Propose new time
+                    </button>
+                  )}
+                  {role === "buyer" && b.status === "reschedule_requested" && (
+                    <>
+                      <button
+                        onClick={() => respondReschedule(b, true)}
+                        className="text-xs bg-teal/10 text-teal ring-1 ring-teal/20 rounded-lg px-3 py-2 min-h-[40px]"
+                      >
+                        Accept new time
+                      </button>
+                      <button
+                        onClick={() => respondReschedule(b, false)}
+                        className="text-xs bg-white ring-1 ring-hairline rounded-lg px-3 py-2 min-h-[40px]"
+                      >
+                        Decline new time
                       </button>
                     </>
                   )}
