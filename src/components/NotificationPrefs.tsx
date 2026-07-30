@@ -278,7 +278,6 @@ function WhatsAppConsent({ verified, phone }: { verified: boolean; phone: string
       )}
     </div>
   );
-  );
 }
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
