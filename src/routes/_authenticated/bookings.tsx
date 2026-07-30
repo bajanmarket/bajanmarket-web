@@ -91,6 +91,65 @@ function BookingsPage() {
     toast.success("Booking updated");
   };
 
+  const notify = async (b: BookingRow, event: string) =>
+    notifyEvent({
+      data: {
+        event: event as never,
+        booking_id: b.id,
+        recipient_id: user!.id === b.buyer_id ? b.provider_id : b.buyer_id,
+        origin: window.location.origin,
+        detail: b.reference,
+      },
+    }).catch(() => undefined);
+
+  const requestReschedule = async (b: BookingRow) => {
+    const current = new Date(b.starts_at);
+    const local = new Date(current.getTime() - current.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    const input = window.prompt("Propose a new date and time (YYYY-MM-DDTHH:MM)", local);
+    if (!input) return;
+    const proposed = new Date(input);
+    if (Number.isNaN(proposed.getTime())) return toast.error("That date and time isn't valid.");
+    if (proposed.getTime() <= Date.now()) return toast.error("Choose a time in the future.");
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: "reschedule_requested", requested_starts_at: proposed.toISOString() })
+      .eq("id", b.id);
+    if (error) return toast.error(error.message);
+    await notify(b, "booking_reschedule_requested");
+    qc.invalidateQueries({ queryKey: ["my-bookings"] });
+    toast.success("New time proposed");
+  };
+
+  const respondReschedule = async (b: BookingRow, accept: boolean) => {
+    if (accept) {
+      if (!b.requested_starts_at) return toast.error("No proposed time found.");
+      const duration = new Date(b.ends_at).getTime() - new Date(b.starts_at).getTime();
+      const start = new Date(b.requested_starts_at);
+      const { error } = await supabase
+        .from("bookings")
+        .update({
+          status: "confirmed",
+          starts_at: start.toISOString(),
+          ends_at: new Date(start.getTime() + duration).toISOString(),
+          requested_starts_at: null,
+        })
+        .eq("id", b.id);
+      if (error) return toast.error(error.message);
+      await notify(b, "booking_changed");
+    } else {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: "declined", requested_starts_at: null })
+        .eq("id", b.id);
+      if (error) return toast.error(error.message);
+      await notify(b, "booking_declined");
+    }
+    qc.invalidateQueries({ queryKey: ["my-bookings"] });
+    toast.success(accept ? "New time confirmed" : "New time declined");
+  };
+
   const downloadIcs = (b: BookingRow, title: string) => {
     const ics = buildIcs({
       title,
