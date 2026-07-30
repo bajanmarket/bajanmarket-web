@@ -199,6 +199,10 @@ function Thread() {
           </Link>
         )}
 
+        <BookingSummary conversationId={id} />
+
+
+
         <div ref={scrollRef} className="bg-white rounded-3xl ring-1 ring-hairline p-4 h-[55vh] overflow-y-auto flex flex-col gap-2">
           {(() => {
             let lastReadMineIdx = -1;
