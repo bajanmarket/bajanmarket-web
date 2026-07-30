@@ -36,6 +36,7 @@ type BookingRow = {
   location: string | null;
   buyer_note: string | null;
   provider_note: string | null;
+  requested_starts_at: string | null;
   buyer_id: string;
   provider_id: string;
   conversation_id: string | null;
