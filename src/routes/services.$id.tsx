@@ -334,17 +334,10 @@ function ServiceDetail() {
             <div className="bg-sand rounded-2xl p-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-navy/60">When</span>
-                <span className="font-medium">
-                  {slot
-                    ? slot.start.toLocaleString([], {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })
-                    : "—"}
+                <span className="font-medium text-right">
+                  {slot ? bookingWhenLabel(slot.start, slot.end) : "—"}
                 </span>
+
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-navy/60">Total</span>
