@@ -272,10 +272,14 @@ function ServiceDetail() {
           </div>
         ) : (
           <div className="bg-white rounded-3xl ring-1 ring-hairline p-5 flex flex-col gap-5">
-            <div className="flex items-center gap-2">
-              <CalendarCheck className="size-4 text-teal" />
-              <h2 className="text-base font-medium">Book an appointment</h2>
+            <div>
+              <div className="flex items-center gap-2">
+                <CalendarCheck className="size-4 text-teal" />
+                <h2 className="text-base font-medium">Book an appointment</h2>
+              </div>
+              <p className="text-xs text-navy/50 mt-1">{TZ_NOTE}</p>
             </div>
+
 
             <BookingCalendar
               providerId={service.provider_id}
