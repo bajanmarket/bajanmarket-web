@@ -20,11 +20,12 @@ export function whatsappConfigured() {
 
 /** Normalises to digits only (E.164 without the leading +), as the Cloud API expects. */
 export function normalisePhone(raw: string) {
-  const digits = raw.replace(/\D/g, "");
+  let digits = raw.replace(/\D/g, "");
   if (!digits) return null;
+  // Barbados: local 7-digit and 246XXXXXXX both become 1246XXXXXXX.
+  if (digits.length === 7) digits = `1246${digits}`;
+  else if (digits.length === 10 && digits.startsWith("246")) digits = `1${digits}`;
   if (digits.length < 8 || digits.length > 15) return null;
-  // Local Barbados numbers without a country code get the 1246 prefix.
-  if (digits.length === 7) return `1246${digits}`;
   return digits;
 }
 
