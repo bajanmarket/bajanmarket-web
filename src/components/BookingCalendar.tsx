@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { buildSlots, isoDate, nextDays, type AvailabilityRow, type Slot } from "@/lib/services";
+import { buildSlots, isoDate, nextDays, TZ_NOTE, type AvailabilityRow, type Slot } from "@/lib/services";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
@@ -128,7 +128,10 @@ export function BookingCalendar({
         })}
       </div>
 
+      <p className="text-[11px] text-navy/40 -mt-1">{TZ_NOTE}</p>
+
       {slots.length > 0 ? (
+
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {slots.map((s) => {
             const active = value?.start.getTime() === s.start.getTime();

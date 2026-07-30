@@ -73,6 +73,37 @@ export const BOOKING_STATUS_TONE: Record<BookingStatus, string> = {
 /** Barbados has no DST — a fixed -04:00 offset is correct year-round. */
 const BARBADOS_OFFSET = "-04:00";
 
+/** Every appointment time on Bajan.market is shown in Barbados time. */
+export const BARBADOS_TZ = "America/Barbados";
+export const TZ_SHORT = "AST";
+export const TZ_NOTE = "All times shown in Barbados time (AST, UTC−4).";
+
+/** Formats an instant in Barbados time, regardless of the viewer's device. */
+export function fmtBjt(
+  value: Date | string,
+  opts: Intl.DateTimeFormatOptions = { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" },
+) {
+  return new Date(value).toLocaleString([], { ...opts, timeZone: BARBADOS_TZ });
+}
+
+/** Time only, in Barbados time. */
+export function fmtBjtTime(value: Date | string) {
+  return new Date(value).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: BARBADOS_TZ,
+  });
+}
+
+/** "Fri 3 Aug · 2:00 pm – 3:00 pm AST" */
+export function bookingWhenLabel(startsAt: Date | string, endsAt?: Date | string | null) {
+  const day = fmtBjt(startsAt, { weekday: "short", day: "numeric", month: "short" });
+  const start = fmtBjtTime(startsAt);
+  const end = endsAt ? ` – ${fmtBjtTime(endsAt)}` : "";
+  return `${day} · ${start}${end} ${TZ_SHORT}`;
+}
+
+
 export function isoDate(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
@@ -139,7 +170,7 @@ export function buildSlots(opts: {
       slots.push({
         start,
         end,
-        label: start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
+        label: fmtBjtTime(start),
       });
     }
   }
@@ -148,10 +179,9 @@ export function buildSlots(opts: {
 }
 
 export function formatBookingWhen(startsAt: string, endsAt: string) {
-  const s = new Date(startsAt);
-  const e = new Date(endsAt);
-  return `${s.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · ${s.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} – ${e.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+  return bookingWhenLabel(startsAt, endsAt);
 }
+
 
 export function nextDays(count: number, from = new Date()) {
   const out: string[] = [];

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/useAuth";
-import { BOOKING_STATUS_LABEL, BOOKING_STATUS_TONE, type BookingStatus } from "@/lib/services";
+import { BOOKING_STATUS_LABEL, BOOKING_STATUS_TONE, bookingWhenLabel, fmtBjt, TZ_NOTE, type BookingStatus } from "@/lib/services";
 import { buildIcs, googleCalendarUrl, outlookCalendarUrl } from "@/lib/ics";
 import { notifyEvent } from "@/lib/notify.functions";
 import { CalendarCheck, CalendarPlus, Download, MessageSquare } from "lucide-react";
@@ -103,14 +103,16 @@ function BookingsPage() {
     }).catch(() => undefined);
 
   const requestReschedule = async (b: BookingRow) => {
-    const current = new Date(b.starts_at);
-    const local = new Date(current.getTime() - current.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16);
-    const input = window.prompt("Propose a new date and time (YYYY-MM-DDTHH:MM)", local);
+    // Everything is entered and shown in Barbados time (AST, UTC−4, no DST).
+    const bjt = new Date(new Date(b.starts_at).getTime() - 4 * 3600_000).toISOString().slice(0, 16);
+    const input = window.prompt(
+      "Propose a new date and time in Barbados time (AST, UTC−4)\nFormat: YYYY-MM-DDTHH:MM",
+      bjt,
+    );
     if (!input) return;
-    const proposed = new Date(input);
+    const proposed = new Date(`${input.trim().slice(0, 16)}:00-04:00`);
     if (Number.isNaN(proposed.getTime())) return toast.error("That date and time isn't valid.");
+
     if (proposed.getTime() <= Date.now()) return toast.error("Choose a time in the future.");
     const { error } = await supabase
       .from("bookings")
@@ -168,10 +170,14 @@ function BookingsPage() {
 
   return (
     <AppShell>
-      <div className="flex items-center gap-2 mb-4">
-        <CalendarCheck className="size-5 text-teal" />
-        <h1 className="text-2xl font-medium">Bookings</h1>
+      <div className="mb-4">
+        <div className="flex items-center gap-2">
+          <CalendarCheck className="size-5 text-teal" />
+          <h1 className="text-2xl font-medium">Bookings</h1>
+        </div>
+        <p className="text-xs text-navy/50 mt-1">{TZ_NOTE}</p>
       </div>
+
 
       <div className="flex gap-1 mb-4 bg-white rounded-xl p-1 ring-1 ring-hairline w-fit">
         {([["buyer", "As customer"], ["provider", "As provider"]] as const).map(([k, label]) => (
@@ -193,7 +199,7 @@ function BookingsPage() {
         <div className="flex flex-col gap-3 max-w-2xl">
           {bookings.map((b) => {
             const title = services?.get(b.service_listing_id) ?? "Service";
-            const when = new Date(b.starts_at);
+
             return (
               <div key={b.id} className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
@@ -206,15 +212,9 @@ function BookingsPage() {
                       {title}
                     </Link>
                     <div className="text-xs text-navy/50 mt-1">
-                      {when.toLocaleString([], {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}{" "}
-                      · {b.reference}
+                      {bookingWhenLabel(b.starts_at, b.ends_at)} · {b.reference}
                     </div>
+
                     {b.location && <div className="text-xs text-navy/50 mt-0.5">{b.location}</div>}
                   </div>
                   <span
@@ -232,13 +232,8 @@ function BookingsPage() {
                   <div className="bg-sand rounded-xl px-3 py-2 text-xs text-navy/70">
                     New time proposed:{" "}
                     <span className="font-medium text-navy">
-                      {new Date(b.requested_starts_at).toLocaleString([], {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
+                      {fmtBjt(b.requested_starts_at)} AST
+
                     </span>
                   </div>
                 )}

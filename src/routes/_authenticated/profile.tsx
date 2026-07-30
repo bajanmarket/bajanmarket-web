@@ -9,6 +9,8 @@ import { initials } from "@/lib/format";
 import { LogOut, Settings, Package, Heart, Shield, Store, CalendarCheck, Briefcase } from "lucide-react";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { MarketingPrefs } from "@/components/MarketingPrefs";
+import { NotificationPrefs } from "@/components/NotificationPrefs";
+
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -169,7 +171,10 @@ function Profile() {
           </Link>
         </div>
 
+        <NotificationPrefs />
+
         <MarketingPrefs />
+
 
         <ModeratorLink />
 

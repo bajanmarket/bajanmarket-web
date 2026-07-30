@@ -8,7 +8,7 @@ import { BookingCalendar } from "@/components/BookingCalendar";
 import { ServiceTemplateForm, type AnswerMap } from "@/components/ServiceTemplateForm";
 import { useAuth } from "@/lib/useAuth";
 import { parishLabel } from "@/lib/parishes";
-import type { TemplateField, Slot } from "@/lib/services";
+import { bookingWhenLabel, TZ_NOTE, type TemplateField, type Slot } from "@/lib/services";
 import { notifyEvent } from "@/lib/notify.functions";
 import { MapPin, Clock, Star, ShieldCheck, CalendarCheck } from "lucide-react";
 
@@ -171,13 +171,11 @@ function ServiceDetail() {
         await supabase.from("messages").insert({
           conversation_id: convo.id,
           sender_id: user.id,
-          body: `Booking ${booking.reference} — ${service.title} on ${slot.start.toLocaleString([], {
-            weekday: "short",
-            day: "numeric",
-            month: "short",
-            hour: "numeric",
-            minute: "2-digit",
-          })}${note.trim() ? `\n\n${note.trim()}` : ""}`,
+          body: `Booking ${booking.reference} — ${service.title} on ${bookingWhenLabel(
+            slot.start,
+            slot.end,
+          )}${note.trim() ? `\n\n${note.trim()}` : ""}`,
+
         });
       }
 
@@ -274,10 +272,14 @@ function ServiceDetail() {
           </div>
         ) : (
           <div className="bg-white rounded-3xl ring-1 ring-hairline p-5 flex flex-col gap-5">
-            <div className="flex items-center gap-2">
-              <CalendarCheck className="size-4 text-teal" />
-              <h2 className="text-base font-medium">Book an appointment</h2>
+            <div>
+              <div className="flex items-center gap-2">
+                <CalendarCheck className="size-4 text-teal" />
+                <h2 className="text-base font-medium">Book an appointment</h2>
+              </div>
+              <p className="text-xs text-navy/50 mt-1">{TZ_NOTE}</p>
             </div>
+
 
             <BookingCalendar
               providerId={service.provider_id}
@@ -332,17 +334,10 @@ function ServiceDetail() {
             <div className="bg-sand rounded-2xl p-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-navy/60">When</span>
-                <span className="font-medium">
-                  {slot
-                    ? slot.start.toLocaleString([], {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })
-                    : "—"}
+                <span className="font-medium text-right">
+                  {slot ? bookingWhenLabel(slot.start, slot.end) : "—"}
                 </span>
+
               </div>
               <div className="flex justify-between mt-1">
                 <span className="text-navy/60">Total</span>

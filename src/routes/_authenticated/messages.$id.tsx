@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
 import { markConversationRead } from "@/lib/markConversationRead";
+import { BOOKING_STATUS_LABEL, BOOKING_STATUS_TONE, bookingWhenLabel, TZ_NOTE, type BookingStatus } from "@/lib/services";
+import { CalendarCheck } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/messages/$id")({
   head: () => ({ meta: [{ title: "Conversation — Bajan.market" }] }),
@@ -196,6 +199,10 @@ function Thread() {
           </Link>
         )}
 
+        <BookingSummary conversationId={id} />
+
+
+
         <div ref={scrollRef} className="bg-white rounded-3xl ring-1 ring-hairline p-4 h-[55vh] overflow-y-auto flex flex-col gap-2">
           {(() => {
             let lastReadMineIdx = -1;
@@ -250,3 +257,55 @@ function Thread() {
     </AppShell>
   );
 }
+
+/** Shows the appointment this thread belongs to, with a link to manage it. */
+function BookingSummary({ conversationId }: { conversationId: string }) {
+  const { data: booking } = useQuery({
+    queryKey: ["thread-booking", conversationId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("bookings")
+        .select("id, reference, starts_at, ends_at, status, price, currency, location, service_listing_id")
+        .eq("conversation_id", conversationId)
+        .maybeSingle();
+      if (!data) return null;
+      const { data: svc } = await supabase
+        .from("service_listings")
+        .select("title")
+        .eq("id", data.service_listing_id)
+        .maybeSingle();
+      return { ...data, title: svc?.title ?? "Service" };
+    },
+  });
+
+  if (!booking) return null;
+  const status = booking.status as BookingStatus;
+
+  return (
+    <div className="bg-white rounded-2xl p-4 ring-1 ring-hairline flex flex-col gap-2">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="inline-flex items-center gap-1.5 text-sm font-medium">
+            <CalendarCheck className="size-4 text-teal" /> {booking.title}
+          </div>
+          <div className="text-xs text-navy/60 mt-1">
+            {bookingWhenLabel(booking.starts_at, booking.ends_at)} · {booking.reference}
+          </div>
+          {booking.location && <div className="text-xs text-navy/50 mt-0.5">{booking.location}</div>}
+        </div>
+        <span
+          className={`text-[10px] font-semibold uppercase rounded-full px-2 py-1 shrink-0 ${BOOKING_STATUS_TONE[status]}`}
+        >
+          {BOOKING_STATUS_LABEL[status]}
+        </span>
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[10px] text-navy/40">{TZ_NOTE}</span>
+        <Link to="/bookings" className="text-xs text-teal font-medium underline">
+          Manage booking
+        </Link>
+      </div>
+    </div>
+  );
+}
+
