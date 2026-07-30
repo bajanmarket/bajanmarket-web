@@ -425,6 +425,30 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
             <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">End</span>
             <input type="time" value={end} onChange={(e) => setEnd(e.target.value)} className={inputCls} />
           </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">Break start</span>
+            <input type="time" value={breakStart} onChange={(e) => setBreakStart(e.target.value)} className={inputCls} />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">Break end</span>
+            <input type="time" value={breakEnd} onChange={(e) => setBreakEnd(e.target.value)} className={inputCls} />
+          </label>
+          <label className="flex flex-col gap-1.5 col-span-2">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-navy/50">
+              Buffer between appointments
+            </span>
+            <select
+              value={bufferMinutes}
+              onChange={(e) => setBufferMinutes(Number(e.target.value))}
+              className={inputCls}
+            >
+              {[0, 5, 10, 15, 30, 45, 60].map((m) => (
+                <option key={m} value={m}>
+                  {m === 0 ? "No buffer" : `${m} min`}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         <button className="bg-navy text-white rounded-2xl py-3.5 text-sm font-medium min-h-[48px]">Add hours</button>
       </form>
@@ -435,8 +459,11 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
             <span className="font-medium">{WEEKDAYS[r.weekday]?.label}</span>{" "}
             <span className="text-navy/60">
               {r.start_time.slice(0, 5)}–{r.end_time.slice(0, 5)} · {r.slot_minutes} min slots
+              {r.break_start && r.break_end ? ` · break ${r.break_start.slice(0, 5)}–${r.break_end.slice(0, 5)}` : ""}
+              {r.buffer_minutes ? ` · ${r.buffer_minutes} min buffer` : ""}
             </span>
           </div>
+
           <button
             onClick={async () => {
               const { error } = await supabase.from("provider_availability").delete().eq("id", r.id);
