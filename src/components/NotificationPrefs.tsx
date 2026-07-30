@@ -42,21 +42,31 @@ export function NotificationPrefs() {
     },
   });
 
-  const [inApp, setInApp] = useState(true);
-  const [email, setEmail] = useState(true);
-  const [whatsapp, setWhatsapp] = useState(false);
-  const [messageEvents, setMessageEvents] = useState(true);
-  const [bookingEvents, setBookingEvents] = useState(true);
-  const [reminderEvents, setReminderEvents] = useState(true);
+  type Key =
+    | "in_app_booking" | "in_app_message" | "in_app_reminder"
+    | "email_booking" | "email_message" | "email_reminder"
+    | "wa_booking" | "wa_message" | "wa_reminder";
+
+  const DEFAULTS: Record<Key, boolean> = {
+    in_app_booking: true, in_app_message: true, in_app_reminder: true,
+    email_booking: true, email_message: true, email_reminder: true,
+    wa_booking: false, wa_message: false, wa_reminder: false,
+  };
+
+  const [state, setState] = useState<Record<Key, boolean>>(DEFAULTS);
+  const set = (k: Key) => (v: boolean) => setState((s) => ({ ...s, [k]: v }));
 
   useEffect(() => {
     if (!prefs) return;
-    setInApp(prefs.in_app_enabled);
-    setEmail(prefs.email_enabled);
-    setWhatsapp(prefs.whatsapp_enabled);
-    setMessageEvents(prefs.message_events);
-    setBookingEvents(prefs.booking_events);
-    setReminderEvents(prefs.reminder_events);
+    const p = prefs as unknown as Record<string, boolean>;
+    setState((s) => {
+      const next = { ...s };
+      (Object.keys(DEFAULTS) as Key[]).forEach((k) => {
+        if (typeof p[k] === "boolean") next[k] = p[k];
+      });
+      return next;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefs]);
 
   const save = async (e: React.FormEvent) => {
@@ -65,12 +75,14 @@ export function NotificationPrefs() {
     setSaving(true);
     const { error } = await supabase.from("notification_preferences").upsert({
       user_id: user.id,
-      in_app_enabled: inApp,
-      email_enabled: email,
-      whatsapp_enabled: whatsapp,
-      message_events: messageEvents,
-      booking_events: bookingEvents,
-      reminder_events: reminderEvents,
+      ...state,
+      // Legacy roll-up columns kept in sync for older readers.
+      in_app_enabled: state.in_app_booking || state.in_app_message || state.in_app_reminder,
+      email_enabled: state.email_booking || state.email_message || state.email_reminder,
+      whatsapp_enabled: state.wa_booking || state.wa_message || state.wa_reminder,
+      booking_events: state.in_app_booking || state.email_booking || state.wa_booking,
+      message_events: state.in_app_message || state.email_message || state.wa_message,
+      reminder_events: state.in_app_reminder || state.email_reminder || state.wa_reminder,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -78,29 +90,52 @@ export function NotificationPrefs() {
     qc.invalidateQueries({ queryKey: ["notification_prefs", user.id] });
   };
 
-  const verified = Boolean(consent?.consented_at && !consent?.opted_out_at);
+  const verified = Boolean(consent?.verified_at && consent?.consented_at && !consent?.opted_out_at);
+  const waWanted = state.wa_booking || state.wa_message || state.wa_reminder;
+
+  const groups: { label: string; prefix: "in_app" | "email" | "wa"; note?: string }[] = [
+    { label: "In the app", prefix: "in_app" },
+    { label: "Email", prefix: "email" },
+    { label: "WhatsApp", prefix: "wa", note: "Off unless you verify a number" },
+  ];
 
   return (
-    <form onSubmit={save} className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-4">
+    <form onSubmit={save} className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-5">
       <div className="flex items-start gap-3">
         <BellRing className="size-5 text-teal mt-0.5" />
         <div>
           <div className="text-sm font-medium">Booking &amp; message alerts</div>
           <p className="text-xs text-navy/50 mt-1">
-            We only ever send activity alerts — never the private answers you give a provider.
+            We only ever send activity alerts — never the private answers you give a provider. Security and
+            account notices are always sent.
           </p>
         </div>
       </div>
 
-      <Toggle label="In-app notifications" checked={inApp} onChange={setInApp} />
-      <Toggle label="Email me" checked={email} onChange={setEmail} />
-      <Toggle label="WhatsApp me" checked={whatsapp} onChange={setWhatsapp} />
-
-      <div className="h-px bg-hairline" />
-
-      <Toggle label="New messages" checked={messageEvents} onChange={setMessageEvents} />
-      <Toggle label="Booking updates" checked={bookingEvents} onChange={setBookingEvents} />
-      <Toggle label="Appointment reminders" checked={reminderEvents} onChange={setReminderEvents} />
+      {groups.map((g, i) => (
+        <div key={g.prefix} className="flex flex-col gap-3">
+          {i > 0 && <div className="h-px bg-hairline" />}
+          <div className="text-xs font-semibold uppercase tracking-wide text-navy/50">
+            {g.label}
+            {g.note && <span className="ml-2 normal-case font-normal text-navy/40">{g.note}</span>}
+          </div>
+          <Toggle
+            label="Booking updates"
+            checked={state[`${g.prefix}_booking` as Key]}
+            onChange={set(`${g.prefix}_booking` as Key)}
+          />
+          <Toggle
+            label="New messages"
+            checked={state[`${g.prefix}_message` as Key]}
+            onChange={set(`${g.prefix}_message` as Key)}
+          />
+          <Toggle
+            label="Appointment reminders"
+            checked={state[`${g.prefix}_reminder` as Key]}
+            onChange={set(`${g.prefix}_reminder` as Key)}
+          />
+        </div>
+      ))}
 
       <button
         disabled={saving}
@@ -109,7 +144,7 @@ export function NotificationPrefs() {
         {saving ? "Saving…" : "Save settings"}
       </button>
 
-      {whatsapp && <WhatsAppConsent verified={verified} phone={consent?.phone ?? ""} />}
+      {waWanted && <WhatsAppConsent verified={verified} phone={consent?.phone ?? ""} />}
     </form>
   );
 }
