@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
 import { markConversationRead } from "@/lib/markConversationRead";
+import { BOOKING_STATUS_LABEL, BOOKING_STATUS_TONE, bookingWhenLabel, TZ_NOTE, type BookingStatus } from "@/lib/services";
+import { CalendarCheck } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/messages/$id")({
   head: () => ({ meta: [{ title: "Conversation — Bajan.market" }] }),
