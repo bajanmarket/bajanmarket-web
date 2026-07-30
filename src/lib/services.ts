@@ -179,10 +179,9 @@ export function buildSlots(opts: {
 }
 
 export function formatBookingWhen(startsAt: string, endsAt: string) {
-  const s = new Date(startsAt);
-  const e = new Date(endsAt);
-  return `${s.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · ${s.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} – ${e.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+  return bookingWhenLabel(startsAt, endsAt);
 }
+
 
 export function nextDays(count: number, from = new Date()) {
   const out: string[] = [];
