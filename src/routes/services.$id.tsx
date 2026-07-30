@@ -8,7 +8,7 @@ import { BookingCalendar } from "@/components/BookingCalendar";
 import { ServiceTemplateForm, type AnswerMap } from "@/components/ServiceTemplateForm";
 import { useAuth } from "@/lib/useAuth";
 import { parishLabel } from "@/lib/parishes";
-import type { TemplateField, Slot } from "@/lib/services";
+import { bookingWhenLabel, TZ_NOTE, type TemplateField, type Slot } from "@/lib/services";
 import { notifyEvent } from "@/lib/notify.functions";
 import { MapPin, Clock, Star, ShieldCheck, CalendarCheck } from "lucide-react";
 
