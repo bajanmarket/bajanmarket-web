@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/useAuth";
-import { BOOKING_STATUS_LABEL, BOOKING_STATUS_TONE, type BookingStatus } from "@/lib/services";
+import { BOOKING_STATUS_LABEL, BOOKING_STATUS_TONE, bookingWhenLabel, fmtBjt, TZ_NOTE, type BookingStatus } from "@/lib/services";
 import { buildIcs, googleCalendarUrl, outlookCalendarUrl } from "@/lib/ics";
 import { notifyEvent } from "@/lib/notify.functions";
 import { CalendarCheck, CalendarPlus, Download, MessageSquare } from "lucide-react";
