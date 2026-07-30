@@ -210,15 +210,9 @@ function BookingsPage() {
                       {title}
                     </Link>
                     <div className="text-xs text-navy/50 mt-1">
-                      {when.toLocaleString([], {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}{" "}
-                      · {b.reference}
+                      {bookingWhenLabel(b.starts_at, b.ends_at)} · {b.reference}
                     </div>
+
                     {b.location && <div className="text-xs text-navy/50 mt-0.5">{b.location}</div>}
                   </div>
                   <span
