@@ -55,7 +55,7 @@ function BookingsPage() {
       const { data, error } = await supabase
         .from("bookings")
         .select(
-          "id, reference, starts_at, ends_at, status, price, currency, location, buyer_note, provider_note, buyer_id, provider_id, conversation_id, service_listing_id",
+          "id, reference, starts_at, ends_at, status, price, currency, location, buyer_note, provider_note, requested_starts_at, buyer_id, provider_id, conversation_id, service_listing_id",
         )
         .eq(role === "buyer" ? "buyer_id" : "provider_id", user!.id)
         .order("starts_at", { ascending: false })
