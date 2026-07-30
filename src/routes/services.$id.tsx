@@ -171,13 +171,11 @@ function ServiceDetail() {
         await supabase.from("messages").insert({
           conversation_id: convo.id,
           sender_id: user.id,
-          body: `Booking ${booking.reference} — ${service.title} on ${slot.start.toLocaleString([], {
-            weekday: "short",
-            day: "numeric",
-            month: "short",
-            hour: "numeric",
-            minute: "2-digit",
-          })}${note.trim() ? `\n\n${note.trim()}` : ""}`,
+          body: `Booking ${booking.reference} — ${service.title} on ${bookingWhenLabel(
+            slot.start,
+            slot.end,
+          )}${note.trim() ? `\n\n${note.trim()}` : ""}`,
+
         });
       }
 
