@@ -170,7 +170,7 @@ export function buildSlots(opts: {
       slots.push({
         start,
         end,
-        label: start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
+        label: fmtBjtTime(start),
       });
     }
   }
