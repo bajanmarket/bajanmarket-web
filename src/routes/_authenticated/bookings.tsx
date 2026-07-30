@@ -230,13 +230,8 @@ function BookingsPage() {
                   <div className="bg-sand rounded-xl px-3 py-2 text-xs text-navy/70">
                     New time proposed:{" "}
                     <span className="font-medium text-navy">
-                      {new Date(b.requested_starts_at).toLocaleString([], {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
+                      {fmtBjt(b.requested_starts_at)} AST
+
                     </span>
                   </div>
                 )}
