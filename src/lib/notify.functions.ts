@@ -117,6 +117,8 @@ export const notifyEvent = createServerFn({ method: "POST" })
         recipient_id: z.string().uuid(),
         origin: z.string().url(),
         detail: z.string().max(300).optional(),
+        dedupe_key: z.string().max(200).optional(),
+
       })
       .parse(data),
   )
@@ -173,8 +175,23 @@ export const notifyEvent = createServerFn({ method: "POST" })
     if (!groupOn) return { skipped: "opted-out" };
 
     let notificationId: string | null = null;
+    // Duplicate-event prevention. One-off transitions (confirmed, declined,
+    // completed…) can only ever notify once per booking. Events that may
+    // legitimately repeat collapse within a 5-minute window so retries and
+    // double clicks don't spam the recipient.
+    const REPEATABLE = new Set([
+      "message",
+      "booking_reschedule_requested",
+      "booking_changed",
+      "booking_reminder",
+    ]);
+    const subject = data.booking_id ?? data.conversation_id ?? "";
+    const bucket = REPEATABLE.has(data.event) ? String(Math.floor(Date.now() / 300_000)) : "";
+    const dedupeKey = (data.dedupe_key ?? [data.event, subject, bucket].join(":")).slice(0, 200);
+
+
     if (inApp) {
-      const { data: n } = await supabaseAdmin
+      const { data: n, error: insErr } = await supabaseAdmin
         .from("notifications")
         .insert({
           user_id: data.recipient_id,
@@ -184,11 +201,17 @@ export const notifyEvent = createServerFn({ method: "POST" })
           link,
           booking_id: data.booking_id ?? null,
           conversation_id: data.conversation_id ?? null,
+          dedupe_key: dedupeKey,
         })
         .select("id")
         .maybeSingle();
+      // 23505 = unique violation on (user_id, dedupe_key): already notified.
+      if (insErr && (insErr as { code?: string }).code === "23505") {
+        return { skipped: "duplicate" as const };
+      }
       notificationId = n?.id ?? null;
     }
+
 
     const deliveries: { channel: string; status: string; error?: string | null; providerMessageId?: string | null }[] =
       [];

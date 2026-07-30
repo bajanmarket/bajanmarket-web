@@ -1142,6 +1142,7 @@ export type Database = {
           booking_id: string | null
           conversation_id: string | null
           created_at: string
+          dedupe_key: string | null
           id: string
           link: string | null
           read_at: string | null
@@ -1154,6 +1155,7 @@ export type Database = {
           booking_id?: string | null
           conversation_id?: string | null
           created_at?: string
+          dedupe_key?: string | null
           id?: string
           link?: string | null
           read_at?: string | null
@@ -1166,6 +1168,7 @@ export type Database = {
           booking_id?: string | null
           conversation_id?: string | null
           created_at?: string
+          dedupe_key?: string | null
           id?: string
           link?: string | null
           read_at?: string | null
