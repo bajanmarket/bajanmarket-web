@@ -103,14 +103,16 @@ function BookingsPage() {
     }).catch(() => undefined);
 
   const requestReschedule = async (b: BookingRow) => {
-    const current = new Date(b.starts_at);
-    const local = new Date(current.getTime() - current.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16);
-    const input = window.prompt("Propose a new date and time (YYYY-MM-DDTHH:MM)", local);
+    // Everything is entered and shown in Barbados time (AST, UTC−4, no DST).
+    const bjt = new Date(new Date(b.starts_at).getTime() - 4 * 3600_000).toISOString().slice(0, 16);
+    const input = window.prompt(
+      "Propose a new date and time in Barbados time (AST, UTC−4)\nFormat: YYYY-MM-DDTHH:MM",
+      bjt,
+    );
     if (!input) return;
-    const proposed = new Date(input);
+    const proposed = new Date(`${input.trim().slice(0, 16)}:00-04:00`);
     if (Number.isNaN(proposed.getTime())) return toast.error("That date and time isn't valid.");
+
     if (proposed.getTime() <= Date.now()) return toast.error("Choose a time in the future.");
     const { error } = await supabase
       .from("bookings")
