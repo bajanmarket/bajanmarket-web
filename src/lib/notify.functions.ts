@@ -175,11 +175,20 @@ export const notifyEvent = createServerFn({ method: "POST" })
     if (!groupOn) return { skipped: "opted-out" };
 
     let notificationId: string | null = null;
-    // Duplicate-event prevention: the same event for the same subject and
-    // recipient can only ever produce one notification (and one fan-out).
-    const dedupeKey =
-      data.dedupe_key ??
-      [data.event, data.booking_id ?? data.conversation_id ?? "", data.detail ?? ""].join(":").slice(0, 200);
+    // Duplicate-event prevention. One-off transitions (confirmed, declined,
+    // completed…) can only ever notify once per booking. Events that may
+    // legitimately repeat collapse within a 5-minute window so retries and
+    // double clicks don't spam the recipient.
+    const REPEATABLE = new Set([
+      "message",
+      "booking_reschedule_requested",
+      "booking_changed",
+      "booking_reminder",
+    ]);
+    const subject = data.booking_id ?? data.conversation_id ?? "";
+    const bucket = REPEATABLE.has(data.event) ? String(Math.floor(Date.now() / 300_000)) : "";
+    const dedupeKey = (data.dedupe_key ?? [data.event, subject, bucket].join(":")).slice(0, 200);
+
 
     if (inApp) {
       const { data: n, error: insErr } = await supabaseAdmin
