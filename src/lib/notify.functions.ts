@@ -162,17 +162,17 @@ export const notifyEvent = createServerFn({ method: "POST" })
       .eq("user_id", data.recipient_id)
       .maybeSingle();
 
-    const inApp = prefs?.in_app_enabled ?? true;
-    const emailOn = prefs?.email_enabled ?? true;
-    const waOn = prefs?.whatsapp_enabled ?? false;
-    const groupOn =
-      data.event === "message"
-        ? (prefs?.message_events ?? true)
-        : data.event === "booking_reminder"
-          ? (prefs?.reminder_events ?? true)
-          : (prefs?.booking_events ?? true);
+    const group: "booking" | "message" | "reminder" =
+      data.event === "message" ? "message" : data.event === "booking_reminder" ? "reminder" : "booking";
 
-    if (!groupOn) return { skipped: "opted-out" };
+    // Nine independent switches. Each channel/group pair is opt-out on its own;
+    // WhatsApp is opt-in (defaults false) and email/in-app default on.
+    const p = prefs as Record<string, boolean | undefined> | null;
+    const inApp = p?.[`in_app_${group}`] ?? true;
+    const emailOn = p?.[`email_${group}`] ?? true;
+    const waOn = p?.[`wa_${group}`] ?? false;
+
+    if (!inApp && !emailOn && !waOn) return { skipped: "opted-out" };
 
     let notificationId: string | null = null;
     // Duplicate-event prevention. One-off transitions (confirmed, declined,
@@ -213,54 +213,201 @@ export const notifyEvent = createServerFn({ method: "POST" })
     }
 
 
-    const deliveries: { channel: string; status: string; error?: string | null; providerMessageId?: string | null }[] =
-      [];
+    type Delivery = {
+      channel: string;
+      status: string;
+      error?: string | null;
+      providerMessageId?: string | null;
+    };
+    const deliveries: Delivery[] = [];
 
-    if (emailOn) {
+    // Idempotency: one row per (recipient, dedupe key, channel). A replayed
+    // event can never produce a second provider send.
+    const claim = async (channel: string) => {
+      const { error } = await supabaseAdmin.from("notification_deliveries").insert({
+        notification_id: notificationId,
+        user_id: data.recipient_id,
+        channel,
+        status: "queued",
+        attempts: 1,
+        idempotency_key: `${data.recipient_id}:${dedupeKey}:${channel}`.slice(0, 300),
+      });
+      return !error;
+    };
+    const settle = async (channel: string, d: Delivery) => {
+      await supabaseAdmin
+        .from("notification_deliveries")
+        .update({
+          status: d.status,
+          error: d.error ?? null,
+          provider_message_id: d.providerMessageId ?? null,
+          next_retry_at: d.status === "failed" ? new Date(Date.now() + 5 * 60_000).toISOString() : null,
+        })
+        .eq("idempotency_key", `${data.recipient_id}:${dedupeKey}:${channel}`.slice(0, 300));
+      deliveries.push(d);
+    };
+
+    if (emailOn && (await claim("email"))) {
       const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(data.recipient_id);
       const to = userRes?.user?.email;
       if (to) {
         const text = `${copy.body}\n\n${data.detail ?? ""}\n\nOpen Bajan.market: ${url}`;
         const html = `<p>${escapeHtml(copy.body)}</p>${data.detail ? `<p>${escapeHtml(data.detail)}</p>` : ""}<p><a href="${url}">Open on Bajan.market</a></p>`;
         const r = await sendEmail(to, `${copy.title} — Bajan.market`, text, html);
-        deliveries.push({ channel: "email", status: r.ok ? "sent" : "failed", error: r.ok ? null : (r as any).error });
+        await settle("email", {
+          channel: "email",
+          status: r.ok ? "sent" : "failed",
+          error: r.ok ? null : (r as { error?: string }).error,
+        });
+      } else {
+        await settle("email", { channel: "email", status: "skipped", error: "No email on file" });
       }
     }
 
-    if (waOn) {
+    if (waOn && (await claim("whatsapp"))) {
       const { data: consent } = await supabaseAdmin
         .from("whatsapp_consent")
         .select("phone, verified_at, consented_at, opted_out_at")
         .eq("user_id", data.recipient_id)
         .maybeSingle();
-      if (consent?.phone && consent.consented_at && !consent.opted_out_at) {
+      // Suppression: unverified numbers and withdrawn consent never receive.
+      if (consent?.phone && consent.verified_at && consent.consented_at && !consent.opted_out_at) {
         const { sendWhatsApp } = await import("@/lib/whatsapp.server");
         const r = await sendWhatsApp(consent.phone, `${copy.whatsapp}\n${url}`);
-        deliveries.push({
+        await settle("whatsapp", {
           channel: "whatsapp",
           status: r.status,
           error: r.status === "failed" ? r.error : r.status === "skipped" ? r.reason : null,
           providerMessageId: r.status === "sent" ? r.providerMessageId : null,
         });
+        await supabaseAdmin
+          .from("whatsapp_consent")
+          .update({ last_delivery_status: r.status, last_delivery_at: new Date().toISOString() })
+          .eq("user_id", data.recipient_id);
       } else {
-        deliveries.push({ channel: "whatsapp", status: "skipped", error: "No verified consent on file" });
+        await settle("whatsapp", {
+          channel: "whatsapp",
+          status: "suppressed",
+          error: "No verified consent on file",
+        });
       }
     }
 
-    if (deliveries.length) {
-      await supabaseAdmin.from("notification_deliveries").insert(
-        deliveries.map((d) => ({
-          notification_id: notificationId,
-          user_id: data.recipient_id,
-          channel: d.channel,
-          status: d.status,
-          error: d.error ?? null,
-          provider_message_id: d.providerMessageId ?? null,
-        })),
-      );
+    return { ok: true, deliveries: deliveries.map((d) => ({ channel: d.channel, status: d.status })) };
+  });
+
+const CONSENT_TEXT_VERSION = "wa-consent-v1";
+
+function hashCode(userId: string, code: string) {
+  // Codes are never stored or logged in plain text.
+  return createHash("sha256").update(`${userId}:${code}`).digest("hex");
+}
+
+/** Sends a 6-digit verification code over WhatsApp to confirm the user's number. */
+export const startWhatsAppVerification = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ phone: z.string().min(7).max(24) }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendWhatsApp, whatsappConfigured, normalisePhone } = await import("@/lib/whatsapp.server");
+
+    const phone = normalisePhone(data.phone);
+    if (!phone) throw new Error("That phone number doesn't look valid. Include the country code.");
+
+    const { data: existing } = await supabaseAdmin
+      .from("whatsapp_consent")
+      .select("last_code_sent_at")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    // Resend cooldown: 60 seconds.
+    if (existing?.last_code_sent_at && Date.now() - new Date(existing.last_code_sent_at).getTime() < 60_000) {
+      throw new Error("Please wait a minute before requesting another code.");
     }
 
-    return { ok: true, deliveries: deliveries.map((d) => ({ channel: d.channel, status: d.status })) };
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    await supabaseAdmin.from("whatsapp_consent").upsert(
+      {
+        user_id: context.userId,
+        phone: `+${phone}`,
+        verification_code_hash: hashCode(context.userId, code),
+        verification_expires_at: new Date(Date.now() + 10 * 60_000).toISOString(),
+        verify_attempts: 0,
+        last_code_sent_at: new Date().toISOString(),
+        verified_at: null,
+        consented_at: null,
+        opted_out_at: null,
+      },
+      { onConflict: "user_id" },
+    );
+
+    if (!whatsappConfigured()) {
+      return { status: "pending_channel" as const };
+    }
+    const r = await sendWhatsApp(phone, `Your BajanMarket verification code is ${code}.`);
+    if (r.status === "failed") throw new Error("Could not send the code. Please try again shortly.");
+    return { status: "sent" as const };
+  });
+
+export const confirmWhatsAppVerification = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ code: z.string().length(6) }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("whatsapp_consent")
+      .select("verification_code_hash, verification_expires_at, verify_attempts")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!row?.verification_code_hash) throw new Error("Request a new code first.");
+    if ((row.verify_attempts ?? 0) >= 5) throw new Error("Too many attempts. Request a new code.");
+    if (row.verification_expires_at && new Date(row.verification_expires_at) < new Date())
+      throw new Error("That code expired. Request a new one.");
+
+    if (row.verification_code_hash !== hashCode(context.userId, data.code)) {
+      await supabaseAdmin
+        .from("whatsapp_consent")
+        .update({ verify_attempts: (row.verify_attempts ?? 0) + 1 })
+        .eq("user_id", context.userId);
+      throw new Error("That code doesn't match.");
+    }
+
+    const now = new Date().toISOString();
+    await supabaseAdmin
+      .from("whatsapp_consent")
+      .update({
+        verified_at: now,
+        // Consent is only ever recorded after a successful verification.
+        consented_at: now,
+        consent_method: "in_app_checkbox_and_code",
+        consent_source: "notification_preferences",
+        consent_text_version: CONSENT_TEXT_VERSION,
+        verification_code_hash: null,
+        verification_expires_at: null,
+        verify_attempts: 0,
+      })
+      .eq("user_id", context.userId);
+    return { ok: true };
+  });
+
+/** Withdraws WhatsApp consent. Future deliveries are suppressed immediately. */
+export const withdrawWhatsAppConsent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("whatsapp_consent")
+      .update({
+        opted_out_at: new Date().toISOString(),
+        consented_at: null,
+        verification_code_hash: null,
+        verification_expires_at: null,
+      })
+      .eq("user_id", context.userId);
+    await supabaseAdmin
+      .from("notification_preferences")
+      .update({ wa_booking: false, wa_message: false, wa_reminder: false, whatsapp_enabled: false })
+      .eq("user_id", context.userId);
+    return { ok: true };
   });
 
 /** Sends a 6-digit verification code over WhatsApp to confirm the user's number. */
