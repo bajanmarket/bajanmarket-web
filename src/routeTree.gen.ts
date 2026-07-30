@@ -28,6 +28,7 @@ import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
 import { Route as AuthenticatedProviderServicesRouteImport } from './routes/_authenticated/provider-services'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMyListingsRouteImport } from './routes/_authenticated/my-listings'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedFavouritesRouteImport } from './routes/_authenticated/favourites'
@@ -138,6 +139,12 @@ const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
   path: '/post',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMyListingsRoute = AuthenticatedMyListingsRouteImport.update({
   id: '/my-listings',
   path: '/my-listings',
@@ -234,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/favourites': typeof AuthenticatedFavouritesRoute
   '/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/my-listings': typeof AuthenticatedMyListingsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/provider-services': typeof AuthenticatedProviderServicesRoute
@@ -267,6 +275,7 @@ export interface FileRoutesByTo {
   '/campaigns': typeof AuthenticatedCampaignsRoute
   '/favourites': typeof AuthenticatedFavouritesRoute
   '/my-listings': typeof AuthenticatedMyListingsRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/provider-services': typeof AuthenticatedProviderServicesRoute
@@ -303,6 +312,7 @@ export interface FileRoutesById {
   '/_authenticated/favourites': typeof AuthenticatedFavouritesRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/_authenticated/my-listings': typeof AuthenticatedMyListingsRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/post': typeof AuthenticatedPostRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/provider-services': typeof AuthenticatedProviderServicesRoute
@@ -339,6 +349,7 @@ export interface FileRouteTypes {
     | '/favourites'
     | '/messages'
     | '/my-listings'
+    | '/notifications'
     | '/post'
     | '/profile'
     | '/provider-services'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/campaigns'
     | '/favourites'
     | '/my-listings'
+    | '/notifications'
     | '/post'
     | '/profile'
     | '/provider-services'
@@ -407,6 +419,7 @@ export interface FileRouteTypes {
     | '/_authenticated/favourites'
     | '/_authenticated/messages'
     | '/_authenticated/my-listings'
+    | '/_authenticated/notifications'
     | '/_authenticated/post'
     | '/_authenticated/profile'
     | '/_authenticated/provider-services'
@@ -581,6 +594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPostRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/my-listings': {
       id: '/_authenticated/my-listings'
       path: '/my-listings'
@@ -705,6 +725,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFavouritesRoute: typeof AuthenticatedFavouritesRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRouteWithChildren
   AuthenticatedMyListingsRoute: typeof AuthenticatedMyListingsRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedPostRoute: typeof AuthenticatedPostRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProviderServicesRoute: typeof AuthenticatedProviderServicesRoute
@@ -718,6 +739,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFavouritesRoute: AuthenticatedFavouritesRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRouteWithChildren,
   AuthenticatedMyListingsRoute: AuthenticatedMyListingsRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedPostRoute: AuthenticatedPostRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProviderServicesRoute: AuthenticatedProviderServicesRoute,
