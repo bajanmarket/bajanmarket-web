@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
 import { formatRelative } from "@/lib/format";
@@ -122,6 +122,13 @@ export function NotificationBell() {
             ))
           )}
         </div>
+        <Link
+          to="/notifications"
+          onClick={() => setOpen(false)}
+          className="block text-center text-[11px] font-medium text-teal py-2.5 border-t border-hairline hover:bg-sand"
+        >
+          See all notifications
+        </Link>
       </DropdownMenuContent>
     </DropdownMenu>
   );
