@@ -228,6 +228,21 @@ function BookingsPage() {
 
                 {b.buyer_note && <p className="text-sm text-navy/70 whitespace-pre-wrap">{b.buyer_note}</p>}
 
+                {b.status === "reschedule_requested" && b.requested_starts_at && (
+                  <div className="bg-sand rounded-xl px-3 py-2 text-xs text-navy/70">
+                    New time proposed:{" "}
+                    <span className="font-medium text-navy">
+                      {new Date(b.requested_starts_at).toLocaleString([], {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-2">
                   {role === "provider" && b.status === "pending" && (
                     <>
@@ -242,6 +257,30 @@ function BookingsPage() {
                         className="text-xs bg-white ring-1 ring-hairline rounded-lg px-3 py-2 min-h-[40px]"
                       >
                         Decline
+                      </button>
+                    </>
+                  )}
+                  {role === "provider" && (b.status === "pending" || b.status === "confirmed") && (
+                    <button
+                      onClick={() => requestReschedule(b)}
+                      className="text-xs bg-white ring-1 ring-hairline rounded-lg px-3 py-2 min-h-[40px]"
+                    >
+                      Propose new time
+                    </button>
+                  )}
+                  {role === "buyer" && b.status === "reschedule_requested" && (
+                    <>
+                      <button
+                        onClick={() => respondReschedule(b, true)}
+                        className="text-xs bg-teal/10 text-teal ring-1 ring-teal/20 rounded-lg px-3 py-2 min-h-[40px]"
+                      >
+                        Accept new time
+                      </button>
+                      <button
+                        onClick={() => respondReschedule(b, false)}
+                        className="text-xs bg-white ring-1 ring-hairline rounded-lg px-3 py-2 min-h-[40px]"
+                      >
+                        Decline new time
                       </button>
                     </>
                   )}
