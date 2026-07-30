@@ -332,6 +332,9 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
   const [start, setStart] = useState("09:00");
   const [end, setEnd] = useState("17:00");
   const [slotMinutes, setSlotMinutes] = useState(60);
+  const [breakStart, setBreakStart] = useState("");
+  const [breakEnd, setBreakEnd] = useState("");
+  const [bufferMinutes, setBufferMinutes] = useState(0);
   const [blockDate, setBlockDate] = useState("");
 
   const { data: rows } = useQuery({
