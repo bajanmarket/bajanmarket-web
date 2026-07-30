@@ -1061,33 +1061,45 @@ export type Database = {
       }
       notification_deliveries: {
         Row: {
+          attempts: number
           channel: string
           created_at: string
           error: string | null
           id: string
+          idempotency_key: string | null
+          next_retry_at: string | null
           notification_id: string | null
           provider_message_id: string | null
           status: string
+          updated_at: string
           user_id: string
         }
         Insert: {
+          attempts?: number
           channel: string
           created_at?: string
           error?: string | null
           id?: string
+          idempotency_key?: string | null
+          next_retry_at?: string | null
           notification_id?: string | null
           provider_message_id?: string | null
           status?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
+          attempts?: number
           channel?: string
           created_at?: string
           error?: string | null
           id?: string
+          idempotency_key?: string | null
+          next_retry_at?: string | null
           notification_id?: string | null
           provider_message_id?: string | null
           status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -1104,34 +1116,61 @@ export type Database = {
         Row: {
           booking_events: boolean
           created_at: string
+          email_booking: boolean
           email_enabled: boolean
+          email_message: boolean
+          email_reminder: boolean
+          in_app_booking: boolean
           in_app_enabled: boolean
+          in_app_message: boolean
+          in_app_reminder: boolean
           message_events: boolean
           reminder_events: boolean
           updated_at: string
           user_id: string
+          wa_booking: boolean
+          wa_message: boolean
+          wa_reminder: boolean
           whatsapp_enabled: boolean
         }
         Insert: {
           booking_events?: boolean
           created_at?: string
+          email_booking?: boolean
           email_enabled?: boolean
+          email_message?: boolean
+          email_reminder?: boolean
+          in_app_booking?: boolean
           in_app_enabled?: boolean
+          in_app_message?: boolean
+          in_app_reminder?: boolean
           message_events?: boolean
           reminder_events?: boolean
           updated_at?: string
           user_id: string
+          wa_booking?: boolean
+          wa_message?: boolean
+          wa_reminder?: boolean
           whatsapp_enabled?: boolean
         }
         Update: {
           booking_events?: boolean
           created_at?: string
+          email_booking?: boolean
           email_enabled?: boolean
+          email_message?: boolean
+          email_reminder?: boolean
+          in_app_booking?: boolean
           in_app_enabled?: boolean
+          in_app_message?: boolean
+          in_app_reminder?: boolean
           message_events?: boolean
           reminder_events?: boolean
           updated_at?: string
           user_id?: string
+          wa_booking?: boolean
+          wa_message?: boolean
+          wa_reminder?: boolean
           whatsapp_enabled?: boolean
         }
         Relationships: []
@@ -1810,39 +1849,57 @@ export type Database = {
       whatsapp_consent: {
         Row: {
           consent_method: string | null
+          consent_source: string | null
+          consent_text_version: string | null
           consented_at: string | null
           created_at: string
+          last_code_sent_at: string | null
+          last_delivery_at: string | null
+          last_delivery_status: string | null
           opted_out_at: string | null
           phone: string
           updated_at: string
           user_id: string
-          verification_code: string | null
+          verification_code_hash: string | null
           verification_expires_at: string | null
           verified_at: string | null
+          verify_attempts: number
         }
         Insert: {
           consent_method?: string | null
+          consent_source?: string | null
+          consent_text_version?: string | null
           consented_at?: string | null
           created_at?: string
+          last_code_sent_at?: string | null
+          last_delivery_at?: string | null
+          last_delivery_status?: string | null
           opted_out_at?: string | null
           phone: string
           updated_at?: string
           user_id: string
-          verification_code?: string | null
+          verification_code_hash?: string | null
           verification_expires_at?: string | null
           verified_at?: string | null
+          verify_attempts?: number
         }
         Update: {
           consent_method?: string | null
+          consent_source?: string | null
+          consent_text_version?: string | null
           consented_at?: string | null
           created_at?: string
+          last_code_sent_at?: string | null
+          last_delivery_at?: string | null
+          last_delivery_status?: string | null
           opted_out_at?: string | null
           phone?: string
           updated_at?: string
           user_id?: string
-          verification_code?: string | null
+          verification_code_hash?: string | null
           verification_expires_at?: string | null
           verified_at?: string | null
+          verify_attempts?: number
         }
         Relationships: []
       }
