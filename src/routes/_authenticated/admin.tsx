@@ -13,6 +13,7 @@ import { AdminsPanel } from "@/components/AdminsPanel";
 import { BusinessesPanel } from "@/components/BusinessesPanel";
 import { AnalyticsPanel } from "@/components/AnalyticsPanel";
 import { MarketplaceControlsPanel } from "@/components/MarketplaceControlsPanel";
+import { WhatsAppPanel } from "@/components/WhatsAppPanel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -164,6 +165,7 @@ function AdminPage() {
           ["admins", "Admins", ShieldCheck],
           ["businesses", "Businesses", Store],
           ["marketplace", "Marketplace", Settings2],
+          ["whatsapp", "WhatsApp", MessageCircle],
         ] as [Section, string, typeof Shield][]).map(([key, label, Icon]) => (
           <button
             key={key}
@@ -196,6 +198,8 @@ function AdminPage() {
         <BusinessesPanel />
       ) : section === "marketplace" ? (
         <MarketplaceControlsPanel />
+      ) : section === "whatsapp" ? (
+        <WhatsAppPanel />
       ) : (
         <ReportsSection
           tab={tab}

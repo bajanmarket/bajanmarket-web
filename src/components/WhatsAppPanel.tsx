@@ -45,9 +45,6 @@ export function WhatsAppPanel() {
   const { data, isLoading } = useQuery({ queryKey: ["whatsapp-status"], queryFn: () => status({}) });
   const refresh = () => qc.invalidateQueries({ queryKey: ["whatsapp-status"] });
 
-  const m = <T,>(fn: (v: T) => Promise<unknown>, msg: string) =>
-    useMutationSafe(fn, msg, refresh);
-
   const saveSettings = useMutation({
     mutationFn: (patch: { production_enabled?: boolean; test_mode?: boolean }) => update({ data: patch }),
     onSuccess: () => { refresh(); toast.success("Saved"); },
@@ -251,13 +248,4 @@ export function WhatsAppPanel() {
       </div>
     </div>
   );
-}
-
-// Small helper kept out of the render path.
-function useMutationSafe<T>(fn: (v: T) => Promise<unknown>, msg: string, refresh: () => void) {
-  return useMutation({
-    mutationFn: fn,
-    onSuccess: () => { refresh(); toast.success(msg); },
-    onError: (e) => toast.error((e as Error).message),
-  });
 }
