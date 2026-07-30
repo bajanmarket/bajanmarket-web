@@ -253,7 +253,31 @@ function WhatsAppConsent({ verified, phone }: { verified: boolean; phone: string
           {verified ? "Update number" : "Send verification code"}
         </button>
       )}
+
+      {verified && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await withdrawWhatsAppConsent({});
+              toast.success("WhatsApp alerts switched off");
+              qc.invalidateQueries({ queryKey: ["whatsapp_consent", user?.id] });
+              qc.invalidateQueries({ queryKey: ["notification_prefs", user?.id] });
+            } catch (e) {
+              toast.error((e as Error).message);
+            } finally {
+              setBusy(false);
+            }
+          }}
+          className="text-xs text-coral underline underline-offset-2 self-start disabled:opacity-50"
+        >
+          Withdraw WhatsApp consent
+        </button>
+      )}
     </div>
+  );
   );
 }
 
