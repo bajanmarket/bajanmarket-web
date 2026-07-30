@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createHash } from "crypto";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
@@ -406,65 +407,6 @@ export const withdrawWhatsAppConsent = createServerFn({ method: "POST" })
     await supabaseAdmin
       .from("notification_preferences")
       .update({ wa_booking: false, wa_message: false, wa_reminder: false, whatsapp_enabled: false })
-      .eq("user_id", context.userId);
-    return { ok: true };
-  });
-
-/** Sends a 6-digit verification code over WhatsApp to confirm the user's number. */
-export const startWhatsAppVerification = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({ phone: z.string().min(7).max(24) }).parse(data))
-  .handler(async ({ context, data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendWhatsApp, whatsappConfigured, normalisePhone } = await import("@/lib/whatsapp.server");
-
-    const phone = normalisePhone(data.phone);
-    if (!phone) throw new Error("That phone number doesn't look valid. Include the country code.");
-
-    const code = String(Math.floor(100000 + Math.random() * 900000));
-    await supabaseAdmin.from("whatsapp_consent").upsert(
-      {
-        user_id: context.userId,
-        phone: data.phone.trim(),
-        verification_code: code,
-        verification_expires_at: new Date(Date.now() + 15 * 60_000).toISOString(),
-        opted_out_at: null,
-      },
-      { onConflict: "user_id" },
-    );
-
-    if (!whatsappConfigured()) {
-      return { status: "pending_channel" as const };
-    }
-    const r = await sendWhatsApp(phone, `Your BajanMarket verification code is ${code}.`);
-    if (r.status === "failed") throw new Error(`Could not send the code: ${r.error}`);
-    return { status: "sent" as const };
-  });
-
-export const confirmWhatsAppVerification = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({ code: z.string().length(6) }).parse(data))
-  .handler(async ({ context, data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row } = await supabaseAdmin
-      .from("whatsapp_consent")
-      .select("verification_code, verification_expires_at")
-      .eq("user_id", context.userId)
-      .maybeSingle();
-    if (!row?.verification_code) throw new Error("Request a new code first.");
-    if (row.verification_expires_at && new Date(row.verification_expires_at) < new Date())
-      throw new Error("That code expired. Request a new one.");
-    if (row.verification_code !== data.code) throw new Error("That code doesn't match.");
-
-    await supabaseAdmin
-      .from("whatsapp_consent")
-      .update({
-        verified_at: new Date().toISOString(),
-        consented_at: new Date().toISOString(),
-        consent_method: "in_app_checkbox_and_code",
-        verification_code: null,
-        verification_expires_at: null,
-      })
       .eq("user_id", context.userId);
     return { ok: true };
   });
