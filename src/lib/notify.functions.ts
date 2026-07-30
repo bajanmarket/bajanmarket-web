@@ -219,6 +219,8 @@ export const notifyEvent = createServerFn({ method: "POST" })
       status: string;
       error?: string | null;
       providerMessageId?: string | null;
+      isTest?: boolean;
+      errorCode?: string | null;
     };
     const deliveries: Delivery[] = [];
 
@@ -242,8 +244,13 @@ export const notifyEvent = createServerFn({ method: "POST" })
           status: d.status,
           error: d.error ?? null,
           provider_message_id: d.providerMessageId ?? null,
+          provider_error_code: d.errorCode ?? null,
+          is_test: d.isTest ?? false,
+          status_at: new Date().toISOString(),
+          status_rank: d.status === "sent" ? 1 : 0,
           next_retry_at: d.status === "failed" ? new Date(Date.now() + 5 * 60_000).toISOString() : null,
         })
+
         .eq("idempotency_key", `${data.recipient_id}:${dedupeKey}:${channel}`.slice(0, 300));
       deliveries.push(d);
     };
@@ -271,15 +278,52 @@ export const notifyEvent = createServerFn({ method: "POST" })
         .select("phone, verified_at, consented_at, opted_out_at")
         .eq("user_id", data.recipient_id)
         .maybeSingle();
+      const { WA_EVENT_MAP } = await import("@/lib/whatsapp-events");
+      const waEvent = WA_EVENT_MAP[data.event];
       // Suppression: unverified numbers and withdrawn consent never receive.
-      if (consent?.phone && consent.verified_at && consent.consented_at && !consent.opted_out_at) {
-        const { sendWhatsApp } = await import("@/lib/whatsapp.server");
-        const r = await sendWhatsApp(consent.phone, `${copy.whatsapp}\n${url}`);
+      if (!waEvent) {
+        await settle("whatsapp", {
+          channel: "whatsapp",
+          status: "suppressed",
+          error: "Event is not eligible for WhatsApp delivery",
+        });
+      } else if (consent?.phone && consent.verified_at && consent.consented_at && !consent.opted_out_at) {
+        const { sendWhatsAppTemplate } = await import("@/lib/whatsapp.server");
+        // Template parameters are built server-side from safe fields only:
+        // reference, service name, date, time, Barbados-time label and link.
+        let reference = "";
+        let serviceName: string | undefined;
+        let date: string | undefined;
+        let time: string | undefined;
+        if (data.booking_id) {
+          const { data: b } = await supabaseAdmin
+            .from("bookings")
+            .select("reference, starts_at, service_listings(title)")
+            .eq("id", data.booking_id)
+            .maybeSingle();
+          reference = b?.reference ?? "";
+          serviceName = (b as { service_listings?: { title?: string } } | null)?.service_listings?.title;
+          if (b?.starts_at) {
+            const d = new Date(b.starts_at);
+            date = d.toLocaleDateString("en-GB", { timeZone: "America/Barbados", day: "2-digit", month: "short", year: "numeric" });
+            time = d.toLocaleTimeString("en-GB", { timeZone: "America/Barbados", hour: "2-digit", minute: "2-digit" });
+          }
+        }
+        const r = await sendWhatsAppTemplate(consent.phone, waEvent, {
+          reference,
+          serviceName,
+          date,
+          time,
+          tzLabel: "AST (Barbados time)",
+          link: url,
+        });
         await settle("whatsapp", {
           channel: "whatsapp",
           status: r.status,
-          error: r.status === "failed" ? r.error : r.status === "skipped" ? r.reason : null,
+          error: r.status === "failed" ? r.error : r.status === "suppressed" ? r.reason : null,
           providerMessageId: r.status === "sent" ? r.providerMessageId : null,
+          isTest: r.status === "sent" ? r.isTest : false,
+          errorCode: r.status === "failed" ? (r.errorCode ?? null) : null,
         });
         await supabaseAdmin
           .from("whatsapp_consent")
@@ -293,6 +337,7 @@ export const notifyEvent = createServerFn({ method: "POST" })
         });
       }
     }
+
 
     return { ok: true, deliveries: deliveries.map((d) => ({ channel: d.channel, status: d.status })) };
   });
@@ -310,7 +355,7 @@ export const startWhatsAppVerification = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ phone: z.string().min(7).max(24) }).parse(data))
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendWhatsApp, whatsappConfigured, normalisePhone } = await import("@/lib/whatsapp.server");
+    const { sendVerificationCode, normalisePhone } = await import("@/lib/whatsapp.server");
 
     const phone = normalisePhone(data.phone);
     if (!phone) throw new Error("That phone number doesn't look valid. Include the country code.");
@@ -326,6 +371,31 @@ export const startWhatsAppVerification = createServerFn({ method: "POST" })
     }
 
     const code = String(Math.floor(100000 + Math.random() * 900000));
+
+    // Delivery is attempted BEFORE the code is persisted. If the provider is
+    // not configured (or refuses), no code hash is stored, so the number can
+    // never be confirmed off an internally generated code.
+    const r = await sendVerificationCode(phone, code);
+
+    if (r.status !== "sent") {
+      await supabaseAdmin.from("whatsapp_consent").upsert(
+        {
+          user_id: context.userId,
+          phone: `+${phone}`,
+          verification_code_hash: null,
+          verification_expires_at: null,
+          verify_attempts: 0,
+          verified_at: null,
+          consented_at: null,
+          opted_out_at: null,
+        },
+        { onConflict: "user_id" },
+      );
+      if (r.status === "failed") throw new Error("Could not send the code. Please try again shortly.");
+      // Development / pre-approval state — clearly labelled, never "verified".
+      return { status: "pending_channel" as const, reason: r.reason };
+    }
+
     await supabaseAdmin.from("whatsapp_consent").upsert(
       {
         user_id: context.userId,
@@ -341,13 +411,9 @@ export const startWhatsAppVerification = createServerFn({ method: "POST" })
       { onConflict: "user_id" },
     );
 
-    if (!whatsappConfigured()) {
-      return { status: "pending_channel" as const };
-    }
-    const r = await sendWhatsApp(phone, `Your BajanMarket verification code is ${code}.`);
-    if (r.status === "failed") throw new Error("Could not send the code. Please try again shortly.");
     return { status: "sent" as const };
   });
+
 
 export const confirmWhatsAppVerification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
