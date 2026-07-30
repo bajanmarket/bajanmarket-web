@@ -1067,10 +1067,15 @@ export type Database = {
           error: string | null
           id: string
           idempotency_key: string | null
+          is_test: boolean
           next_retry_at: string | null
           notification_id: string | null
+          provider_error_code: string | null
           provider_message_id: string | null
+          provider_status: string | null
           status: string
+          status_at: string | null
+          status_rank: number
           updated_at: string
           user_id: string
         }
@@ -1081,10 +1086,15 @@ export type Database = {
           error?: string | null
           id?: string
           idempotency_key?: string | null
+          is_test?: boolean
           next_retry_at?: string | null
           notification_id?: string | null
+          provider_error_code?: string | null
           provider_message_id?: string | null
+          provider_status?: string | null
           status?: string
+          status_at?: string | null
+          status_rank?: number
           updated_at?: string
           user_id: string
         }
@@ -1095,10 +1105,15 @@ export type Database = {
           error?: string | null
           id?: string
           idempotency_key?: string | null
+          is_test?: boolean
           next_retry_at?: string | null
           notification_id?: string | null
+          provider_error_code?: string | null
           provider_message_id?: string | null
+          provider_status?: string | null
           status?: string
+          status_at?: string | null
+          status_rank?: number
           updated_at?: string
           user_id?: string
         }
@@ -1846,6 +1861,33 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_connection_tests: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          kind: string
+          ok: boolean
+          run_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          ok: boolean
+          run_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          ok?: boolean
+          run_by?: string | null
+        }
+        Relationships: []
+      }
       whatsapp_consent: {
         Row: {
           consent_method: string | null
@@ -1900,6 +1942,72 @@ export type Database = {
           verification_expires_at?: string | null
           verified_at?: string | null
           verify_attempts?: number
+        }
+        Relationships: []
+      }
+      whatsapp_settings: {
+        Row: {
+          id: number
+          production_enabled: boolean
+          test_mode: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: number
+          production_enabled?: boolean
+          test_mode?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: number
+          production_enabled?: boolean
+          test_mode?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      whatsapp_test_numbers: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          id: string
+          label: string | null
+          phone: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          label?: string | null
+          phone: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          label?: string | null
+          phone?: string
+        }
+        Relationships: []
+      }
+      whatsapp_webhook_events: {
+        Row: {
+          event_key: string
+          kind: string
+          received_at: string
+        }
+        Insert: {
+          event_key: string
+          kind: string
+          received_at?: string
+        }
+        Update: {
+          event_key?: string
+          kind?: string
+          received_at?: string
         }
         Relationships: []
       }
