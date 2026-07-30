@@ -197,7 +197,7 @@ function BookingsPage() {
         <div className="flex flex-col gap-3 max-w-2xl">
           {bookings.map((b) => {
             const title = services?.get(b.service_listing_id) ?? "Service";
-            const when = new Date(b.starts_at);
+
             return (
               <div key={b.id} className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
