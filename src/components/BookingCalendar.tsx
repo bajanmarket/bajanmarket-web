@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { buildSlots, isoDate, nextDays, type AvailabilityRow, type Slot } from "@/lib/services";
+import { buildSlots, isoDate, nextDays, TZ_NOTE, type AvailabilityRow, type Slot } from "@/lib/services";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
