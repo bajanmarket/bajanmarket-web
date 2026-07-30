@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/useAuth";
+import { NotificationBell } from "@/components/NotificationBell";
 import { UserRound } from "lucide-react";
+
 
 export function TopHeader() {
   const { user } = useAuth();
