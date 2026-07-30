@@ -173,8 +173,14 @@ export const notifyEvent = createServerFn({ method: "POST" })
     if (!groupOn) return { skipped: "opted-out" };
 
     let notificationId: string | null = null;
+    // Duplicate-event prevention: the same event for the same subject and
+    // recipient can only ever produce one notification (and one fan-out).
+    const dedupeKey =
+      data.dedupe_key ??
+      [data.event, data.booking_id ?? data.conversation_id ?? "", data.detail ?? ""].join(":").slice(0, 200);
+
     if (inApp) {
-      const { data: n } = await supabaseAdmin
+      const { data: n, error: insErr } = await supabaseAdmin
         .from("notifications")
         .insert({
           user_id: data.recipient_id,
@@ -184,11 +190,17 @@ export const notifyEvent = createServerFn({ method: "POST" })
           link,
           booking_id: data.booking_id ?? null,
           conversation_id: data.conversation_id ?? null,
+          dedupe_key: dedupeKey,
         })
         .select("id")
         .maybeSingle();
+      // 23505 = unique violation on (user_id, dedupe_key): already notified.
+      if (insErr && (insErr as { code?: string }).code === "23505") {
+        return { skipped: "duplicate" as const };
+      }
       notificationId = n?.id ?? null;
     }
+
 
     const deliveries: { channel: string; status: string; error?: string | null; providerMessageId?: string | null }[] =
       [];
