@@ -168,10 +168,14 @@ function BookingsPage() {
 
   return (
     <AppShell>
-      <div className="flex items-center gap-2 mb-4">
-        <CalendarCheck className="size-5 text-teal" />
-        <h1 className="text-2xl font-medium">Bookings</h1>
+      <div className="mb-4">
+        <div className="flex items-center gap-2">
+          <CalendarCheck className="size-5 text-teal" />
+          <h1 className="text-2xl font-medium">Bookings</h1>
+        </div>
+        <p className="text-xs text-navy/50 mt-1">{TZ_NOTE}</p>
       </div>
+
 
       <div className="flex gap-1 mb-4 bg-white rounded-xl p-1 ring-1 ring-hairline w-fit">
         {([["buyer", "As customer"], ["provider", "As provider"]] as const).map(([k, label]) => (
