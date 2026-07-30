@@ -20,7 +20,10 @@ export function TopHeader() {
             Browse
           </Link>
           {user ? (
+            <>
+            <NotificationBell />
             <Link
+
               to="/profile"
               className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 ring-1 ring-hairline text-sm font-medium"
             >
