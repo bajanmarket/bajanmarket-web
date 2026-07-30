@@ -369,12 +369,22 @@ function AvailabilityTab({ userId, qc }: { userId?: string; qc: QC }) {
         onSubmit={async (e) => {
           e.preventDefault();
           if (!userId) return;
+          if ((breakStart && !breakEnd) || (!breakStart && breakEnd)) {
+            return toast.error("Add both a break start and end time");
+          }
+          if (breakStart && breakEnd && breakEnd <= breakStart) {
+            return toast.error("Break end must be after break start");
+          }
+          if (end <= start) return toast.error("End time must be after start time");
           const { error } = await supabase.from("provider_availability").insert({
             provider_id: userId,
             weekday,
             start_time: start,
             end_time: end,
             slot_minutes: slotMinutes,
+            break_start: breakStart || null,
+            break_end: breakEnd || null,
+            buffer_minutes: bufferMinutes,
           });
           if (error) return toast.error(error.message);
           toast.success("Working hours added");
