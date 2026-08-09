@@ -24,6 +24,7 @@ import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesIdRouteImport } from './routes/services.$id'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
 import { Route as AuthenticatedProviderServicesRouteImport } from './routes/_authenticated/provider-services'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -117,6 +118,11 @@ const SellerIdRoute = SellerIdRouteImport.update({
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessSlugRoute = BusinessSlugRouteImport.update({
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
@@ -288,6 +295,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
@@ -326,6 +334,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
@@ -364,6 +373,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/provider-services'
     | '/business/$slug'
+    | '/category/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/services/$id'
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/provider-services'
     | '/business/$slug'
+    | '/category/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/services/$id'
@@ -436,6 +447,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/provider-services'
     | '/business/$slug'
+    | '/category/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/services/$id'
@@ -463,6 +475,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BusinessSlugRoute: typeof BusinessSlugRoute
+  CategorySlugRoute: typeof CategorySlugRoute
   ListingIdRoute: typeof ListingIdRoute
   SellerIdRoute: typeof SellerIdRoute
   ServicesIdRoute: typeof ServicesIdRoute
@@ -578,6 +591,13 @@ declare module '@tanstack/react-router' {
       path: '/listing/$id'
       fullPath: '/listing/$id'
       preLoaderRoute: typeof ListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/business/$slug': {
@@ -785,6 +805,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BusinessSlugRoute: BusinessSlugRoute,
+  CategorySlugRoute: CategorySlugRoute,
   ListingIdRoute: ListingIdRoute,
   SellerIdRoute: SellerIdRoute,
   ServicesIdRoute: ServicesIdRoute,
