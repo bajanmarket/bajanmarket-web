@@ -123,9 +123,13 @@ function Home() {
           <EmptyMarketplace />
         )}
       </section>
+
+      <HowItWorks />
+      <TrustSection />
     </AppShell>
   );
 }
+
 
 function EmptyMarketplace() {
   return (
