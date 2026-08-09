@@ -2079,6 +2079,12 @@ export type Database = {
         }
         Returns: number
       }
+      providers_with_availability: {
+        Args: { _provider_ids: string[] }
+        Returns: {
+          provider_id: string
+        }[]
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -2087,11 +2093,36 @@ export type Database = {
           read_ct: number
         }[]
       }
+      service_blocked_dates: {
+        Args: { _provider_id: string }
+        Returns: {
+          blocked_date: string
+        }[]
+      }
       service_busy_slots: {
         Args: { _from: string; _provider_id: string; _to: string }
         Returns: {
           ends_at: string
           starts_at: string
+        }[]
+      }
+      service_public_availability: {
+        Args: { _provider_id: string; _service_listing_id: string }
+        Returns: {
+          active: boolean
+          advance_days: number
+          break_end: string
+          break_start: string
+          buffer_minutes: number
+          end_time: string
+          id: string
+          max_daily_bookings: number
+          min_notice_hours: number
+          service_listing_id: string
+          slot_minutes: number
+          start_time: string
+          timezone: string
+          weekday: number
         }[]
       }
     }

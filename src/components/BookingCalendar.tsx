@@ -32,22 +32,20 @@ export function BookingCalendar({
   const { data: availability } = useQuery({
     queryKey: ["service-availability", providerId, serviceListingId],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("provider_availability")
-        .select("*")
-        .eq("provider_id", providerId)
-        .or(`service_listing_id.eq.${serviceListingId},service_listing_id.is.null`);
-      return (data ?? []) as AvailabilityRow[];
+      const { data } = await supabase.rpc("service_public_availability", {
+        _provider_id: providerId,
+        _service_listing_id: serviceListingId,
+      });
+      return (data ?? []) as unknown as AvailabilityRow[];
     },
   });
 
   const { data: blocked } = useQuery({
     queryKey: ["service-blocked", providerId],
     queryFn: async () => {
-      const { data } = await supabase
-        .from("provider_blocked_dates")
-        .select("blocked_date")
-        .eq("provider_id", providerId);
+      const { data } = await supabase.rpc("service_blocked_dates", {
+        _provider_id: providerId,
+      });
       return (data ?? []).map((b) => b.blocked_date as string);
     },
   });

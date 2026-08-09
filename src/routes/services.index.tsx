@@ -84,11 +84,9 @@ function ServicesBrowse() {
       if (search.available) {
         const ids = Array.from(new Set(rows.map((r) => r.provider_id)));
         if (ids.length) {
-          const { data: av } = await supabase
-            .from("provider_availability")
-            .select("provider_id")
-            .in("provider_id", ids)
-            .eq("active", true);
+          const { data: av } = await supabase.rpc("providers_with_availability", {
+            _provider_ids: ids,
+          });
           const withAvail = new Set((av ?? []).map((a) => a.provider_id));
           rows = rows.filter((r) => withAvail.has(r.provider_id));
         }
