@@ -139,7 +139,7 @@ function BusinessPage() {
         <div className="p-6 flex flex-col sm:flex-row gap-4 sm:items-end -mt-16 sm:-mt-20 relative">
           <div className="size-24 sm:size-32 rounded-2xl ring-4 ring-white bg-white overflow-hidden shrink-0 grid place-items-center">
             {business.logo_url ? (
-              <img src={business.logo_url} alt={`${business.name} logo`} className="w-full h-full object-cover" />
+              <img src={business.logo_url} alt={`${business.name} logo`} width={128} height={128} decoding="async" className="w-full h-full object-cover" />
             ) : (
               <Store className="size-10 text-navy/30" />
             )}
