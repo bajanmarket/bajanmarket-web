@@ -20,13 +20,13 @@ export const Route = createFileRoute("/services/")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Book local services in Barbados — Bajan.market" },
+      { title: "Book local services in Barbados — BajanMarket" },
       {
         name: "description",
         content:
           "Book spa, massage, cleaning, lawn care, tutoring, pet care, childcare and tech support appointments with trusted Barbadian providers.",
       },
-      { property: "og:title", content: "Book local services in Barbados — Bajan.market" },
+      { property: "og:title", content: "Book local services in Barbados — BajanMarket" },
       {
         property: "og:description",
         content: "Find a local service provider, pick a time that suits you, and book it in a few taps.",

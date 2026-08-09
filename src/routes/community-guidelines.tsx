@@ -2,15 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { LegalPage, H2 } from "@/components/LegalPage";
 
-const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+const SITE_URL = "https://bajanmarket.app";
 
 export const Route = createFileRoute("/community-guidelines")({
   head: () => ({
     meta: [
-      { title: "Community Guidelines — Bajan.market" },
-      { name: "description", content: "The rules that keep Bajan.market a safe, honest marketplace for Barbados." },
-      { property: "og:title", content: "Community Guidelines — Bajan.market" },
-      { property: "og:description", content: "The rules that keep Bajan.market safe and honest." },
+      { title: "Community Guidelines — BajanMarket" },
+      { name: "description", content: "The rules that keep BajanMarket a safe, honest marketplace for Barbados." },
+      { property: "og:title", content: "Community Guidelines — BajanMarket" },
+      { property: "og:description", content: "The rules that keep BajanMarket safe and honest." },
       { property: "og:url", content: `${SITE_URL}/community-guidelines` },
     ],
     links: [{ rel: "canonical", href: `${SITE_URL}/community-guidelines` }],
@@ -23,7 +23,7 @@ function Community() {
     <AppShell>
       <LegalPage title="Community Guidelines" updated="4 July 2026">
         <p>
-          Bajan.market only works when people trust each other. These rules apply to everyone — buyers,
+          BajanMarket only works when people trust each other. These rules apply to everyone — buyers,
           sellers and browsers alike. Break them and your listings can be hidden and your account banned.
         </p>
 

@@ -3,7 +3,7 @@ import { createHash } from "crypto";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const FROM = "Bajan.market <bajanmarket@bajanmarket.app>";
+const FROM = "BajanMarket <bajanmarket@bajanmarket.app>";
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
 const EVENTS = [
@@ -24,7 +24,7 @@ type EventKey = (typeof EVENTS)[number];
 const COPY: Record<EventKey, { title: string; body: string; whatsapp: string }> = {
   message: {
     title: "New message",
-    body: "You have a new message on Bajan.market.",
+    body: "You have a new message on BajanMarket.",
     whatsapp: "You have a new message on BajanMarket.",
   },
   booking_submitted: {
@@ -259,9 +259,9 @@ export const notifyEvent = createServerFn({ method: "POST" })
       const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(data.recipient_id);
       const to = userRes?.user?.email;
       if (to) {
-        const text = `${copy.body}\n\n${data.detail ?? ""}\n\nOpen Bajan.market: ${url}`;
-        const html = `<p>${escapeHtml(copy.body)}</p>${data.detail ? `<p>${escapeHtml(data.detail)}</p>` : ""}<p><a href="${url}">Open on Bajan.market</a></p>`;
-        const r = await sendEmail(to, `${copy.title} — Bajan.market`, text, html);
+        const text = `${copy.body}\n\n${data.detail ?? ""}\n\nOpen BajanMarket: ${url}`;
+        const html = `<p>${escapeHtml(copy.body)}</p>${data.detail ? `<p>${escapeHtml(data.detail)}</p>` : ""}<p><a href="${url}">Open on BajanMarket</a></p>`;
+        const r = await sendEmail(to, `${copy.title} — BajanMarket`, text, html);
         await settle("email", {
           channel: "email",
           status: r.ok ? "sent" : "failed",

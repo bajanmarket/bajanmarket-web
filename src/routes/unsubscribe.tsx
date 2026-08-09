@@ -6,7 +6,7 @@ import { unsubscribeByToken } from "@/lib/campaigns.functions";
 export const Route = createFileRoute("/unsubscribe")({
   head: () => ({
     meta: [
-      { title: "Unsubscribe — Bajan.market" },
+      { title: "Unsubscribe — BajanMarket" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -32,7 +32,7 @@ function UnsubscribePage() {
     unsub({ data: { token } })
       .then(() => {
         setStatus("done");
-        setMsg("You've been unsubscribed from all Bajan.market marketing messages.");
+        setMsg("You've been unsubscribed from all BajanMarket marketing messages.");
       })
       .catch((e) => {
         setStatus("error");

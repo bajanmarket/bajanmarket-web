@@ -73,7 +73,7 @@ export const BOOKING_STATUS_TONE: Record<BookingStatus, string> = {
 /** Barbados has no DST — a fixed -04:00 offset is correct year-round. */
 const BARBADOS_OFFSET = "-04:00";
 
-/** Every appointment time on Bajan.market is shown in Barbados time. */
+/** Every appointment time on BajanMarket is shown in Barbados time. */
 export const BARBADOS_TZ = "America/Barbados";
 export const TZ_SHORT = "AST";
 export const TZ_NOTE = "All times shown in Barbados time (AST, UTC−4).";

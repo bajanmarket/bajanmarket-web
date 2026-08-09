@@ -13,13 +13,23 @@ import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
 import { track, deviceType } from "@/lib/analytics";
 
-const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+const SITE_URL = "https://bajanmarket.app";
+
+const SCHEMA_CONDITION: Record<string, string> = {
+  new: "https://schema.org/NewCondition",
+  like_new: "https://schema.org/UsedCondition",
+  good: "https://schema.org/UsedCondition",
+  fair: "https://schema.org/UsedCondition",
+  for_parts: "https://schema.org/DamagedCondition",
+};
 
 export const Route = createFileRoute("/listing/$id")({
   loader: async ({ params }) => {
     const { data } = await supabase
       .from("listings")
-      .select("id, title, description, price, currency, cover_image_url")
+      .select(
+        "id, title, description, price, currency, cover_image_url, status, condition, parish, updated_at, categories (name, slug)",
+      )
       .eq("id", params.id)
       .maybeSingle();
     return { listing: data };
@@ -27,10 +37,15 @@ export const Route = createFileRoute("/listing/$id")({
   head: ({ params, loaderData }) => {
     const l = loaderData?.listing;
     const url = `${SITE_URL}/listing/${params.id}`;
-    const title = l ? `${l.title} — ${formatBBD(l.price, l.currency)} · Bajan.market` : "Listing — Bajan.market";
+    const cat = (l as { categories?: { name: string; slug: string } | null } | null)?.categories ?? null;
+    const where = l?.parish ? parishLabel(l.parish) : "Barbados";
+    const title = l
+      ? `${l.title} — ${formatBBD(l.price, l.currency)} in ${where} · BajanMarket`
+      : "Listing — BajanMarket";
+    const body = (l?.description ?? "").replace(/\s+/g, " ").trim();
     const desc = l
-      ? (l.description ?? "").replace(/\s+/g, " ").trim().slice(0, 155) || `${l.title} for sale on Bajan.market.`
-      : "View this listing on Bajan.market — Barbados' cleaner marketplace.";
+      ? (body || `${l.title} for sale in ${where}, Barbados.`).slice(0, 155)
+      : "View this listing on BajanMarket — Barbados' cleaner marketplace.";
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },
@@ -38,21 +53,54 @@ export const Route = createFileRoute("/listing/$id")({
       { property: "og:description", content: desc },
       { property: "og:type", content: "product" },
       { property: "og:url", content: url },
+      { property: "og:site_name", content: "BajanMarket" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: desc },
     ];
     if (l?.cover_image_url) meta.push({ property: "og:image", content: l.cover_image_url }, { name: "twitter:image", content: l.cover_image_url });
-    const scripts = l ? [{
-      type: "application/ld+json",
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Product",
-        name: l.title,
-        description: l.description ?? undefined,
-        image: l.cover_image_url ?? undefined,
-        offers: { "@type": "Offer", price: l.price, priceCurrency: l.currency ?? "BBD", url, availability: "https://schema.org/InStock" },
-      }),
-    }] : undefined;
+    // Only live/sold public listings belong in the index.
+    if (!l || (l.status !== "active" && l.status !== "sold")) {
+      meta.push({ name: "robots", content: "noindex, nofollow" });
+    }
+    const scripts = l ? [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: l.title,
+          description: body || undefined,
+          image: l.cover_image_url ?? undefined,
+          category: cat?.name ?? undefined,
+          url,
+          itemCondition: l.condition ? SCHEMA_CONDITION[l.condition] : undefined,
+          offers: {
+            "@type": "Offer",
+            price: l.price,
+            priceCurrency: l.currency ?? "BBD",
+            url,
+            availability: l.status === "sold" ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+            areaServed: "Barbados",
+          },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "BajanMarket", item: SITE_URL },
+            ...(cat ? [{ "@type": "ListItem", position: 2, name: cat.name, item: `${SITE_URL}/category/${cat.slug}` }] : []),
+            { "@type": "ListItem", position: cat ? 3 : 2, name: l.title, item: url },
+          ],
+        }),
+      },
+    ] : undefined;
     return { meta, links: [{ rel: "canonical", href: url }], scripts };
   },
+
   component: ListingDetail,
 });
 

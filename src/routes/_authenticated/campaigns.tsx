@@ -14,7 +14,7 @@ import { Megaphone, Send, Users, Mail, Shield, ChevronRight, FileText } from "lu
 export const Route = createFileRoute("/_authenticated/campaigns")({
   head: () => ({
     meta: [
-      { title: "Campaigns — Bajan.market" },
+      { title: "Campaigns — BajanMarket" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -200,7 +200,7 @@ function CampaignsPage() {
           </Field>
 
           <Field label="Subject">
-            <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Big weekend on Bajan.market 🇧🇧"
+            <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Big weekend on BajanMarket 🇧🇧"
               className="w-full rounded-xl bg-sand px-3 py-2 text-sm outline-none ring-1 ring-hairline focus:ring-teal" />
           </Field>
 

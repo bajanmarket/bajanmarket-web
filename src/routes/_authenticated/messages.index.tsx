@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/useAuth";
 import { formatRelative, initials } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/messages/")({
-  head: () => ({ meta: [{ title: "Inbox — Bajan.market" }] }),
+  head: () => ({ meta: [{ title: "Inbox — BajanMarket" }] }),
   component: Inbox,
 });
 

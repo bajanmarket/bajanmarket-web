@@ -2,15 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { LegalPage, H2 } from "@/components/LegalPage";
 
-const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+const SITE_URL = "https://bajanmarket.app";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Bajan.market" },
-      { name: "description", content: "How Bajan.market collects, uses and protects your personal information." },
-      { property: "og:title", content: "Privacy Policy — Bajan.market" },
-      { property: "og:description", content: "How Bajan.market handles your personal information." },
+      { title: "Privacy Policy — BajanMarket" },
+      { name: "description", content: "How BajanMarket collects, uses and protects your personal information." },
+      { property: "og:title", content: "Privacy Policy — BajanMarket" },
+      { property: "og:description", content: "How BajanMarket handles your personal information." },
       { property: "og:url", content: `${SITE_URL}/privacy` },
     ],
     links: [{ rel: "canonical", href: `${SITE_URL}/privacy` }],
@@ -23,8 +23,8 @@ function Privacy() {
     <AppShell>
       <LegalPage title="Privacy Policy" updated="4 July 2026">
         <p>
-          This policy explains what Bajan.market collects, how we use it, and the choices you have.
-          It is maintained by the Bajan.market team.
+          This policy explains what BajanMarket collects, how we use it, and the choices you have.
+          It is maintained by the BajanMarket team.
         </p>
 
         <H2>Information we collect</H2>
@@ -76,10 +76,10 @@ function Privacy() {
         </p>
 
         <H2>Children</H2>
-        <p>Bajan.market is not intended for anyone under 18.</p>
+        <p>BajanMarket is not intended for anyone under 18.</p>
 
         <H2>Contact</H2>
-        <p>Privacy questions? Email <a className="text-teal hover:underline" href="mailto:privacy@bajan.market">privacy@bajan.market</a>.</p>
+        <p>Privacy questions? Email <a className="text-teal hover:underline" href="mailto:privacy@bajanmarket.app">privacy@bajanmarket.app</a>.</p>
       </LegalPage>
     </AppShell>
   );

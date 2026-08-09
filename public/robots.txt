@@ -1,10 +1,17 @@
 User-agent: *
 Allow: /
 Disallow: /auth
+Disallow: /reset-password
+Disallow: /unsubscribe
 Disallow: /messages
 Disallow: /favourites
 Disallow: /my-listings
 Disallow: /post
 Disallow: /profile
+Disallow: /notifications
+Disallow: /bookings
+Disallow: /provider-services
+Disallow: /admin
+Disallow: /lovable/
 
-Sitemap: https://bajanmarketplacetest.lovable.app/sitemap.xml
+Sitemap: https://bajanmarket.app/sitemap.xml

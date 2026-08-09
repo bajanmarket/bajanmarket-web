@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
 
-const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+const SITE_URL = "https://bajanmarket.app";
 
 const DAYS = [
   { key: "mon", label: "Mon" },
@@ -38,8 +38,8 @@ export const Route = createFileRoute("/business/$slug")({
   head: ({ params, loaderData }) => {
     const b = loaderData?.business;
     const url = `${SITE_URL}/business/${params.slug}`;
-    const title = b ? `${b.name} — Bajan.market` : "Business — Bajan.market";
-    const desc = (b?.tagline ?? b?.description ?? `Shop with ${b?.name ?? "this business"} on Bajan.market.`)?.slice(0, 155) ?? "";
+    const title = b ? `${b.name} — BajanMarket` : "Business — BajanMarket";
+    const desc = (b?.tagline ?? b?.description ?? `Shop with ${b?.name ?? "this business"} on BajanMarket.`)?.slice(0, 155) ?? "";
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },

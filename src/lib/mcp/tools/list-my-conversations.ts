@@ -5,7 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 export default defineTool({
   name: "list_my_conversations",
   title: "List my conversations",
-  description: "List the signed-in user's message threads on Bajan.market with the other participant and listing.",
+  description: "List the signed-in user's message threads on BajanMarket with the other participant and listing.",
   inputSchema: {},
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async (_input, ctx: ToolContext) => {

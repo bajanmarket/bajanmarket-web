@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="border-t border-hairline bg-white mt-12">
       <div className="max-w-6xl mx-auto px-5 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="text-sm text-navy/60">
-          <span className="font-medium text-navy">Bajan.market</span> — Barbados' cleaner marketplace.
+          <span className="font-medium text-navy">BajanMarket</span> — Barbados' cleaner marketplace.
         </div>
         <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-navy/60">
           <Link to="/browse" className="hover:text-teal">Browse</Link>
@@ -15,7 +15,7 @@ export function Footer() {
         </nav>
       </div>
       <div className="max-w-6xl mx-auto px-5 pb-6 text-xs text-navy/40">
-        © {new Date().getFullYear()} Bajan.market. All rights reserved.
+        © {new Date().getFullYear()} BajanMarket. All rights reserved.
       </div>
     </footer>
   );

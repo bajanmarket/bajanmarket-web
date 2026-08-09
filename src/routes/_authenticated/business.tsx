@@ -30,7 +30,7 @@ function slugify(s: string) {
 }
 
 export const Route = createFileRoute("/_authenticated/business")({
-  head: () => ({ meta: [{ title: "Business storefront — Bajan.market" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Business storefront — BajanMarket" }, { name: "robots", content: "noindex" }] }),
   component: BusinessManager,
 });
 
@@ -176,7 +176,7 @@ function BusinessManager() {
           <F label="Business name">
             <input value={form.name} onChange={(e) => onNameChange(e.target.value)} maxLength={80} className={inp} />
           </F>
-          <F label={`URL — bajan.market/business/${form.slug || "your-slug"}`}>
+          <F label={`URL — bajanmarket.app/business/${form.slug || "your-slug"}`}>
             <input
               value={form.slug}
               onChange={(e) => { setSlugTouched(true); setForm((f) => ({ ...f, slug: slugify(e.target.value) })); }}
@@ -266,7 +266,7 @@ function StatusBanner({ status, slug, reason }: { status: string; slug: string; 
         <CheckCircle2 className="size-5 text-teal shrink-0 mt-0.5" />
         <div className="text-sm">
           <div className="font-medium text-navy">Approved — your storefront is live</div>
-          <Link to="/business/$slug" params={{ slug }} className="text-teal hover:underline text-xs">bajan.market/business/{slug}</Link>
+          <Link to="/business/$slug" params={{ slug }} className="text-teal hover:underline text-xs">bajanmarket.app/business/{slug}</Link>
         </div>
       </div>
     );

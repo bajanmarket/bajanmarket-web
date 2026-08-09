@@ -13,10 +13,10 @@ import { CalendarCheck, CalendarPlus, Download, MessageSquare } from "lucide-rea
 export const Route = createFileRoute("/_authenticated/bookings")({
   head: () => ({
     meta: [
-      { title: "My bookings — Bajan.market" },
+      { title: "My bookings — BajanMarket" },
       { name: "description", content: "Track your service appointments as a customer and as a provider." },
-      { property: "og:title", content: "My bookings — Bajan.market" },
-      { property: "og:description", content: "Track and manage your Bajan.market service appointments." },
+      { property: "og:title", content: "My bookings — BajanMarket" },
+      { property: "og:description", content: "Track and manage your BajanMarket service appointments." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },

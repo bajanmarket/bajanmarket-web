@@ -7,7 +7,7 @@ export default defineTool({
   name: "search_listings",
   title: "Search listings",
   description:
-    "Search active public listings on Bajan.market by keyword, parish, category, and price range. Returns titles, prices, condition, parish, and links.",
+    "Search active public listings on BajanMarket by keyword, parish, category, and price range. Returns titles, prices, condition, parish, and links.",
   inputSchema: {
     query: z.string().trim().max(200).optional().describe("Free-text search across title and description."),
     parish: z.string().trim().max(50).optional().describe("Filter by Barbados parish (e.g. 'St. Michael')."),

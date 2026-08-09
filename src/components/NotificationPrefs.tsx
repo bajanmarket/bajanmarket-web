@@ -212,7 +212,7 @@ function WhatsAppConsent({ verified, phone }: { verified: boolean; phone: string
           className="mt-0.5"
         />
         <span>
-          I agree to receive booking and message alerts from Bajan.market on WhatsApp. Reply STOP anytime to opt out.
+          I agree to receive booking and message alerts from BajanMarket on WhatsApp. Reply STOP anytime to opt out.
         </span>
       </label>
 

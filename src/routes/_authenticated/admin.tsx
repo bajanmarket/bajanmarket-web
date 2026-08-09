@@ -18,7 +18,7 @@ import { WhatsAppPanel } from "@/components/WhatsAppPanel";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Moderation — Bajan.market" },
+      { title: "Moderation — BajanMarket" },
       { name: "robots", content: "noindex" },
     ],
   }),

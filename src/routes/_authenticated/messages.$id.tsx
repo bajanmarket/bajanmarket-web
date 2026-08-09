@@ -22,7 +22,7 @@ import { CalendarCheck } from "lucide-react";
 
 
 export const Route = createFileRoute("/_authenticated/messages/$id")({
-  head: () => ({ meta: [{ title: "Conversation — Bajan.market" }] }),
+  head: () => ({ meta: [{ title: "Conversation — BajanMarket" }] }),
   component: Thread,
 });
 

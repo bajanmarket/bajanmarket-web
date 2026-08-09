@@ -12,7 +12,7 @@ import { Flag } from "lucide-react";
 import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
 
-const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+const SITE_URL = "https://bajanmarket.app";
 
 export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
@@ -27,8 +27,8 @@ export const Route = createFileRoute("/seller/$id")({
     const p = loaderData?.profile;
     const url = `${SITE_URL}/seller/${params.id}`;
     const name = p?.display_name ?? "Seller";
-    const title = `${name} — Seller on Bajan.market`;
-    const desc = (p?.bio ?? `Browse listings from ${name} on Bajan.market, Barbados' cleaner marketplace.`).slice(0, 155);
+    const title = `${name} — Seller on BajanMarket`;
+    const desc = (p?.bio ?? `Browse listings from ${name} on BajanMarket, Barbados' cleaner marketplace.`).slice(0, 155);
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },

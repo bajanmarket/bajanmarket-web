@@ -7,7 +7,7 @@ import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { useAuth } from "@/lib/useAuth";
 
 export const Route = createFileRoute("/_authenticated/favourites")({
-  head: () => ({ meta: [{ title: "Saved listings — Bajan.market" }] }),
+  head: () => ({ meta: [{ title: "Saved listings — BajanMarket" }] }),
   component: Favs,
 });
 

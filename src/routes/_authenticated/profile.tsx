@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
-  head: () => ({ meta: [{ title: "My account — Bajan.market" }] }),
+  head: () => ({ meta: [{ title: "My account — BajanMarket" }] }),
   component: Profile,
 });
 

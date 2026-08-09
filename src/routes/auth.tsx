@@ -13,13 +13,13 @@ export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Sign in — Bajan.market" },
-      { name: "description", content: "Sign in or create your Bajan.market account to post listings, save favourites and message sellers." },
-      { property: "og:title", content: "Sign in — Bajan.market" },
-      { property: "og:url", content: "https://bajanmarketplacetest.lovable.app/auth" },
+      { title: "Sign in — BajanMarket" },
+      { name: "description", content: "Sign in or create your BajanMarket account to post listings, save favourites and message sellers." },
+      { property: "og:title", content: "Sign in — BajanMarket" },
+      { property: "og:url", content: "https://bajanmarket.app/auth" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "https://bajanmarketplacetest.lovable.app/auth" }],
+    links: [{ rel: "canonical", href: "https://bajanmarket.app/auth" }],
   }),
   component: AuthPage,
 });
@@ -86,7 +86,7 @@ function AuthPage() {
           return;
         }
         track("account_created", { method: "email", confirmed: true });
-        toast.success("Welcome to Bajan.market!");
+        toast.success("Welcome to BajanMarket!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -126,7 +126,7 @@ function AuthPage() {
             Bajan<span className="text-teal">.market</span>
           </Link>
           <h1 className="text-navy/60 text-sm mt-2 font-normal">
-            {mode === "signup" ? "Create your Bajan.market account" : mode === "forgot" ? "Reset your password" : "Welcome back to Bajan.market"}
+            {mode === "signup" ? "Create your BajanMarket account" : mode === "forgot" ? "Reset your password" : "Welcome back to BajanMarket"}
           </h1>
         </div>
 
@@ -225,7 +225,7 @@ function AuthPage() {
                   onChange={(e) => setMarketingOptIn(e.target.checked)}
                   className="mt-0.5 size-4 accent-teal"
                 />
-                <span>Send me occasional tips, updates, and offers from Bajan.market. You can unsubscribe anytime.</span>
+                <span>Send me occasional tips, updates, and offers from BajanMarket. You can unsubscribe anytime.</span>
               </label>
             )}
             <button
@@ -242,7 +242,7 @@ function AuthPage() {
             onClick={() => { setResetSent(false); setMode(mode === "signin" ? "signup" : "signin"); }}
             className="text-xs text-navy/60 hover:text-navy"
           >
-            {mode === "signup" ? "Already have an account? Sign in" : mode === "forgot" ? "Back to sign in" : "New to Bajan.market? Create an account"}
+            {mode === "signup" ? "Already have an account? Sign in" : mode === "forgot" ? "Back to sign in" : "New to BajanMarket? Create an account"}
           </button>
         </div>
 

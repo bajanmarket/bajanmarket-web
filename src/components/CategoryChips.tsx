@@ -68,8 +68,8 @@ export function CategoryGrid() {
       {data?.map((c) => (
         <Link
           key={c.id}
-          to="/browse"
-          search={{ category: c.slug }}
+          to="/category/$slug"
+          params={{ slug: c.slug }}
           className="flex flex-col items-center gap-2 group"
         >
           <div className="size-14 rounded-2xl bg-white ring-1 ring-hairline grid place-items-center group-hover:ring-teal/40 transition-shadow">

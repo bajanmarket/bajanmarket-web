@@ -27,3 +27,12 @@ export const CONDITIONS = [
 
 export const conditionLabel = (v?: string | null): string =>
   CONDITIONS.find((c) => c.value === v)?.label ?? "Used";
+
+/** SEO-friendly parish slugs, e.g. saint_michael -> st-michael. */
+export const parishSlug = (v: string): string =>
+  v.replace(/^saint_/, "st-").replace(/_/g, "-");
+
+export const parishFromSlug = (slug: string): Parish | undefined =>
+  PARISHES.find((p) => parishSlug(p.value) === slug)?.value;
+
+export const PARISH_SLUGS = PARISHES.map((p) => ({ ...p, slug: parishSlug(p.value) }));

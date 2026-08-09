@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ---------- Bajan.market design tokens ---------- */
+/* ---------- BajanMarket design tokens ---------- */
 @theme {
   --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
 

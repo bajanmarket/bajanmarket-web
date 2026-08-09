@@ -24,6 +24,7 @@ import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesIdRouteImport } from './routes/services.$id'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
 import { Route as AuthenticatedProviderServicesRouteImport } from './routes/_authenticated/provider-services'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -39,6 +40,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
+import { Route as CategorySlugParishRouteImport } from './routes/category.$slug.$parish'
 import { Route as AuthenticatedMessagesIdRouteImport } from './routes/_authenticated/messages.$id'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -117,6 +119,11 @@ const SellerIdRoute = SellerIdRouteImport.update({
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessSlugRoute = BusinessSlugRouteImport.update({
@@ -199,6 +206,11 @@ const AuthenticatedMessagesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedMessagesRoute,
   } as any)
+const CategorySlugParishRoute = CategorySlugParishRouteImport.update({
+  id: '/$parish',
+  path: '/$parish',
+  getParentRoute: () => CategorySlugRoute,
+} as any)
 const AuthenticatedMessagesIdRoute = AuthenticatedMessagesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -253,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
+  '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
@@ -260,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/messages/': typeof AuthenticatedMessagesIndexRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -288,6 +302,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
+  '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
@@ -295,6 +310,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/messages': typeof AuthenticatedMessagesIndexRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -326,6 +342,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/provider-services': typeof AuthenticatedProviderServicesRoute
   '/business/$slug': typeof BusinessSlugRoute
+  '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
@@ -333,6 +350,7 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/messages/$id': typeof AuthenticatedMessagesIdRoute
+  '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -364,6 +382,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/provider-services'
     | '/business/$slug'
+    | '/category/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/services/$id'
@@ -371,6 +390,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/messages/$id'
+    | '/category/$slug/$parish'
     | '/messages/'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
@@ -399,6 +419,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/provider-services'
     | '/business/$slug'
+    | '/category/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/services/$id'
@@ -406,6 +427,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/messages/$id'
+    | '/category/$slug/$parish'
     | '/messages'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
@@ -436,6 +458,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/provider-services'
     | '/business/$slug'
+    | '/category/$slug'
     | '/listing/$id'
     | '/seller/$id'
     | '/services/$id'
@@ -443,6 +466,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/messages/$id'
+    | '/category/$slug/$parish'
     | '/_authenticated/messages/'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
@@ -463,6 +487,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BusinessSlugRoute: typeof BusinessSlugRoute
+  CategorySlugRoute: typeof CategorySlugRouteWithChildren
   ListingIdRoute: typeof ListingIdRoute
   SellerIdRoute: typeof SellerIdRoute
   ServicesIdRoute: typeof ServicesIdRoute
@@ -580,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/business/$slug': {
       id: '/business/$slug'
       path: '/business/$slug'
@@ -685,6 +717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesIndexRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
     }
+    '/category/$slug/$parish': {
+      id: '/category/$slug/$parish'
+      path: '/$parish'
+      fullPath: '/category/$slug/$parish'
+      preLoaderRoute: typeof CategorySlugParishRouteImport
+      parentRoute: typeof CategorySlugRoute
+    }
     '/_authenticated/messages/$id': {
       id: '/_authenticated/messages/$id'
       path: '/$id'
@@ -769,6 +808,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface CategorySlugRouteChildren {
+  CategorySlugParishRoute: typeof CategorySlugParishRoute
+}
+
+const CategorySlugRouteChildren: CategorySlugRouteChildren = {
+  CategorySlugParishRoute: CategorySlugParishRoute,
+}
+
+const CategorySlugRouteWithChildren = CategorySlugRoute._addFileChildren(
+  CategorySlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -785,6 +836,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BusinessSlugRoute: BusinessSlugRoute,
+  CategorySlugRoute: CategorySlugRouteWithChildren,
   ListingIdRoute: ListingIdRoute,
   SellerIdRoute: SellerIdRoute,
   ServicesIdRoute: ServicesIdRoute,

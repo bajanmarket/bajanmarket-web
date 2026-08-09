@@ -51,7 +51,7 @@ export function buildIcs(ev: CalendarEvent) {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Bajan.market//Services Booking//EN",
+    "PRODID:-//BajanMarket//Services Booking//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",

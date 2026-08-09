@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const CAP = 500;
-const FROM = "Bajan.market <bajanmarket@bajanmarket.app>";
+const FROM = "BajanMarket <bajanmarket@bajanmarket.app>";
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
 async function assertAdmin(supabase: any, userId: string) {
@@ -102,7 +102,7 @@ export const sendCampaign = createServerFn({ method: "POST" })
       const textFooter = unsubUrl ? `\n\n—\nUnsubscribe: ${unsubUrl}` : "";
       const htmlBody = personalize(campaign.body_html ?? escapeHtml(campaign.body_text ?? ""), name);
       const htmlFooter = unsubUrl
-        ? `<hr style="border:none;border-top:1px solid #eee;margin:24px 0"/><p style="font-size:12px;color:#888"><a href="${unsubUrl}" style="color:#888">Unsubscribe</a> from Bajan.market marketing emails.</p>`
+        ? `<hr style="border:none;border-top:1px solid #eee;margin:24px 0"/><p style="font-size:12px;color:#888"><a href="${unsubUrl}" style="color:#888">Unsubscribe</a> from BajanMarket marketing emails.</p>`
         : "";
 
       try {
