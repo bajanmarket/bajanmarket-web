@@ -89,7 +89,7 @@ function Seller() {
       <div className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex items-center gap-4 mb-6">
         <div className="size-16 rounded-full bg-sand-deep grid place-items-center overflow-hidden text-lg font-semibold text-navy/60">
           {profile.avatar_url
-            ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+            ? <img src={profile.avatar_url} alt="" width={96} height={96} loading="lazy" decoding="async" className="w-full h-full object-cover" />
             : initials(profile.display_name)}
         </div>
         <div className="flex-1">

@@ -296,7 +296,7 @@ function ListingDetail() {
                 <div className="flex items-center gap-3">
                   <div className="size-10 rounded-full bg-white ring-1 ring-hairline grid place-items-center overflow-hidden text-xs font-semibold text-navy/50">
                     {seller.avatar_url
-                      ? <img src={seller.avatar_url} alt="" className="w-full h-full object-cover" />
+                      ? <img src={seller.avatar_url} alt="" width={48} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                       : initials(seller.display_name)}
                   </div>
                   <div className="flex flex-col text-left gap-1.5">

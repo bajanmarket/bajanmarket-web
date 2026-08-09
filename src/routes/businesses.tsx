@@ -135,7 +135,7 @@ function BusinessDirectory() {
                   >
                     <div className="size-12 rounded-2xl bg-sand-deep grid place-items-center overflow-hidden shrink-0 text-navy/40">
                       {b.logo_url ? (
-                        <img src={b.logo_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                        <img src={b.logo_url} alt="" width={48} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                       ) : (
                         <Store className="size-5" aria-hidden />
                       )}

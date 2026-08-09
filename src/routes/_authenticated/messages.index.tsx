@@ -106,7 +106,7 @@ function Inbox() {
               >
                 <div className="size-12 rounded-xl overflow-hidden bg-sand-deep shrink-0 grid place-items-center text-xs font-semibold text-navy/50">
                   {listing?.cover_image_url
-                    ? <img src={listing.cover_image_url} alt="" className="w-full h-full object-cover" />
+                    ? <img src={listing.cover_image_url} alt="" width={64} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                     : initials(other?.display_name)}
                 </div>
                 <div className="flex-1 min-w-0">

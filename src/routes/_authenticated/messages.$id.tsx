@@ -190,7 +190,7 @@ function Thread() {
             className="flex items-center gap-3 bg-white rounded-2xl p-3 ring-1 ring-hairline"
           >
             <div className="size-12 rounded-xl overflow-hidden bg-sand-deep shrink-0">
-              {listing.cover_image_url && <img src={listing.cover_image_url} alt="" className="w-full h-full object-cover" />}
+              {listing.cover_image_url && <img src={listing.cover_image_url} alt="" width={64} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium truncate">{listing.title}</div>
