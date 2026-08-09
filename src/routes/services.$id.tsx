@@ -204,7 +204,7 @@ function ServiceDetail() {
       <div className="flex flex-col gap-5 max-w-3xl">
         <div className="rounded-3xl overflow-hidden bg-sand-deep aspect-[16/9]">
           {service.cover_image_url && (
-            <img src={service.cover_image_url} alt={service.title} className="w-full h-full object-cover" />
+            <img src={service.cover_image_url} alt={service.title} width={1280} height={720} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
           )}
         </div>
 
