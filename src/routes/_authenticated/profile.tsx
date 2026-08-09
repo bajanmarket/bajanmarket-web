@@ -112,7 +112,7 @@ function Profile() {
             <input type="file" accept="image/*,.heic,.heif" hidden onChange={(e) => uploadAvatar(e.target.files?.[0] ?? null)} />
           </label>
           <div className="flex-1 min-w-0">
-            <div className="text-lg font-medium truncate">{profile.display_name}</div>
+            <h1 className="text-lg font-medium truncate">{profile.display_name}</h1>
             <div className="text-xs text-navy/50 truncate">{user?.email}</div>
           </div>
           <button
