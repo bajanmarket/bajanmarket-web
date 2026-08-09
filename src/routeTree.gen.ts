@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
+import { Route as BusinessesRouteImport } from './routes/businesses'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -80,6 +81,11 @@ const McpRoute = McpRouteImport.update({
 const CommunityGuidelinesRoute = CommunityGuidelinesRouteImport.update({
   id: '/community-guidelines',
   path: '/community-guidelines',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessesRoute = BusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BrowseRoute = BrowseRouteImport.update({
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
+  '/businesses': typeof BusinessesRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/mcp': typeof McpRoute
   '/privacy': typeof PrivacyRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
+  '/businesses': typeof BusinessesRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/mcp': typeof McpRoute
   '/privacy': typeof PrivacyRoute
@@ -321,6 +329,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
+  '/businesses': typeof BusinessesRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/mcp': typeof McpRoute
   '/privacy': typeof PrivacyRoute
@@ -361,6 +370,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/browse'
+    | '/businesses'
     | '/community-guidelines'
     | '/mcp'
     | '/privacy'
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/browse'
+    | '/businesses'
     | '/community-guidelines'
     | '/mcp'
     | '/privacy'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/browse'
+    | '/businesses'
     | '/community-guidelines'
     | '/mcp'
     | '/privacy'
@@ -477,6 +489,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   BrowseRoute: typeof BrowseRoute
+  BusinessesRoute: typeof BusinessesRoute
   CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   McpRoute: typeof McpRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -547,6 +560,13 @@ declare module '@tanstack/react-router' {
       path: '/community-guidelines'
       fullPath: '/community-guidelines'
       preLoaderRoute: typeof CommunityGuidelinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/businesses': {
+      id: '/businesses'
+      path: '/businesses'
+      fullPath: '/businesses'
+      preLoaderRoute: typeof BusinessesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/browse': {
@@ -825,6 +845,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   BrowseRoute: BrowseRoute,
+  BusinessesRoute: BusinessesRoute,
   CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   McpRoute: McpRoute,
   PrivacyRoute: PrivacyRoute,
