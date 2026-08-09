@@ -236,7 +236,7 @@ function ListingDetail() {
           <div className="bg-white rounded-3xl overflow-hidden ring-1 ring-hairline">
             <div className="w-full aspect-[4/3] bg-sand-deep grid place-items-center">
               {currentUrl ? (
-                <img src={currentUrl} alt={data.title} className="w-full h-full object-cover" />
+                <img src={currentUrl} alt={data.title} width={1200} height={900} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
               ) : (
                 <ImageOff className="size-12 text-navy/20" />
               )}
