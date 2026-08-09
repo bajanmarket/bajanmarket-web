@@ -4,6 +4,8 @@ import { OnboardingModal } from "@/components/OnboardingModal";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
+  head: () => ({ meta: [{ name: "robots", content: "noindex, nofollow" }] }),
+
   beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) {
