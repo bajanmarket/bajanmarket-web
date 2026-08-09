@@ -209,7 +209,7 @@ function BusinessPage() {
               {reviews && reviews.length > 0 ? reviews.map((r) => (
                 <div key={r.id} className="flex gap-3 pb-4 border-b border-hairline last:border-0 last:pb-0">
                   <div className="size-9 rounded-full bg-sand-deep overflow-hidden shrink-0">
-                    {r.reviewer?.avatar_url && <img src={r.reviewer.avatar_url} alt="" className="w-full h-full object-cover" />}
+                    {r.reviewer?.avatar_url && <img src={r.reviewer.avatar_url} alt="" width={40} height={40} loading="lazy" decoding="async" className="w-full h-full object-cover" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 text-xs">
