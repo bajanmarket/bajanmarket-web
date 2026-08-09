@@ -75,12 +75,24 @@ function Home() {
           <p className="text-navy/60 text-sm sm:text-base max-w-xl">
             Cleaner than the Facebook groups. Safer than a car park meet. Faster than a WhatsApp back-and-forth.
           </p>
+          <div className="flex flex-wrap items-center gap-3 mt-1">
+            <Link
+              to="/post"
+              className="inline-flex items-center rounded-2xl bg-coral text-white px-5 py-3 text-sm font-medium active:scale-95 transition-transform"
+            >
+              Post a free listing
+            </Link>
+            <span className="text-xs text-navy/50">
+              Got something to sell? List it free in minutes.
+            </span>
+          </div>
         </div>
 
         <SearchBar />
         <CategoryChips />
         <SellerOnboarding variant="banner" />
       </section>
+
 
       <section className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-navy/50 mb-4">Browse categories</h2>
