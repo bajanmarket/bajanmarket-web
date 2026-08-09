@@ -185,7 +185,7 @@ function BusinessPage() {
             <h2 className="text-sm font-semibold uppercase tracking-wider text-navy/50 mb-3">Catalog</h2>
             {listings && listings.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {listings.map((l) => <ListingCard key={l.id} listing={l} />)}
+                {listings.map((l, i) => <ListingCard key={l.id} listing={l} priority={i < 4} />)}
               </div>
             ) : (
               <div className="bg-white rounded-3xl ring-1 ring-hairline p-8 text-center text-sm text-navy/60">
