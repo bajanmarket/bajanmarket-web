@@ -2,15 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { LegalPage, H2 } from "@/components/LegalPage";
 
-const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+const SITE_URL = "https://bajanmarket.app";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service — Bajan.market" },
-      { name: "description", content: "The terms that govern your use of Bajan.market, Barbados' cleaner marketplace." },
-      { property: "og:title", content: "Terms of Service — Bajan.market" },
-      { property: "og:description", content: "The terms that govern your use of Bajan.market." },
+      { title: "Terms of Service — BajanMarket" },
+      { name: "description", content: "The terms that govern your use of BajanMarket, Barbados' cleaner marketplace." },
+      { property: "og:title", content: "Terms of Service — BajanMarket" },
+      { property: "og:description", content: "The terms that govern your use of BajanMarket." },
       { property: "og:url", content: `${SITE_URL}/terms` },
     ],
     links: [{ rel: "canonical", href: `${SITE_URL}/terms` }],
@@ -23,11 +23,11 @@ function Terms() {
     <AppShell>
       <LegalPage title="Terms of Service" updated="4 July 2026">
         <p>
-          Welcome to Bajan.market. By creating an account or using the site you agree to these terms.
-          This page is maintained by the Bajan.market team.
+          Welcome to BajanMarket. By creating an account or using the site you agree to these terms.
+          This page is maintained by the BajanMarket team.
         </p>
 
-        <H2>Who can use Bajan.market</H2>
+        <H2>Who can use BajanMarket</H2>
         <p>
           You must be at least 18 years old and able to enter a binding contract. You are responsible for
           keeping your account credentials safe and for everything that happens under your account.
@@ -35,7 +35,7 @@ function Terms() {
 
         <H2>Your listings</H2>
         <p>
-          You keep ownership of the content you post. By posting, you grant Bajan.market a worldwide, royalty-free
+          You keep ownership of the content you post. By posting, you grant BajanMarket a worldwide, royalty-free
           licence to display and distribute that content on the platform so buyers can find it. You confirm you
           have the right to sell what you list and that the description is accurate.
         </p>
@@ -45,12 +45,12 @@ function Terms() {
           <li>List prohibited or illegal items (see the Community Guidelines).</li>
           <li>Scam, defraud, harass or impersonate anyone.</li>
           <li>Scrape, spam, or otherwise abuse the platform or its users.</li>
-          <li>Use Bajan.market to break any law of Barbados.</li>
+          <li>Use BajanMarket to break any law of Barbados.</li>
         </ul>
 
         <H2>Transactions</H2>
         <p>
-          Bajan.market is a listing platform. We do not process payments, arrange delivery, verify condition,
+          BajanMarket is a listing platform. We do not process payments, arrange delivery, verify condition,
           or act as an escrow. Buyers and sellers arrange payment and handover directly and are responsible for
           their own dealings. Meet in a safe public place, inspect items in person, and use common sense.
         </p>
@@ -63,7 +63,7 @@ function Terms() {
 
         <H2>Disclaimer</H2>
         <p>
-          Bajan.market is provided "as is" without warranty of any kind. To the fullest extent permitted by law,
+          BajanMarket is provided "as is" without warranty of any kind. To the fullest extent permitted by law,
           we are not liable for indirect or consequential loss arising from your use of the platform or from any
           transaction between users.
         </p>
@@ -75,7 +75,7 @@ function Terms() {
         </p>
 
         <H2>Contact</H2>
-        <p>Questions? Reach us at <a className="text-teal hover:underline" href="mailto:hello@bajan.market">hello@bajan.market</a>.</p>
+        <p>Questions? Reach us at <a className="text-teal hover:underline" href="mailto:hello@bajanmarket.app">hello@bajanmarket.app</a>.</p>
       </LegalPage>
     </AppShell>
   );

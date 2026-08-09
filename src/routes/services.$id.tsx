@@ -15,9 +15,9 @@ import { MapPin, Clock, Star, ShieldCheck, CalendarCheck } from "lucide-react";
 export const Route = createFileRoute("/services/$id")({
   head: () => ({
     meta: [
-      { title: "Service details — Bajan.market" },
+      { title: "Service details — BajanMarket" },
       { name: "description", content: "View this Barbadian service provider's details and book an appointment." },
-      { property: "og:title", content: "Service details — Bajan.market" },
+      { property: "og:title", content: "Service details — BajanMarket" },
       { property: "og:description", content: "Book this service with a trusted local provider in Barbados." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -346,7 +346,7 @@ function ServiceDetail() {
                 </span>
               </div>
               <p className="text-[11px] text-navy/50 mt-2">
-                Payment is arranged directly with the provider. Bajan.market does not process payments.
+                Payment is arranged directly with the provider. BajanMarket does not process payments.
               </p>
             </div>
 

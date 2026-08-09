@@ -11,9 +11,9 @@ import { Bell, Check, CheckCheck, Undo2 } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — Bajan.market" },
-      { name: "description", content: "Every booking and message update on your Bajan.market account in one place." },
-      { property: "og:title", content: "Notifications — Bajan.market" },
+      { title: "Notifications — BajanMarket" },
+      { name: "description", content: "Every booking and message update on your BajanMarket account in one place." },
+      { property: "og:title", content: "Notifications — BajanMarket" },
       { property: "og:description", content: "Track booking requests, confirmations, reminders and messages." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

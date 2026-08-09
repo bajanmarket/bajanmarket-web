@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/my-listings")({
-  head: () => ({ meta: [{ title: "My listings — Bajan.market" }] }),
+  head: () => ({ meta: [{ title: "My listings — BajanMarket" }] }),
   component: MyListings,
 });
 

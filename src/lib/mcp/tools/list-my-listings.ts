@@ -5,7 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 export default defineTool({
   name: "list_my_listings",
   title: "List my listings",
-  description: "List the signed-in user's own listings on Bajan.market, including drafts and sold items.",
+  description: "List the signed-in user's own listings on BajanMarket, including drafts and sold items.",
   inputSchema: {},
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async (_input, ctx: ToolContext) => {

@@ -5,7 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 export default defineTool({
   name: "list_my_favourites",
   title: "List my favourites",
-  description: "List listings the signed-in user has favourited on Bajan.market.",
+  description: "List listings the signed-in user has favourited on BajanMarket.",
   inputSchema: {},
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async (_input, ctx: ToolContext) => {

@@ -83,11 +83,11 @@ function Consent() {
     <main className="min-h-screen grid place-items-center p-6 bg-sand text-navy">
       <div className="max-w-md w-full bg-white rounded-3xl ring-1 ring-hairline p-6 flex flex-col gap-4">
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-navy/50 mb-1">Bajan.market</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-navy/50 mb-1">BajanMarket</div>
           <h1 className="text-xl font-medium">Connect {clientName} to your account</h1>
         </div>
         <p className="text-sm text-navy/70">
-          This lets {clientName} use Bajan.market as you — searching listings and accessing your own listings,
+          This lets {clientName} use BajanMarket as you — searching listings and accessing your own listings,
           favourites, and messages. Your existing app permissions still apply.
         </p>
         {details?.scope ? (

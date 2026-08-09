@@ -1,7 +1,7 @@
 // Shared helpers for social sharing across the app.
 // URL builders + UTM tagging + prefill copy.
 
-export const SITE_URL = "https://bajan.market";
+export const SITE_URL = "https://bajanmarket.app";
 
 export type ShareSource = "listing" | "storefront" | "seller" | "my_listings" | "post_success";
 export type ShareChannel = "whatsapp" | "facebook" | "x" | "instagram" | "copy" | "native";
@@ -48,10 +48,10 @@ export function sharePrefill(kind: ShareSource, opts: { title: string; price?: s
     case "listing":
     case "post_success":
     case "my_listings":
-      return opts.price ? `${opts.title} — ${opts.price} on Bajan.market` : `${opts.title} on Bajan.market`;
+      return opts.price ? `${opts.title} — ${opts.price} on BajanMarket` : `${opts.title} on BajanMarket`;
     case "storefront":
-      return `Check out ${opts.name ?? opts.title} on Bajan.market`;
+      return `Check out ${opts.name ?? opts.title} on BajanMarket`;
     case "seller":
-      return `${opts.name ?? opts.title}'s listings on Bajan.market`;
+      return `${opts.name ?? opts.title}'s listings on BajanMarket`;
   }
 }

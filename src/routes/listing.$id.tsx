@@ -13,7 +13,7 @@ import { ShareMenu } from "@/components/ShareMenu";
 import { sharePrefill } from "@/lib/share";
 import { track, deviceType } from "@/lib/analytics";
 
-const SITE_URL = "https://bajanmarketplacetest.lovable.app";
+const SITE_URL = "https://bajanmarket.app";
 
 export const Route = createFileRoute("/listing/$id")({
   loader: async ({ params }) => {
@@ -27,10 +27,10 @@ export const Route = createFileRoute("/listing/$id")({
   head: ({ params, loaderData }) => {
     const l = loaderData?.listing;
     const url = `${SITE_URL}/listing/${params.id}`;
-    const title = l ? `${l.title} — ${formatBBD(l.price, l.currency)} · Bajan.market` : "Listing — Bajan.market";
+    const title = l ? `${l.title} — ${formatBBD(l.price, l.currency)} · BajanMarket` : "Listing — BajanMarket";
     const desc = l
-      ? (l.description ?? "").replace(/\s+/g, " ").trim().slice(0, 155) || `${l.title} for sale on Bajan.market.`
-      : "View this listing on Bajan.market — Barbados' cleaner marketplace.";
+      ? (l.description ?? "").replace(/\s+/g, " ").trim().slice(0, 155) || `${l.title} for sale on BajanMarket.`
+      : "View this listing on BajanMarket — Barbados' cleaner marketplace.";
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },

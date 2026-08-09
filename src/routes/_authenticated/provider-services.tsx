@@ -13,10 +13,10 @@ import { Briefcase, CalendarDays, Plus, Trash2 } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/provider-services")({
   head: () => ({
     meta: [
-      { title: "My services — Bajan.market" },
+      { title: "My services — BajanMarket" },
       { name: "description", content: "Publish services, set your working hours and manage bookings." },
-      { property: "og:title", content: "My services — Bajan.market" },
-      { property: "og:description", content: "Publish services and manage your availability on Bajan.market." },
+      { property: "og:title", content: "My services — BajanMarket" },
+      { property: "og:description", content: "Publish services and manage your availability on BajanMarket." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },

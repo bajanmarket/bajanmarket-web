@@ -24,13 +24,13 @@ export const Route = createFileRoute("/browse")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Browse listings — Bajan.market" },
+      { title: "Browse listings — BajanMarket" },
       { name: "description", content: "Search and filter thousands of listings across Barbados by category, parish, and price." },
-      { property: "og:title", content: "Browse listings — Bajan.market" },
+      { property: "og:title", content: "Browse listings — BajanMarket" },
       { property: "og:description", content: "Search and filter thousands of listings across Barbados by category, parish, and price." },
-      { property: "og:url", content: "https://bajanmarketplacetest.lovable.app/browse" },
+      { property: "og:url", content: "https://bajanmarket.app/browse" },
     ],
-    links: [{ rel: "canonical", href: "https://bajanmarketplacetest.lovable.app/browse" }],
+    links: [{ rel: "canonical", href: "https://bajanmarket.app/browse" }],
   }),
   component: Browse,
 });

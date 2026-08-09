@@ -10,26 +10,26 @@ import { SellerOnboarding } from "@/components/SellerOnboarding";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bajan.market — Barbados' cleaner marketplace" },
+      { title: "BajanMarket — Barbados' cleaner marketplace" },
       { name: "description", content: "Buy and sell across Barbados. Vehicles, property, electronics, furniture, jobs, road tennis and more." },
-      { property: "og:title", content: "Bajan.market — Barbados' cleaner marketplace" },
+      { property: "og:title", content: "BajanMarket — Barbados' cleaner marketplace" },
       { property: "og:description", content: "Buy and sell across Barbados. Vehicles, property, electronics, furniture, jobs, road tennis and more." },
-      { property: "og:url", content: "https://bajanmarketplacetest.lovable.app/" },
+      { property: "og:url", content: "https://bajanmarket.app/" },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0d88b43b-b3b3-4b30-9493-dbec904b1b84/id-preview-7fb59a06--8db25fba-f4e5-4a57-9041-b44f430d1c99.lovable.app-1783100307101.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0d88b43b-b3b3-4b30-9493-dbec904b1b84/id-preview-7fb59a06--8db25fba-f4e5-4a57-9041-b44f430d1c99.lovable.app-1783100307101.png" },
     ],
-    links: [{ rel: "canonical", href: "https://bajanmarketplacetest.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://bajanmarket.app/" }],
     scripts: [
       {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Bajan.market",
-          url: "https://bajanmarketplacetest.lovable.app/",
+          name: "BajanMarket",
+          url: "https://bajanmarket.app/",
           potentialAction: {
             "@type": "SearchAction",
-            target: "https://bajanmarketplacetest.lovable.app/browse?q={search_term_string}",
+            target: "https://bajanmarket.app/browse?q={search_term_string}",
             "query-input": "required name=search_term_string",
           },
         }),
@@ -39,8 +39,8 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Bajan.market",
-          url: "https://bajanmarketplacetest.lovable.app/",
+          name: "BajanMarket",
+          url: "https://bajanmarket.app/",
           areaServed: "Barbados",
         }),
       },

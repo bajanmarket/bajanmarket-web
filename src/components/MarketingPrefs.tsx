@@ -70,7 +70,7 @@ export function MarketingPrefs() {
         <div>
           <div className="text-sm font-medium">Communication preferences</div>
           <p className="text-xs text-navy/50 mt-1">
-            Hear from Bajan.market about tips, new features and offers. Turn any channel off anytime.
+            Hear from BajanMarket about tips, new features and offers. Turn any channel off anytime.
           </p>
         </div>
       </div>
