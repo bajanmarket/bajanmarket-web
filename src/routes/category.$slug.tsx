@@ -124,7 +124,7 @@ function CategoryLanding() {
         ) : listings && listings.length > 0 ? (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {listings.map((l) => <ListingCard key={l.id} listing={l} />)}
+              {listings.map((l, i) => <ListingCard key={l.id} listing={l} priority={i < 4} />)}
             </div>
             <Link
               to="/browse"

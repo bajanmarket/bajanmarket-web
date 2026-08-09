@@ -131,7 +131,7 @@ function BusinessPage() {
       <div className="bg-white rounded-3xl ring-1 ring-hairline overflow-hidden mb-6">
         <div className="w-full aspect-[3/1] bg-sand-deep relative">
           {business.banner_url ? (
-            <img src={business.banner_url} alt="" className="w-full h-full object-cover" />
+            <img src={business.banner_url} alt="" width={1500} height={500} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-teal-soft to-sand-deep" />
           )}
@@ -139,7 +139,7 @@ function BusinessPage() {
         <div className="p-6 flex flex-col sm:flex-row gap-4 sm:items-end -mt-16 sm:-mt-20 relative">
           <div className="size-24 sm:size-32 rounded-2xl ring-4 ring-white bg-white overflow-hidden shrink-0 grid place-items-center">
             {business.logo_url ? (
-              <img src={business.logo_url} alt={`${business.name} logo`} className="w-full h-full object-cover" />
+              <img src={business.logo_url} alt={`${business.name} logo`} width={128} height={128} decoding="async" className="w-full h-full object-cover" />
             ) : (
               <Store className="size-10 text-navy/30" />
             )}
@@ -185,7 +185,7 @@ function BusinessPage() {
             <h2 className="text-sm font-semibold uppercase tracking-wider text-navy/50 mb-3">Catalog</h2>
             {listings && listings.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {listings.map((l) => <ListingCard key={l.id} listing={l} />)}
+                {listings.map((l, i) => <ListingCard key={l.id} listing={l} priority={i < 4} />)}
               </div>
             ) : (
               <div className="bg-white rounded-3xl ring-1 ring-hairline p-8 text-center text-sm text-navy/60">
@@ -209,7 +209,7 @@ function BusinessPage() {
               {reviews && reviews.length > 0 ? reviews.map((r) => (
                 <div key={r.id} className="flex gap-3 pb-4 border-b border-hairline last:border-0 last:pb-0">
                   <div className="size-9 rounded-full bg-sand-deep overflow-hidden shrink-0">
-                    {r.reviewer?.avatar_url && <img src={r.reviewer.avatar_url} alt="" className="w-full h-full object-cover" />}
+                    {r.reviewer?.avatar_url && <img src={r.reviewer.avatar_url} alt="" width={40} height={40} loading="lazy" decoding="async" className="w-full h-full object-cover" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 text-xs">

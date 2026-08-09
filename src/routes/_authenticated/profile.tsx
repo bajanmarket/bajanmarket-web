@@ -107,7 +107,7 @@ function Profile() {
         <div className="bg-white rounded-3xl ring-1 ring-hairline p-6 flex items-center gap-4">
           <label className="relative size-16 rounded-full overflow-hidden bg-sand-deep grid place-items-center text-lg font-semibold text-navy/60 cursor-pointer">
             {profile.avatar_url
-              ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+              ? <img src={profile.avatar_url} alt="" width={96} height={96} loading="lazy" decoding="async" className="w-full h-full object-cover" />
               : initials(profile.display_name)}
             <input type="file" accept="image/*,.heic,.heif" hidden onChange={(e) => uploadAvatar(e.target.files?.[0] ?? null)} />
           </label>

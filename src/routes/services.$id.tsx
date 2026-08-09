@@ -204,7 +204,7 @@ function ServiceDetail() {
       <div className="flex flex-col gap-5 max-w-3xl">
         <div className="rounded-3xl overflow-hidden bg-sand-deep aspect-[16/9]">
           {service.cover_image_url && (
-            <img src={service.cover_image_url} alt={service.title} className="w-full h-full object-cover" />
+            <img src={service.cover_image_url} alt={service.title} width={1280} height={720} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
           )}
         </div>
 
@@ -241,7 +241,7 @@ function ServiceDetail() {
             className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex items-center gap-3"
           >
             <div className="size-11 rounded-full bg-sand-deep overflow-hidden shrink-0">
-              {provider.avatar_url && <img src={provider.avatar_url} alt="" className="w-full h-full object-cover" />}
+              {provider.avatar_url && <img src={provider.avatar_url} alt="" width={48} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />}
             </div>
             <div className="min-w-0">
               <div className="text-sm font-medium">{provider.display_name}</div>

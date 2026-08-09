@@ -236,7 +236,7 @@ function ListingDetail() {
           <div className="bg-white rounded-3xl overflow-hidden ring-1 ring-hairline">
             <div className="w-full aspect-[4/3] bg-sand-deep grid place-items-center">
               {currentUrl ? (
-                <img src={currentUrl} alt={data.title} className="w-full h-full object-cover" />
+                <img src={currentUrl} alt={data.title} width={1200} height={900} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
               ) : (
                 <ImageOff className="size-12 text-navy/20" />
               )}
@@ -252,7 +252,7 @@ function ListingDetail() {
                     i === activeImg ? "ring-teal" : "ring-transparent opacity-70"
                   }`}
                 >
-                  <img src={img.url} alt="" className="w-full h-full object-cover" />
+                  <img src={img.url} alt="" width={64} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -296,7 +296,7 @@ function ListingDetail() {
                 <div className="flex items-center gap-3">
                   <div className="size-10 rounded-full bg-white ring-1 ring-hairline grid place-items-center overflow-hidden text-xs font-semibold text-navy/50">
                     {seller.avatar_url
-                      ? <img src={seller.avatar_url} alt="" className="w-full h-full object-cover" />
+                      ? <img src={seller.avatar_url} alt="" width={48} height={48} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                       : initials(seller.display_name)}
                   </div>
                   <div className="flex flex-col text-left gap-1.5">

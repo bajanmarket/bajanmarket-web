@@ -77,7 +77,7 @@ function MyListings() {
         {data?.map((l) => (
           <div key={l.id} className="bg-white rounded-2xl ring-1 ring-hairline p-3 flex items-center gap-3">
             <Link to="/listing/$id" params={{ id: l.id }} className="size-16 rounded-xl overflow-hidden bg-sand-deep shrink-0">
-              {l.cover_image_url && <img src={l.cover_image_url} alt="" className="w-full h-full object-cover" />}
+              {l.cover_image_url && <img src={l.cover_image_url} alt="" width={64} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />}
             </Link>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">

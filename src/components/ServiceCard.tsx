@@ -33,7 +33,7 @@ export function ServiceCard({ service }: { service: ServiceCardData }) {
     >
       <div className="aspect-[4/3] bg-sand-deep">
         {service.cover_image_url && (
-          <img src={service.cover_image_url} alt={service.title} loading="lazy" className="w-full h-full object-cover" />
+          <img src={service.cover_image_url} alt={service.title} width={400} height={300} loading="lazy" decoding="async" className="w-full h-full object-cover" />
         )}
       </div>
       <div className="p-3 flex flex-col gap-1.5">
