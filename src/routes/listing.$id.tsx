@@ -252,7 +252,7 @@ function ListingDetail() {
                     i === activeImg ? "ring-teal" : "ring-transparent opacity-70"
                   }`}
                 >
-                  <img src={img.url} alt="" className="w-full h-full object-cover" />
+                  <img src={img.url} alt="" width={64} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
