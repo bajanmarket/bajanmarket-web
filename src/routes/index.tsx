@@ -6,6 +6,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoryChips, CategoryGrid } from "@/components/CategoryChips";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { SellerOnboarding } from "@/components/SellerOnboarding";
+import { HowItWorks, TrustSection } from "@/components/HomeSections";
 
 export const Route = createFileRoute("/")({
   head: () => ({
