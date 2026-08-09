@@ -131,7 +131,7 @@ function BusinessPage() {
       <div className="bg-white rounded-3xl ring-1 ring-hairline overflow-hidden mb-6">
         <div className="w-full aspect-[3/1] bg-sand-deep relative">
           {business.banner_url ? (
-            <img src={business.banner_url} alt="" className="w-full h-full object-cover" />
+            <img src={business.banner_url} alt="" width={1500} height={500} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-teal-soft to-sand-deep" />
           )}
