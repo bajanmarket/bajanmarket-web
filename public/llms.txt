@@ -1,8 +1,8 @@
-# Bajan.market
+# BajanMarket
 
 > Barbados' cleaner marketplace — buy and sell locally across all 11 parishes. Vehicles, property, electronics, furniture, jobs, road tennis and more.
 
-Bajan.market is a mobile-first classifieds and marketplace platform built for Barbados. Listings are organised by category and parish, with in-app messaging between buyers and sellers.
+BajanMarket is a mobile-first classifieds and marketplace platform built for Barbados. Listings are organised by category and parish, with in-app messaging between buyers and sellers.
 
 ## Pages
 
