@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/useAuth";
 import { ReportDialog } from "@/components/ReportDialog";
 import { Flag } from "lucide-react";
 import { ShareMenu } from "@/components/ShareMenu";
+import { SellerTrust } from "@/components/SellerTrust";
 import { sharePrefill } from "@/lib/share";
 
 const SITE_URL = "https://bajanmarket.app";
@@ -75,6 +76,12 @@ function Seller() {
     },
   });
 
+  const { data: storefront } = useQuery({
+    queryKey: ["seller-storefront", id],
+    queryFn: async () =>
+      (await supabase.from("businesses").select("slug").eq("owner_id", id).eq("status", "approved").maybeSingle()).data,
+  });
+
   if (!profile) return <AppShell><div className="py-20 text-center">Seller not found.</div></AppShell>;
 
   return (
@@ -90,6 +97,17 @@ function Seller() {
           <div className="text-xs text-navy/50">
             {parishLabel(profile.parish)} · Joined {new Date(profile.created_at).toLocaleDateString("en-BB", { month: "short", year: "numeric" })}
           </div>
+          <SellerTrust
+            className="mt-2"
+            data={{
+              created_at: profile.created_at,
+              last_active_at: profile.last_active_at,
+              listings_count: profile.listings_count,
+              activeCount: (listings ?? []).filter((l) => l.status === "active").length,
+              soldCount: (listings ?? []).filter((l) => l.status === "sold").length,
+              hasStorefront: !!storefront,
+            }}
+          />
           {profile.bio && <p className="text-sm text-navy/70 mt-2 max-w-md">{profile.bio}</p>}
         </div>
         <div className="flex items-center gap-2 shrink-0">

@@ -10,6 +10,7 @@ import { Heart, Flag, MessageCircle, Eye, ImageOff } from "lucide-react";
 import { toast } from "sonner";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ShareMenu } from "@/components/ShareMenu";
+import { SellerTrust } from "@/components/SellerTrust";
 import { sharePrefill } from "@/lib/share";
 import { track, deviceType } from "@/lib/analytics";
 
@@ -129,7 +130,7 @@ function ListingDetail() {
       if (!listing) return null;
       const { data: seller } = await supabase
         .from("profiles")
-        .select("id, display_name, avatar_url, created_at")
+        .select("id, display_name, avatar_url, created_at, last_active_at, listings_count")
         .eq("id", listing.seller_id)
         .maybeSingle();
       return { ...listing, seller };
@@ -298,11 +299,15 @@ function ListingDetail() {
                       ? <img src={seller.avatar_url} alt="" className="w-full h-full object-cover" />
                       : initials(seller.display_name)}
                   </div>
-                  <div className="flex flex-col text-left">
+                  <div className="flex flex-col text-left gap-1.5">
                     <span className="text-sm font-medium">{seller.display_name}</span>
-                    <span className="text-[11px] text-navy/40">
-                      Joined {new Date(seller.created_at).toLocaleDateString("en-BB", { month: "short", year: "numeric" })}
-                    </span>
+                    <SellerTrust
+                      data={{
+                        created_at: seller.created_at,
+                        last_active_at: seller.last_active_at,
+                        listings_count: seller.listings_count,
+                      }}
+                    />
                   </div>
                 </div>
                 <span className="text-xs font-medium text-teal">View</span>

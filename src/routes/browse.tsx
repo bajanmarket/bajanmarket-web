@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoryChips } from "@/components/CategoryChips";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
-import { PARISHES } from "@/lib/parishes";
+import { PARISHES, parishLabel } from "@/lib/parishes";
 import { logSearchEvent } from "@/lib/logSearchEvent";
 import type { Database } from "@/integrations/supabase/types";
 import { track, deviceType } from "@/lib/analytics";
@@ -134,13 +134,65 @@ function Browse() {
             ))}
           </div>
         ) : listings && listings.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {listings.map((l) => <ListingCard key={l.id} listing={l} />)}
-          </div>
+          <>
+            <p className="text-xs text-navy/50" aria-live="polite">
+              {listings.length}{listings.length === 60 ? "+" : ""} listing{listings.length === 1 ? "" : "s"}
+              {search.q ? ` for “${search.q}”` : ""}
+              {search.parish ? ` in ${parishLabel(search.parish)}` : ""}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {listings.map((l) => <ListingCard key={l.id} listing={l} />)}
+            </div>
+          </>
         ) : (
           <div className="bg-white rounded-3xl ring-1 ring-hairline p-10 text-center">
-            <h3 className="text-lg font-medium">No listings match your search.</h3>
-            <p className="text-sm text-navy/60 mt-2">Try widening your filters, or check back soon.</p>
+            <h3 className="text-lg font-medium text-navy">
+              {search.q ? `Nothing matching “${search.q}” yet.` : "No listings match these filters yet."}
+            </h3>
+            <p className="text-sm text-navy/60 mt-2 max-w-sm mx-auto">
+              BajanMarket is still filling up. Try loosening a filter — or post what you're selling and let
+              the island come to you.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              {search.parish && (
+                <button
+                  onClick={() => nav({ to: "/browse", search: { ...search, parish: undefined } })}
+                  className="rounded-full bg-white ring-1 ring-hairline px-4 py-1.5 text-xs font-medium text-navy/70"
+                >
+                  Search all parishes
+                </button>
+              )}
+              {search.category && (
+                <button
+                  onClick={() => nav({ to: "/browse", search: { ...search, category: undefined } })}
+                  className="rounded-full bg-white ring-1 ring-hairline px-4 py-1.5 text-xs font-medium text-navy/70"
+                >
+                  Search all categories
+                </button>
+              )}
+              {(search.min != null || search.max != null) && (
+                <button
+                  onClick={() => nav({ to: "/browse", search: { ...search, min: undefined, max: undefined } })}
+                  className="rounded-full bg-white ring-1 ring-hairline px-4 py-1.5 text-xs font-medium text-navy/70"
+                >
+                  Remove price range
+                </button>
+              )}
+              {(search.q || search.parish || search.category || search.min != null || search.max != null) && (
+                <button
+                  onClick={() => nav({ to: "/browse", search: {} })}
+                  className="rounded-full bg-white ring-1 ring-hairline px-4 py-1.5 text-xs font-medium text-navy/70"
+                >
+                  Clear everything
+                </button>
+              )}
+            </div>
+            <Link
+              to="/post"
+              className="inline-flex mt-5 items-center rounded-2xl bg-coral text-white px-5 py-2.5 text-sm font-medium active:scale-95 transition-transform"
+            >
+              Post a free listing
+            </Link>
           </div>
         )}
       </div>

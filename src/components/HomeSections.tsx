@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { PARISH_SLUGS } from "@/lib/parishes";
 import { Search, MessageCircle, Handshake, Camera, Upload, Store, ShieldCheck, Flag, UserCheck, Lock, BookOpen, Eye } from "lucide-react";
 
 function Step({ n, icon: Icon, title, body }: { n: number; icon: typeof Search; title: string; body: string }) {
@@ -81,6 +82,30 @@ export function TrustSection() {
         </Link>
         <Link to="/terms" className="text-navy/60 hover:text-teal">Terms of use</Link>
         <Link to="/privacy" className="text-navy/60 hover:text-teal">Privacy policy</Link>
+      </div>
+    </section>
+  );
+}
+
+/** Internal discovery links — helps cold-start SEO and gives buyers a way in by parish. */
+export function BrowseByParish() {
+  return (
+    <section className="mt-12" aria-labelledby="browse-parish">
+      <h2 id="browse-parish" className="text-xl font-medium text-navy">Browse Barbados by parish</h2>
+      <p className="text-sm text-navy/60 mt-2 max-w-2xl">
+        Buying close to home makes pickup simple. Jump straight to what's listed in your parish.
+      </p>
+      <div className="flex flex-wrap gap-2 mt-4">
+        {PARISH_SLUGS.map((p) => (
+          <Link
+            key={p.value}
+            to="/browse"
+            search={{ parish: p.value }}
+            className="px-4 py-1.5 rounded-full bg-white ring-1 ring-hairline text-xs font-medium text-navy/70 hover:ring-teal/40"
+          >
+            {p.label}
+          </Link>
+        ))}
       </div>
     </section>
   );
