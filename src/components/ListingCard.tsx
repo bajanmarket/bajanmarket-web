@@ -14,7 +14,7 @@ export type ListingCardData = {
   status?: string | null;
 };
 
-export function ListingCard({ listing }: { listing: ListingCardData }) {
+export function ListingCard({ listing, priority = false }: { listing: ListingCardData; priority?: boolean }) {
   const sold = listing.status === "sold";
   return (
     <Link
@@ -27,8 +27,12 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
           <img
             src={listing.cover_image_url}
             alt={listing.title}
+            width={400}
+            height={300}
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-            loading="lazy"
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full grid place-items-center text-navy/20">
