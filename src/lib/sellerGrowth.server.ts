@@ -58,6 +58,68 @@ export async function getSettings(db: Db) {
 const OUTREACH_FROM = "BajanMarket <bajanmarket@bajanmarket.app>";
 const RESEND_GATEWAY = "https://connector-gateway.lovable.dev/resend";
 
+const WA_OUTREACH_TEMPLATE_ENV = "WHATSAPP_TEMPLATE_SELLER_OUTREACH";
+
+/**
+ * WhatsApp cold outreach must use an approved template (no open 24h session
+ * exists with a prospect). The template needs exactly one body parameter that
+ * carries the rendered message.
+ */
+async function deliverWhatsAppOutreach(
+  recipient: string,
+  body: string,
+): Promise<{ ok: boolean; providerId?: string; error?: string }> {
+  const { normalisePhone, checkSendable } = await import("@/lib/whatsapp.server");
+  const phone = normalisePhone(recipient);
+  if (!phone) return { ok: false, error: "Invalid WhatsApp number on this prospect" };
+
+  const templateName = process.env[WA_OUTREACH_TEMPLATE_ENV];
+  if (!templateName)
+    return { ok: false, error: `No approved outreach template configured (${WA_OUTREACH_TEMPLATE_ENV})` };
+
+  const gate = await checkSendable(phone, WA_OUTREACH_TEMPLATE_ENV);
+  if (!gate.ok) return { ok: false, error: gate.reason };
+
+  const text = body.replace(/\s*\n\s*/g, " ").trim().slice(0, 900);
+  const lang = process.env['WHATSAPP_TEMPLATE_LANG'] ?? "en";
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/v20.0/${process.env['WHATSAPP_PHONE_NUMBER_ID']}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env['WHATSAPP_ACCESS_TOKEN']}`,
+        },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          to: phone,
+          type: "template",
+          template: {
+            name: templateName,
+            language: { code: lang },
+            components: [
+              {
+                type: "body",
+                parameters: [{ type: "text", text: gate.mode === "test" ? `TEST ${text}` : text }],
+              },
+            ],
+          },
+        }),
+      },
+    );
+    const json = (await res.json().catch(() => ({}))) as {
+      messages?: { id?: string }[];
+      error?: { message?: string };
+    };
+    if (!res.ok) return { ok: false, error: json.error?.message ?? `HTTP ${res.status}` };
+    const id = json.messages?.[0]?.id;
+    return { ok: true, ...(id ? { providerId: id } : {}) };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message.slice(0, 300) };
+  }
+}
+
 /** Actually delivers an approved outreach message. Only ever called for live (non-simulated) sends. */
 export async function deliverOutreach(args: {
   channel: string;
@@ -65,9 +127,14 @@ export async function deliverOutreach(args: {
   subject: string | null;
   body: string;
 }): Promise<{ ok: boolean; providerId?: string; error?: string }> {
+  if (args.channel === "whatsapp") return deliverWhatsAppOutreach(args.recipient, args.body);
   if (args.channel !== "email") {
-    return { ok: false, error: `Live delivery for the ${args.channel} channel is not enabled yet` };
+    return {
+      ok: false,
+      error: `The ${args.channel} channel has no automated delivery — send it manually and log the reply`,
+    };
   }
+
   const resendKey = process.env['RESEND_API_KEY'];
   const lovableKey = process.env['LOVABLE_API_KEY'];
   if (!resendKey || !lovableKey) return { ok: false, error: "Email sending is not configured" };
