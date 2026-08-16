@@ -480,9 +480,11 @@ function ScannerTab() {
   return (
     <div className="flex flex-col gap-4">
       <div className={`${card} text-xs text-navy/60`}>
-        No automated scraping is performed. The scanner creates structured research tasks with the filters below, and a human records
-        verified public information as prospects. Every field left unknown stays blank rather than being guessed.
+        The scanner suggests candidate Barbados businesses from public knowledge and files each one under{" "}
+        <strong>Verification required</strong> — nothing is treated as verified and no contact details are invented. It also creates
+        structured manual research tasks so you can confirm or expand on what it surfaced.
       </div>
+
       <div className={`${card} grid md:grid-cols-3 gap-2`}>
         <input className={input} placeholder="Category" value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })} />
         <select className={input} value={f.sellerType} onChange={(e) => setF({ ...f, sellerType: e.target.value })}>
