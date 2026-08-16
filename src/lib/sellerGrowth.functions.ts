@@ -7,6 +7,8 @@ import {
   assertAdmin,
   audit,
   buildDraftBody,
+  deliverOutreach,
+
   computeScore,
   evaluateSendGuards,
   findDuplicates,
@@ -473,20 +475,46 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
       .single();
     if (mErr) throw mErr;
 
+    let delivery: { ok: boolean; providerId?: string; error?: string } | null = null;
+    if (!guard.simulated) {
+      const d = await deliverOutreach({
+        channel: draft.channel,
+        recipient: String(recipient),
+        subject: draft.subject,
+        body: draft.body,
+      });
+      delivery = d;
+      await db
+        .from("seller_outreach_messages")
+        .update({
+          status: d.ok ? "sent" : "failed",
+          provider_message_id: d.providerId ?? null,
+          error: d.error ?? null,
+          sent_at: d.ok ? new Date().toISOString() : null,
+        })
+        .eq("id", msg.id);
+    }
+
+
     await db.from("seller_outreach_events").insert({
       message_id: msg.id,
       prospect_id: p.id,
-      event_type: guard.simulated ? "simulated_send" : "queued",
+      event_type: guard.simulated ? "simulated_send" : delivery?.ok ? "sent" : "failed",
       channel: draft.channel,
-      detail: { guard_notes: guard.reasons } as never,
+      detail: { guard_notes: guard.reasons, error: delivery?.error ?? null } as never,
     });
+    if (delivery && !delivery.ok) {
+      await audit(db, context.userId, "outreach.failed", "seller_outreach_messages", msg.id, { error: delivery.error });
+      return { sent: false, simulated: false, reasons: [delivery.error ?? "Delivery failed"], messageId: msg.id };
+    }
+
     await db.from("seller_prospects").update({ pipeline_stage: "contacted", last_contact_at: new Date().toISOString() }).eq("id", p.id);
     await db.from("seller_pipeline_history").insert({
       prospect_id: p.id,
       from_stage: p.pipeline_stage,
       to_stage: "contacted",
       changed_by: context.userId,
-      reason: guard.simulated ? "Simulated outreach recorded" : "Live outreach queued",
+      reason: guard.simulated ? "Simulated outreach recorded" : "Live outreach sent",
       outreach_message_id: msg.id,
       approval_request_id: req.id,
     });

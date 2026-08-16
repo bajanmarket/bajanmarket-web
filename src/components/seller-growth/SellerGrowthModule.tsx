@@ -616,10 +616,15 @@ function ApprovalsTab() {
                 onClick={() =>
                   send({ data: { requestId: r.id } })
                     .then((res) => {
-                      if (res.sent) toast.success(res.simulated ? "Recorded as a simulated send" : "Queued for live sending");
+                      if (res.sent && !res.simulated) toast.success("Sent for real");
+                      else if (res.sent)
+                        toast.warning("Recorded as a simulated send", {
+                          description: res.reasons.find((x) => x.includes("Controls")) ?? "Enable live sending in Controls",
+                        });
                       else toast.error(res.reasons.join(" · "));
                       refresh();
                     })
+
                     .catch((e) => toast.error((e as Error).message))
                 }
               >
