@@ -475,22 +475,24 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
 
     let delivery: { ok: boolean; providerId?: string; error?: string } | null = null;
     if (!guard.simulated) {
-      delivery = await deliverOutreach({
+      const d = await deliverOutreach({
         channel: draft.channel,
         recipient: String(recipient),
         subject: draft.subject,
         body: draft.body,
       });
+      delivery = d;
       await db
         .from("seller_outreach_messages")
         .update({
-          status: delivery.ok ? "sent" : "failed",
-          provider_message_id: delivery.providerId ?? null,
-          error: delivery.error ?? null,
-          sent_at: delivery.ok ? new Date().toISOString() : null,
+          status: d.ok ? "sent" : "failed",
+          provider_message_id: d.providerId ?? null,
+          error: d.error ?? null,
+          sent_at: d.ok ? new Date().toISOString() : null,
         })
         .eq("id", msg.id);
     }
+
 
     await db.from("seller_outreach_events").insert({
       message_id: msg.id,
