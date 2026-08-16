@@ -183,7 +183,7 @@ export const moveStage = createServerFn({ method: "POST" })
       reason: data.reason ?? null,
     });
     await audit(db, context.userId, "prospect.stage_changed", "seller_prospects", p.id, { to: data.stage });
-    return { ok: true };
+    return { ok: true as const };
   });
 
 export const runOpportunityScan = createServerFn({ method: "POST" })
