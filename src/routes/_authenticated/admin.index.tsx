@@ -15,7 +15,7 @@ import { AnalyticsPanel } from "@/components/AnalyticsPanel";
 import { MarketplaceControlsPanel } from "@/components/MarketplaceControlsPanel";
 import { WhatsAppPanel } from "@/components/WhatsAppPanel";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
     meta: [
       { title: "Moderation — BajanMarket" },
