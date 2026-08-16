@@ -44,6 +44,7 @@ import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as CategorySlugParishRouteImport } from './routes/category.$slug.$parish'
 import { Route as AuthenticatedMessagesIdRouteImport } from './routes/_authenticated/messages.$id'
+import { Route as AuthenticatedAdminSellerGrowthRouteImport } from './routes/_authenticated/admin.seller-growth'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -228,6 +229,12 @@ const AuthenticatedMessagesIdRoute = AuthenticatedMessagesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedMessagesRoute,
 } as any)
+const AuthenticatedAdminSellerGrowthRoute =
+  AuthenticatedAdminSellerGrowthRouteImport.update({
+    id: '/seller-growth',
+    path: '/seller-growth',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -285,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/services/': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -323,6 +331,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -365,6 +374,7 @@ export interface FileRoutesById {
   '/services/': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/_authenticated/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
   '/_authenticated/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
     | '/services/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/admin/seller-growth'
     | '/messages/$id'
     | '/category/$slug/$parish'
     | '/admin/'
@@ -445,6 +456,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/admin/seller-growth'
     | '/messages/$id'
     | '/category/$slug/$parish'
     | '/admin'
@@ -486,6 +498,7 @@ export interface FileRouteTypes {
     | '/services/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/_authenticated/admin/seller-growth'
     | '/_authenticated/messages/$id'
     | '/category/$slug/$parish'
     | '/_authenticated/admin/'
@@ -768,6 +781,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesIdRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
     }
+    '/_authenticated/admin/seller-growth': {
+      id: '/_authenticated/admin/seller-growth'
+      path: '/seller-growth'
+      fullPath: '/admin/seller-growth'
+      preLoaderRoute: typeof AuthenticatedAdminSellerGrowthRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -800,10 +820,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminSellerGrowthRoute: typeof AuthenticatedAdminSellerGrowthRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminSellerGrowthRoute: AuthenticatedAdminSellerGrowthRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
