@@ -858,6 +858,29 @@ function SettingsTab() {
       </div>
 
       <div className={card}>
+        <h3 className="text-sm font-medium mb-2">Outreach days (AST)</h3>
+        <p className="text-xs text-navy/50 mb-2">Sends are only allowed on the days you tick here.</p>
+        <div className="flex flex-wrap gap-3">
+          {(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const).map((d) => {
+            const days: string[] = (data as { outreach_days?: string[] }).outreach_days ?? [];
+            const on = days.includes(d);
+            return (
+              <label key={d} className="flex items-center gap-1.5 text-sm">
+                <input
+                  type="checkbox"
+                  checked={on}
+                  onChange={() =>
+                    patch({ outreach_days: on ? days.filter((x) => x !== d) : [...days, d] })
+                  }
+                />
+                {d}
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className={card}>
         <h3 className="text-sm font-medium mb-2">Test recipients</h3>
         <p className="text-xs text-navy/50 mb-2">
           Live sending only ever delivers to this validated allowlist. Channels available: {OUTREACH_CHANNELS.join(", ")}.
