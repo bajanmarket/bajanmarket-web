@@ -885,9 +885,28 @@ function SettingsTab() {
       </div>
 
       <div className={card}>
+        <h3 className="text-sm font-medium mb-2">Recipient gate</h3>
+        <label className="flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={(data as { allowlist_required?: boolean }).allowlist_required ?? true}
+            onChange={(e) => patch({ allowlist_required: e.target.checked })}
+          />
+          <span>
+            Restrict live sends to the test-recipient allowlist
+            <span className="block text-xs text-navy/50">
+              Untick for autonomous mode: approving a draft in the Approval Center is the only gate, and it sends to the
+              prospect&apos;s own contact address.
+            </span>
+          </span>
+        </label>
+      </div>
+
+      <div className={card}>
         <h3 className="text-sm font-medium mb-2">Test recipients</h3>
         <p className="text-xs text-navy/50 mb-2">
-          Live sending only ever delivers to this validated allowlist. Channels available: {OUTREACH_CHANNELS.join(", ")}.
+          Used only while the allowlist gate is on. Channels available: {OUTREACH_CHANNELS.join(", ")}.
         </p>
         <textarea
           className={input}
@@ -896,6 +915,7 @@ function SettingsTab() {
           onBlur={(e) => patch({ test_recipients: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
         />
       </div>
+
     </div>
   );
 }
