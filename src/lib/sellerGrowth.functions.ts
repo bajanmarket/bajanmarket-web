@@ -514,7 +514,7 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
       from_stage: p.pipeline_stage,
       to_stage: "contacted",
       changed_by: context.userId,
-      reason: guard.simulated ? "Simulated outreach recorded" : "Live outreach queued",
+      reason: guard.simulated ? "Simulated outreach recorded" : "Live outreach sent",
       outreach_message_id: msg.id,
       approval_request_id: req.id,
     });
