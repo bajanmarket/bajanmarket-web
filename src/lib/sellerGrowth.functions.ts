@@ -195,11 +195,66 @@ export const runOpportunityScan = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase as unknown as Db, context.userId);
     const db = await admin();
-    // No automated scraping is performed. The scanner produces structured manual
-    // research tasks (one per requested source / supplied URL) instead of inventing rows.
+    const mode = (data.liveResearch ? "live" : "simulation") as "live" | "simulation";
+
+    // Step 1 — AI proposes candidate businesses from public knowledge. Nothing is
+    // treated as verified: every candidate lands in verification_required.
+    const { candidates, note } = await generateScanCandidates({
+      category: data.category,
+      sellerType: data.sellerType,
+      parish: data.parish,
+      minActivity: data.minActivity,
+      minInventory: data.minInventory,
+      seedUrls: data.seedUrls,
+      max: data.maxProspects,
+    });
+
+    let prospectsCreated = 0;
+    let duplicatesSkipped = 0;
+    const created: { id: string; business_name: string }[] = [];
+    for (const c of candidates) {
+      const { source_url, ...fields } = c;
+      const dupes = await findDuplicates(db, fields as never);
+      if (dupes.length) {
+        duplicatesSkipped += 1;
+        continue;
+      }
+      const { data: row, error: insErr } = await db
+        .from("seller_prospects")
+        .insert({
+          ...(fields as Record<string, unknown>),
+          record_mode: mode,
+          created_by: context.userId,
+          verification_status: "needs_review",
+          pipeline_stage: "verification_required",
+        } as never)
+        .select("id, business_name")
+        .single();
+      if (insErr || !row) continue;
+      prospectsCreated += 1;
+      created.push(row);
+      await db.from("seller_pipeline_history").insert({
+        prospect_id: row.id,
+        to_stage: "verification_required",
+        changed_by: context.userId,
+        reason: "Discovered by the Opportunity Scanner — needs human verification",
+      });
+      if (source_url) {
+        await db.from("seller_prospect_sources").insert({
+          prospect_id: row.id,
+          claim: "Candidate surfaced by the Opportunity Scanner from this public source",
+          source_url,
+          source_type: "scanner",
+          researched_by: context.userId,
+        });
+      }
+    }
+
+    // Step 2 — always leave structured manual research tasks so a human can
+    // confirm or expand on what the scanner surfaced.
     const targets = data.seedUrls.length ? data.seedUrls : data.sources.length ? data.sources : ["manual research"];
     const rows = targets.slice(0, data.maxProspects).map((t, i) => ({
-      record_mode: (data.liveResearch ? "live" : "simulation") as "live" | "simulation",
+      record_mode: mode,
       title: `Research ${data.sellerType ?? "seller"} ${i + 1} — ${t}`,
       instructions: [
         `Category: ${data.category ?? "any"}`,
@@ -215,14 +270,22 @@ export const runOpportunityScan = createServerFn({ method: "POST" })
       source_hint: t,
       created_by: context.userId,
     }));
-    const { data: created, error } = await db.from("seller_research_tasks").insert(rows as never).select("id");
-    if (error) throw error;
-    await audit(db, context.userId, "scanner.run", "seller_research_tasks", null, {
-      tasks: created?.length ?? 0,
+    const { data: tasks } = await db.from("seller_research_tasks").insert(rows as never).select("id");
+    await audit(db, context.userId, "scanner.run", "seller_prospects", null, {
+      tasks: tasks?.length ?? 0,
+      prospects: prospectsCreated,
+      duplicates: duplicatesSkipped,
       live: data.liveResearch,
     });
-    return { tasksCreated: created?.length ?? 0, automatedSourcesUnavailable: true };
+    return {
+      tasksCreated: tasks?.length ?? 0,
+      prospectsCreated,
+      duplicatesSkipped,
+      created,
+      note: note ?? null,
+    };
   });
+
 
 export const generateDraft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
