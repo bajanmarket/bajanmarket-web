@@ -282,7 +282,9 @@ export async function evaluateSendGuards(
   const { hour, weekday } = barbadosNowParts();
   if (hour < s.business_hours_start || hour >= s.business_hours_end)
     reasons.push(`Outside Barbados business hours (${s.business_hours_start}:00–${s.business_hours_end}:00 AST)`);
-  if (weekday === "Sun") reasons.push("Sunday — outside outreach days (AST)");
+  const allowedDays = (s as { outreach_days?: string[] }).outreach_days ?? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  if (!allowedDays.includes(weekday))
+    reasons.push(`${weekday} is not an enabled outreach day (allowed: ${allowedDays.join(", ")}, AST)`);
 
   const since = new Date(Date.now() - 86400000).toISOString();
   const { count: dayCount } = await db

@@ -621,6 +621,7 @@ export const updateGrowthSettings = createServerFn({ method: "POST" })
       business_hours_start: z.number().int().min(0).max(23).optional(),
       business_hours_end: z.number().int().min(1).max(24).optional(),
       max_contact_attempts: z.number().int().min(1).max(10).optional(),
+      outreach_days: z.array(z.enum(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])).max(7).optional(),
       test_recipients: z.array(z.string().max(200)).max(20).optional(),
     }).parse(raw),
   )
