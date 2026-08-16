@@ -445,10 +445,16 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
     const recipient =
       draft.channel === "email" ? p.public_email : draft.channel === "whatsapp" ? p.public_whatsapp : p.facebook_url ?? p.instagram_url;
     if (!guard.simulated) {
-      const allow = settings.test_recipients.map((t) => t.toLowerCase());
-      if (!recipient || !allow.includes(String(recipient).toLowerCase()))
-        return { sent: false, simulated: false, reasons: ["Recipient is not on the test-recipient allowlist"] };
+      if (!recipient)
+        return { sent: false, simulated: false, reasons: ["This prospect has no contact address for that channel"] };
+      // Autonomous mode: the admin approval on this request IS the gate.
+      if (settings.allowlist_required) {
+        const allow = settings.test_recipients.map((t) => t.toLowerCase());
+        if (!allow.includes(String(recipient).toLowerCase()))
+          return { sent: false, simulated: false, reasons: ["Recipient is not on the test-recipient allowlist"] };
+      }
     }
+
 
     const idem = `${draft.id}:${draft.sequence_step}:${guard.simulated ? "sim" : "live"}`;
     const { data: existing } = await db
@@ -628,6 +634,7 @@ export const updateGrowthSettings = createServerFn({ method: "POST" })
       max_contact_attempts: z.number().int().min(1).max(10).optional(),
       outreach_days: z.array(z.enum(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])).max(7).optional(),
       test_recipients: z.array(z.string().max(200)).max(20).optional(),
+      allowlist_required: z.boolean().optional(),
     }).parse(raw),
   )
   .handler(async ({ data, context }) => {
@@ -635,16 +642,19 @@ export const updateGrowthSettings = createServerFn({ method: "POST" })
     const db = await admin();
     const current = await getSettings(db);
     const next = { ...data } as Record<string, unknown>;
-    // Live sending can only be enabled with a validated test-recipient allowlist.
+    // In allowlist mode, live sending needs a validated test-recipient list.
+    // In autonomous mode, admin approval of each draft is the gate instead.
+    const allowlistRequired = data.allowlist_required ?? current.allowlist_required;
     const recipients = (data.test_recipients ?? current.test_recipients) as string[];
-    if (data.live_sending_enabled && recipients.length === 0)
-      throw new Error("Add at least one validated test recipient before enabling live sending");
+    if (data.live_sending_enabled && allowlistRequired && recipients.length === 0)
+      throw new Error("Add at least one validated test recipient, or turn off the allowlist requirement");
     next['updated_by'] = context.userId;
     const { error } = await db.from("seller_growth_settings").update(next as never).eq("id", 1);
     if (error) throw error;
     await audit(db, context.userId, "settings.updated", "seller_growth_settings", null, data as never);
     return { ok: true };
   });
+
 
 export const upsertScoringRule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
