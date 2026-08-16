@@ -68,12 +68,12 @@ export const upsertProspect = createServerFn({ method: "POST" })
     const { data: created, error } = await db
       .from("seller_prospects")
       .insert({
-        ...(fields as never),
+        ...(fields as Record<string, unknown>),
         record_mode: data.record_mode ?? "simulation",
         created_by: context.userId,
         verification_status: dupes.length ? "duplicate_suspected" : "unverified",
         pipeline_stage: dupes.length ? "verification_required" : "discovered",
-      })
+      } as never)
       .select("id")
       .single();
     if (error) throw error;
