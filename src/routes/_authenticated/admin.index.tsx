@@ -183,6 +183,12 @@ function AdminPage() {
         >
           <Megaphone className="size-3" /> Campaigns
         </Link>
+        <Link
+          to="/admin/seller-growth"
+          className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 text-navy/60 hover:text-navy"
+        >
+          <Sprout className="size-3" /> Seller Growth
+        </Link>
       </div>
 
 
