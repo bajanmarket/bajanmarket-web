@@ -292,3 +292,146 @@ export function buildDraftBody(
   if (prospect.verification_status !== "verified") warnings.push("Prospect is not verified yet");
   return { body, warnings };
 }
+
+/* ---------------- Opportunity scanner: AI candidate discovery ---------------- */
+
+export type ScanCandidate = {
+  business_name: string;
+  seller_type?: string | null;
+  marketplace_category?: string | null;
+  parish?: string | null;
+  website_url?: string | null;
+  facebook_url?: string | null;
+  instagram_url?: string | null;
+  public_phone?: string | null;
+  public_email?: string | null;
+  estimated_potential_listings?: number | null;
+  notes?: string | null;
+  source_url?: string | null;
+};
+
+/**
+ * Suggests candidate Barbados businesses using the Lovable AI gateway.
+ * Nothing here is treated as verified: every candidate lands in
+ * `verification_required` and must be checked by a human before outreach.
+ */
+export async function generateScanCandidates(filters: {
+  category?: string | undefined;
+  sellerType?: string | undefined;
+  parish?: string | undefined;
+  minActivity?: string | undefined;
+  minInventory?: number | undefined;
+  seedUrls: string[];
+  max: number;
+}): Promise<{ candidates: ScanCandidate[]; note?: string }> {
+  const key = process.env['LOVABLE_API_KEY'];
+  if (!key) return { candidates: [], note: "AI is not configured" };
+
+  const prompt = [
+    "Suggest real, publicly known businesses, dealers, service providers or high-volume sellers based in Barbados that would be a good fit for the BajanMarket online marketplace.",
+    `Category focus: ${filters.category || "any"}`,
+    `Seller type: ${filters.sellerType || "any"}`,
+    `Parish: ${filters.parish || "anywhere in Barbados"}`,
+    filters.minActivity ? `Minimum posting activity: ${filters.minActivity}` : "",
+    filters.minInventory ? `Minimum visible inventory: ${filters.minInventory}` : "",
+    filters.seedUrls.length ? `Consider these public sources: ${filters.seedUrls.join(", ")}` : "",
+    `Return at most ${filters.max} distinct candidates.`,
+    "Only include businesses you are reasonably confident exist. Leave any field you are not confident about null — never invent phone numbers, emails or URLs.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
+    body: JSON.stringify({
+      model: "google/gemini-3-flash-preview",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a lead researcher for a Barbados marketplace. You only surface publicly listed business information. You never fabricate contact details. Return results via the emit_candidates tool.",
+        },
+        { role: "user", content: prompt },
+      ],
+      tools: [
+        {
+          type: "function",
+          function: {
+            name: "emit_candidates",
+            description: "Return candidate Barbados seller businesses.",
+            parameters: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                candidates: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    additionalProperties: false,
+                    properties: {
+                      business_name: { type: "string" },
+                      seller_type: { type: ["string", "null"] },
+                      marketplace_category: { type: ["string", "null"] },
+                      parish: { type: ["string", "null"] },
+                      website_url: { type: ["string", "null"] },
+                      facebook_url: { type: ["string", "null"] },
+                      instagram_url: { type: ["string", "null"] },
+                      public_phone: { type: ["string", "null"] },
+                      public_email: { type: ["string", "null"] },
+                      estimated_potential_listings: { type: ["number", "null"] },
+                      notes: { type: ["string", "null"] },
+                      source_url: { type: ["string", "null"] },
+                    },
+                    required: ["business_name"],
+                  },
+                },
+              },
+              required: ["candidates"],
+            },
+          },
+        },
+      ],
+      tool_choice: { type: "function", function: { name: "emit_candidates" } },
+    }),
+  });
+
+  if (res.status === 429) return { candidates: [], note: "AI is busy — try again in a moment" };
+  if (res.status === 402) return { candidates: [], note: "AI credits exhausted" };
+  if (!res.ok) return { candidates: [], note: `AI request failed (${res.status})` };
+
+  const json = (await res.json()) as {
+    choices?: Array<{ message?: { tool_calls?: Array<{ function?: { arguments?: string } }> } }>;
+  };
+  const argStr = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+  if (!argStr) return { candidates: [], note: "AI returned no candidates" };
+  let parsed: { candidates?: ScanCandidate[] };
+  try {
+    parsed = JSON.parse(argStr) as { candidates?: ScanCandidate[] };
+  } catch {
+    return { candidates: [], note: "AI returned an unreadable response" };
+  }
+  const clean = (v: unknown) => {
+    const s = typeof v === "string" ? v.trim() : "";
+    return s ? s.slice(0, 400) : null;
+  };
+  const candidates = (parsed.candidates ?? [])
+    .filter((c) => typeof c.business_name === "string" && c.business_name.trim().length > 1)
+    .slice(0, filters.max)
+    .map((c) => ({
+      business_name: String(c.business_name).trim().slice(0, 200),
+      seller_type: clean(c.seller_type),
+      marketplace_category: clean(c.marketplace_category),
+      parish: clean(c.parish),
+      website_url: clean(c.website_url),
+      facebook_url: clean(c.facebook_url),
+      instagram_url: clean(c.instagram_url),
+      public_phone: clean(c.public_phone),
+      public_email: clean(c.public_email),
+      estimated_potential_listings:
+        typeof c.estimated_potential_listings === "number" ? Math.max(0, Math.round(c.estimated_potential_listings)) : null,
+      notes: typeof c.notes === "string" ? c.notes.trim().slice(0, 2000) : null,
+      source_url: clean(c.source_url),
+    }));
+  return { candidates };
+}

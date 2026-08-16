@@ -459,18 +459,32 @@ function ScannerTab() {
         },
       }),
     onSuccess: (r) => {
-      toast.success(`${r.tasksCreated} research task(s) created`);
+      if (r.prospectsCreated) {
+        toast.success(
+          `${r.prospectsCreated} candidate prospect(s) added for verification` +
+            (r.duplicatesSkipped ? ` · ${r.duplicatesSkipped} duplicate(s) skipped` : ""),
+        );
+      } else {
+        toast.message(r.note ?? "No new candidates found", {
+          description: `${r.tasksCreated} manual research task(s) created`,
+        });
+      }
       qc.invalidateQueries({ queryKey: ["sg-tasks"] });
+      qc.invalidateQueries({ queryKey: ["sg-prospects"] });
+      qc.invalidateQueries({ queryKey: ["sg-dashboard"] });
     },
     onError: (e) => toast.error((e as Error).message),
+
   });
 
   return (
     <div className="flex flex-col gap-4">
       <div className={`${card} text-xs text-navy/60`}>
-        No automated scraping is performed. The scanner creates structured research tasks with the filters below, and a human records
-        verified public information as prospects. Every field left unknown stays blank rather than being guessed.
+        The scanner suggests candidate Barbados businesses from public knowledge and files each one under{" "}
+        <strong>Verification required</strong> — nothing is treated as verified and no contact details are invented. It also creates
+        structured manual research tasks so you can confirm or expand on what it surfaced.
       </div>
+
       <div className={`${card} grid md:grid-cols-3 gap-2`}>
         <input className={input} placeholder="Category" value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })} />
         <select className={input} value={f.sellerType} onChange={(e) => setF({ ...f, sellerType: e.target.value })}>
