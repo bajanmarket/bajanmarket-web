@@ -1515,6 +1515,1145 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_approval_requests: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          draft_id: string | null
+          duplicate_result: Json
+          id: string
+          prospect_id: string
+          recommended_action: string | null
+          record_mode: Database["public"]["Enums"]["seller_record_mode"]
+          request_type: string
+          risk_warnings: string[]
+          status: Database["public"]["Enums"]["seller_approval_status"]
+          summary: Json
+          updated_at: string
+          verification_result: Json
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          draft_id?: string | null
+          duplicate_result?: Json
+          id?: string
+          prospect_id: string
+          recommended_action?: string | null
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          request_type?: string
+          risk_warnings?: string[]
+          status?: Database["public"]["Enums"]["seller_approval_status"]
+          summary?: Json
+          updated_at?: string
+          verification_result?: Json
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          draft_id?: string | null
+          duplicate_result?: Json
+          id?: string
+          prospect_id?: string
+          recommended_action?: string | null
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          request_type?: string
+          risk_warnings?: string[]
+          status?: Database["public"]["Enums"]["seller_approval_status"]
+          summary?: Json
+          updated_at?: string
+          verification_result?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_approval_requests_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "seller_outreach_drafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_approval_requests_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_followup_tasks: {
+        Row: {
+          assigned_admin_id: string | null
+          cancelled_reason: string | null
+          channel: Database["public"]["Enums"]["seller_outreach_channel"] | null
+          created_at: string
+          created_by: string | null
+          due_at: string
+          id: string
+          playbook_id: string | null
+          prospect_id: string
+          record_mode: Database["public"]["Enums"]["seller_record_mode"]
+          sequence_step: string
+          status: Database["public"]["Enums"]["seller_task_status"]
+          updated_at: string
+        }
+        Insert: {
+          assigned_admin_id?: string | null
+          cancelled_reason?: string | null
+          channel?:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          created_at?: string
+          created_by?: string | null
+          due_at: string
+          id?: string
+          playbook_id?: string | null
+          prospect_id: string
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          sequence_step?: string
+          status?: Database["public"]["Enums"]["seller_task_status"]
+          updated_at?: string
+        }
+        Update: {
+          assigned_admin_id?: string | null
+          cancelled_reason?: string | null
+          channel?:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          created_at?: string
+          created_by?: string | null
+          due_at?: string
+          id?: string
+          playbook_id?: string | null
+          prospect_id?: string
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          sequence_step?: string
+          status?: Database["public"]["Enums"]["seller_task_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_followup_tasks_playbook_id_fkey"
+            columns: ["playbook_id"]
+            isOneToOne: false
+            referencedRelation: "seller_outreach_playbooks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_followup_tasks_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_growth_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_kind: string
+          created_at: string
+          detail: Json
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_kind?: string
+          created_at?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_kind?: string
+          created_at?: string
+          detail?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      seller_growth_settings: {
+        Row: {
+          business_hours_end: number
+          business_hours_start: number
+          daily_contact_limit: number
+          email_paused: boolean
+          global_outreach_paused: boolean
+          id: number
+          live_sending_enabled: boolean
+          max_contact_attempts: number
+          simulation_mode: boolean
+          social_paused: boolean
+          test_recipients: string[]
+          timezone: string
+          updated_at: string
+          updated_by: string | null
+          weekly_contact_limit: number
+          whatsapp_paused: boolean
+        }
+        Insert: {
+          business_hours_end?: number
+          business_hours_start?: number
+          daily_contact_limit?: number
+          email_paused?: boolean
+          global_outreach_paused?: boolean
+          id?: number
+          live_sending_enabled?: boolean
+          max_contact_attempts?: number
+          simulation_mode?: boolean
+          social_paused?: boolean
+          test_recipients?: string[]
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+          weekly_contact_limit?: number
+          whatsapp_paused?: boolean
+        }
+        Update: {
+          business_hours_end?: number
+          business_hours_start?: number
+          daily_contact_limit?: number
+          email_paused?: boolean
+          global_outreach_paused?: boolean
+          id?: number
+          live_sending_enabled?: boolean
+          max_contact_attempts?: number
+          simulation_mode?: boolean
+          social_paused?: boolean
+          test_recipients?: string[]
+          timezone?: string
+          updated_at?: string
+          updated_by?: string | null
+          weekly_contact_limit?: number
+          whatsapp_paused?: boolean
+        }
+        Relationships: []
+      }
+      seller_onboarding_items: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          category_hint: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          image_urls: string[]
+          missing_fields: string[]
+          price: number | null
+          published_listing_id: string | null
+          session_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          category_hint?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_urls?: string[]
+          missing_fields?: string[]
+          price?: number | null
+          published_listing_id?: string | null
+          session_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          category_hint?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          image_urls?: string[]
+          missing_fields?: string[]
+          price?: number | null
+          published_listing_id?: string | null
+          session_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_onboarding_items_published_listing_id_fkey"
+            columns: ["published_listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_onboarding_items_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "seller_onboarding_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_onboarding_sessions: {
+        Row: {
+          accepted_at: string | null
+          business_confirmed: boolean
+          business_id: string | null
+          completed_at: string | null
+          content_permission_granted: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          invite_expires_at: string
+          invite_token: string
+          logo_permission_granted: boolean
+          prefilled: Json
+          prospect_id: string
+          record_mode: Database["public"]["Enums"]["seller_record_mode"]
+          seller_user_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          business_confirmed?: boolean
+          business_id?: string | null
+          completed_at?: string | null
+          content_permission_granted?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invite_expires_at?: string
+          invite_token: string
+          logo_permission_granted?: boolean
+          prefilled?: Json
+          prospect_id: string
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          seller_user_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          business_confirmed?: boolean
+          business_id?: string | null
+          completed_at?: string | null
+          content_permission_granted?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invite_expires_at?: string
+          invite_token?: string
+          logo_permission_granted?: boolean
+          prefilled?: Json
+          prospect_id?: string
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          seller_user_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_onboarding_sessions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_onboarding_sessions_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_outreach_drafts: {
+        Row: {
+          body: string
+          channel: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at: string
+          created_by: string | null
+          id: string
+          playbook_id: string | null
+          prospect_id: string
+          record_mode: Database["public"]["Enums"]["seller_record_mode"]
+          risk_warnings: string[]
+          sequence_step: string
+          status: string
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          channel: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          playbook_id?: string | null
+          prospect_id: string
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          risk_warnings?: string[]
+          sequence_step?: string
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          channel?: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          playbook_id?: string | null
+          prospect_id?: string
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          risk_warnings?: string[]
+          sequence_step?: string
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_outreach_drafts_playbook_id_fkey"
+            columns: ["playbook_id"]
+            isOneToOne: false
+            referencedRelation: "seller_outreach_playbooks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_outreach_drafts_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_outreach_events: {
+        Row: {
+          channel: Database["public"]["Enums"]["seller_outreach_channel"] | null
+          created_at: string
+          detail: Json
+          event_type: string
+          id: string
+          message_id: string | null
+          occurred_at: string
+          prospect_id: string | null
+        }
+        Insert: {
+          channel?:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          created_at?: string
+          detail?: Json
+          event_type: string
+          id?: string
+          message_id?: string | null
+          occurred_at?: string
+          prospect_id?: string | null
+        }
+        Update: {
+          channel?:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          created_at?: string
+          detail?: Json
+          event_type?: string
+          id?: string
+          message_id?: string | null
+          occurred_at?: string
+          prospect_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_outreach_events_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "seller_outreach_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_outreach_events_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_outreach_messages: {
+        Row: {
+          approval_request_id: string | null
+          body: string
+          channel: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at: string
+          created_by: string | null
+          draft_id: string | null
+          error: string | null
+          id: string
+          idempotency_key: string
+          prospect_id: string
+          provider_message_id: string | null
+          recipient: string | null
+          record_mode: Database["public"]["Enums"]["seller_record_mode"]
+          replied_at: string | null
+          sent_at: string | null
+          sequence_step: string
+          simulated: boolean
+          status: string
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          approval_request_id?: string | null
+          body: string
+          channel: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at?: string
+          created_by?: string | null
+          draft_id?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key: string
+          prospect_id: string
+          provider_message_id?: string | null
+          recipient?: string | null
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          replied_at?: string | null
+          sent_at?: string | null
+          sequence_step?: string
+          simulated?: boolean
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approval_request_id?: string | null
+          body?: string
+          channel?: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at?: string
+          created_by?: string | null
+          draft_id?: string | null
+          error?: string | null
+          id?: string
+          idempotency_key?: string
+          prospect_id?: string
+          provider_message_id?: string | null
+          recipient?: string | null
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          replied_at?: string | null
+          sent_at?: string | null
+          sequence_step?: string
+          simulated?: boolean
+          status?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_outreach_messages_approval_request_id_fkey"
+            columns: ["approval_request_id"]
+            isOneToOne: false
+            referencedRelation: "seller_approval_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_outreach_messages_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "seller_outreach_drafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_outreach_messages_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_outreach_playbooks: {
+        Row: {
+          active: boolean
+          created_at: string
+          followup_1_template: string
+          followup_final_template: string
+          followup_interval_days: number
+          id: string
+          initial_template: string
+          key: string
+          max_attempts: number
+          name: string
+          onboarding_offer: string | null
+          recommended_channel: Database["public"]["Enums"]["seller_outreach_channel"]
+          required_info: string[]
+          requires_approval: boolean
+          seller_type: string | null
+          sort_order: number
+          updated_at: string
+          value_proposition: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          followup_1_template?: string
+          followup_final_template?: string
+          followup_interval_days?: number
+          id?: string
+          initial_template?: string
+          key: string
+          max_attempts?: number
+          name: string
+          onboarding_offer?: string | null
+          recommended_channel?: Database["public"]["Enums"]["seller_outreach_channel"]
+          required_info?: string[]
+          requires_approval?: boolean
+          seller_type?: string | null
+          sort_order?: number
+          updated_at?: string
+          value_proposition?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          followup_1_template?: string
+          followup_final_template?: string
+          followup_interval_days?: number
+          id?: string
+          initial_template?: string
+          key?: string
+          max_attempts?: number
+          name?: string
+          onboarding_offer?: string | null
+          recommended_channel?: Database["public"]["Enums"]["seller_outreach_channel"]
+          required_info?: string[]
+          requires_approval?: boolean
+          seller_type?: string | null
+          sort_order?: number
+          updated_at?: string
+          value_proposition?: string
+        }
+        Relationships: []
+      }
+      seller_pipeline_history: {
+        Row: {
+          actor: string
+          approval_request_id: string | null
+          changed_by: string | null
+          created_at: string
+          from_stage:
+            | Database["public"]["Enums"]["seller_pipeline_stage"]
+            | null
+          id: string
+          outreach_message_id: string | null
+          prospect_id: string
+          reason: string | null
+          to_stage: Database["public"]["Enums"]["seller_pipeline_stage"]
+        }
+        Insert: {
+          actor?: string
+          approval_request_id?: string | null
+          changed_by?: string | null
+          created_at?: string
+          from_stage?:
+            | Database["public"]["Enums"]["seller_pipeline_stage"]
+            | null
+          id?: string
+          outreach_message_id?: string | null
+          prospect_id: string
+          reason?: string | null
+          to_stage: Database["public"]["Enums"]["seller_pipeline_stage"]
+        }
+        Update: {
+          actor?: string
+          approval_request_id?: string | null
+          changed_by?: string | null
+          created_at?: string
+          from_stage?:
+            | Database["public"]["Enums"]["seller_pipeline_stage"]
+            | null
+          id?: string
+          outreach_message_id?: string | null
+          prospect_id?: string
+          reason?: string | null
+          to_stage?: Database["public"]["Enums"]["seller_pipeline_stage"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_pipeline_history_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_prospect_contacts: {
+        Row: {
+          channel: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at: string
+          id: string
+          is_public_business_contact: boolean
+          label: string | null
+          prospect_id: string
+          source_url: string | null
+          updated_at: string
+          value: string
+          value_norm: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          channel: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at?: string
+          id?: string
+          is_public_business_contact?: boolean
+          label?: string | null
+          prospect_id: string
+          source_url?: string | null
+          updated_at?: string
+          value: string
+          value_norm?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["seller_outreach_channel"]
+          created_at?: string
+          id?: string
+          is_public_business_contact?: boolean
+          label?: string | null
+          prospect_id?: string
+          source_url?: string | null
+          updated_at?: string
+          value?: string
+          value_norm?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_prospect_contacts_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_prospect_scores: {
+        Row: {
+          breakdown: Json
+          computed_by: string | null
+          created_at: string
+          explanation: string | null
+          id: string
+          missing_evidence: string[]
+          prospect_id: string
+          recommended_channel:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          recommended_priority:
+            | Database["public"]["Enums"]["seller_priority"]
+            | null
+          total_score: number
+        }
+        Insert: {
+          breakdown?: Json
+          computed_by?: string | null
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          missing_evidence?: string[]
+          prospect_id: string
+          recommended_channel?:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          recommended_priority?:
+            | Database["public"]["Enums"]["seller_priority"]
+            | null
+          total_score: number
+        }
+        Update: {
+          breakdown?: Json
+          computed_by?: string | null
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          missing_evidence?: string[]
+          prospect_id?: string
+          recommended_channel?:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          recommended_priority?:
+            | Database["public"]["Enums"]["seller_priority"]
+            | null
+          total_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_prospect_scores_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_prospect_sources: {
+        Row: {
+          claim: string
+          confidence: string
+          created_at: string
+          id: string
+          prospect_id: string
+          researched_at: string
+          researched_by: string | null
+          source_type: string | null
+          source_url: string | null
+        }
+        Insert: {
+          claim: string
+          confidence?: string
+          created_at?: string
+          id?: string
+          prospect_id: string
+          researched_at?: string
+          researched_by?: string | null
+          source_type?: string | null
+          source_url?: string | null
+        }
+        Update: {
+          claim?: string
+          confidence?: string
+          created_at?: string
+          id?: string
+          prospect_id?: string
+          researched_at?: string
+          researched_by?: string | null
+          source_type?: string | null
+          source_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_prospect_sources_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_prospects: {
+        Row: {
+          assigned_admin_id: string | null
+          audience_estimate: number | null
+          bajanmarket_account_status: string
+          business_name: string
+          business_name_norm: string | null
+          contact_name: string | null
+          created_at: string
+          created_by: string | null
+          delivery_available: boolean | null
+          duplicate_of_id: string | null
+          estimated_potential_listings: number | null
+          facebook_group_activity: string | null
+          facebook_url: string | null
+          has_existing_website: boolean | null
+          id: string
+          instagram_url: string | null
+          last_contact_at: string | null
+          lead_score: number | null
+          location_note: string | null
+          marketplace_category: string | null
+          next_followup_at: string | null
+          notes: string | null
+          opted_out: boolean
+          other_source_url: string | null
+          parish: string | null
+          pipeline_stage: Database["public"]["Enums"]["seller_pipeline_stage"]
+          posting_frequency: string | null
+          preferred_channel:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          priority: Database["public"]["Enums"]["seller_priority"]
+          public_email: string | null
+          public_phone: string | null
+          public_whatsapp: string | null
+          record_mode: Database["public"]["Enums"]["seller_record_mode"]
+          seller_type: string | null
+          suppression_reason: string | null
+          updated_at: string
+          verification_status: Database["public"]["Enums"]["seller_verification_status"]
+          visible_product_count: number | null
+          website_domain: string | null
+          website_url: string | null
+        }
+        Insert: {
+          assigned_admin_id?: string | null
+          audience_estimate?: number | null
+          bajanmarket_account_status?: string
+          business_name: string
+          business_name_norm?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          delivery_available?: boolean | null
+          duplicate_of_id?: string | null
+          estimated_potential_listings?: number | null
+          facebook_group_activity?: string | null
+          facebook_url?: string | null
+          has_existing_website?: boolean | null
+          id?: string
+          instagram_url?: string | null
+          last_contact_at?: string | null
+          lead_score?: number | null
+          location_note?: string | null
+          marketplace_category?: string | null
+          next_followup_at?: string | null
+          notes?: string | null
+          opted_out?: boolean
+          other_source_url?: string | null
+          parish?: string | null
+          pipeline_stage?: Database["public"]["Enums"]["seller_pipeline_stage"]
+          posting_frequency?: string | null
+          preferred_channel?:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          priority?: Database["public"]["Enums"]["seller_priority"]
+          public_email?: string | null
+          public_phone?: string | null
+          public_whatsapp?: string | null
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          seller_type?: string | null
+          suppression_reason?: string | null
+          updated_at?: string
+          verification_status?: Database["public"]["Enums"]["seller_verification_status"]
+          visible_product_count?: number | null
+          website_domain?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          assigned_admin_id?: string | null
+          audience_estimate?: number | null
+          bajanmarket_account_status?: string
+          business_name?: string
+          business_name_norm?: string | null
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          delivery_available?: boolean | null
+          duplicate_of_id?: string | null
+          estimated_potential_listings?: number | null
+          facebook_group_activity?: string | null
+          facebook_url?: string | null
+          has_existing_website?: boolean | null
+          id?: string
+          instagram_url?: string | null
+          last_contact_at?: string | null
+          lead_score?: number | null
+          location_note?: string | null
+          marketplace_category?: string | null
+          next_followup_at?: string | null
+          notes?: string | null
+          opted_out?: boolean
+          other_source_url?: string | null
+          parish?: string | null
+          pipeline_stage?: Database["public"]["Enums"]["seller_pipeline_stage"]
+          posting_frequency?: string | null
+          preferred_channel?:
+            | Database["public"]["Enums"]["seller_outreach_channel"]
+            | null
+          priority?: Database["public"]["Enums"]["seller_priority"]
+          public_email?: string | null
+          public_phone?: string | null
+          public_whatsapp?: string | null
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          seller_type?: string | null
+          suppression_reason?: string | null
+          updated_at?: string
+          verification_status?: Database["public"]["Enums"]["seller_verification_status"]
+          visible_product_count?: number | null
+          website_domain?: string | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_prospects_duplicate_of_id_fkey"
+            columns: ["duplicate_of_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_research_tasks: {
+        Row: {
+          assigned_admin_id: string | null
+          category: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          instructions: string | null
+          parish: string | null
+          prospect_id: string | null
+          record_mode: Database["public"]["Enums"]["seller_record_mode"]
+          result_notes: string | null
+          seller_type: string | null
+          source_hint: string | null
+          status: Database["public"]["Enums"]["seller_task_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_admin_id?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          instructions?: string | null
+          parish?: string | null
+          prospect_id?: string | null
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          result_notes?: string | null
+          seller_type?: string | null
+          source_hint?: string | null
+          status?: Database["public"]["Enums"]["seller_task_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_admin_id?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          instructions?: string | null
+          parish?: string | null
+          prospect_id?: string | null
+          record_mode?: Database["public"]["Enums"]["seller_record_mode"]
+          result_notes?: string | null
+          seller_type?: string | null
+          source_hint?: string | null
+          status?: Database["public"]["Enums"]["seller_task_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_research_tasks_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_scoring_rules: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          label: string
+          max_points: number
+          sort_order: number
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          label: string
+          max_points?: number
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          label?: string
+          max_points?: number
+          sort_order?: number
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      seller_suppressions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          match_type: string
+          match_value: string
+          match_value_norm: string | null
+          permanent: boolean
+          prospect_id: string | null
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          match_type: string
+          match_value: string
+          match_value_norm?: string | null
+          permanent?: boolean
+          prospect_id?: string | null
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          match_type?: string
+          match_value?: string
+          match_value_norm?: string | null
+          permanent?: boolean
+          prospect_id?: string | null
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_suppressions_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_categories: {
         Row: {
           active: boolean
@@ -2154,7 +3293,44 @@ export type Database = {
         | "saint_thomas"
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
       report_target: "listing" | "user" | "message"
+      seller_approval_status:
+        | "pending"
+        | "approved"
+        | "edited_approved"
+        | "rejected"
+        | "archived"
+      seller_outreach_channel:
+        | "email"
+        | "whatsapp"
+        | "facebook"
+        | "instagram"
+        | "phone"
+        | "in_person"
+        | "other"
+      seller_pipeline_stage:
+        | "discovered"
+        | "verification_required"
+        | "qualified"
+        | "ready_for_outreach"
+        | "awaiting_approval"
+        | "contacted"
+        | "replied"
+        | "demo_scheduled"
+        | "onboarding"
+        | "trial_active"
+        | "activated_seller"
+        | "declined"
+        | "suppressed"
       seller_plan: "free" | "premium" | "business"
+      seller_priority: "low" | "medium" | "high" | "urgent"
+      seller_record_mode: "demo" | "simulation" | "live"
+      seller_task_status: "open" | "in_progress" | "done" | "cancelled"
+      seller_verification_status:
+        | "unverified"
+        | "needs_review"
+        | "verified"
+        | "rejected"
+        | "duplicate_suspected"
       service_field_audience: "provider" | "buyer"
       service_field_type:
         | "text"
@@ -2324,7 +3500,48 @@ export const Constants = {
       ],
       report_status: ["open", "reviewing", "resolved", "dismissed"],
       report_target: ["listing", "user", "message"],
+      seller_approval_status: [
+        "pending",
+        "approved",
+        "edited_approved",
+        "rejected",
+        "archived",
+      ],
+      seller_outreach_channel: [
+        "email",
+        "whatsapp",
+        "facebook",
+        "instagram",
+        "phone",
+        "in_person",
+        "other",
+      ],
+      seller_pipeline_stage: [
+        "discovered",
+        "verification_required",
+        "qualified",
+        "ready_for_outreach",
+        "awaiting_approval",
+        "contacted",
+        "replied",
+        "demo_scheduled",
+        "onboarding",
+        "trial_active",
+        "activated_seller",
+        "declined",
+        "suppressed",
+      ],
       seller_plan: ["free", "premium", "business"],
+      seller_priority: ["low", "medium", "high", "urgent"],
+      seller_record_mode: ["demo", "simulation", "live"],
+      seller_task_status: ["open", "in_progress", "done", "cancelled"],
+      seller_verification_status: [
+        "unverified",
+        "needs_review",
+        "verified",
+        "rejected",
+        "duplicate_suspected",
+      ],
       service_field_audience: ["provider", "buyer"],
       service_field_type: [
         "text",

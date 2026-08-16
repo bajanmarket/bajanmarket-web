@@ -41,8 +41,10 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authenticated/messages.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as CategorySlugParishRouteImport } from './routes/category.$slug.$parish'
 import { Route as AuthenticatedMessagesIdRouteImport } from './routes/_authenticated/messages.$id'
+import { Route as AuthenticatedAdminSellerGrowthRouteImport } from './routes/_authenticated/admin.seller-growth'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -212,6 +214,11 @@ const AuthenticatedMessagesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedMessagesRoute,
   } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const CategorySlugParishRoute = CategorySlugParishRouteImport.update({
   id: '/$parish',
   path: '/$parish',
@@ -222,6 +229,12 @@ const AuthenticatedMessagesIdRoute = AuthenticatedMessagesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedMessagesRoute,
 } as any)
+const AuthenticatedAdminSellerGrowthRoute =
+  AuthenticatedAdminSellerGrowthRouteImport.update({
+    id: '/seller-growth',
+    path: '/seller-growth',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -260,7 +273,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/bookings': typeof AuthenticatedBookingsRoute
   '/business': typeof AuthenticatedBusinessRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
@@ -279,8 +292,10 @@ export interface FileRoutesByFullPath {
   '/services/': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/messages/': typeof AuthenticatedMessagesIndexRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -299,7 +314,6 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/bookings': typeof AuthenticatedBookingsRoute
   '/business': typeof AuthenticatedBusinessRoute
   '/campaigns': typeof AuthenticatedCampaignsRoute
@@ -317,8 +331,10 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/messages': typeof AuthenticatedMessagesIndexRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -339,7 +355,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
   '/_authenticated/business': typeof AuthenticatedBusinessRoute
   '/_authenticated/campaigns': typeof AuthenticatedCampaignsRoute
@@ -358,8 +374,10 @@ export interface FileRoutesById {
   '/services/': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/_authenticated/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
   '/_authenticated/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -399,8 +417,10 @@ export interface FileRouteTypes {
     | '/services/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/admin/seller-growth'
     | '/messages/$id'
     | '/category/$slug/$parish'
+    | '/admin/'
     | '/messages/'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
@@ -419,7 +439,6 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/admin'
     | '/bookings'
     | '/business'
     | '/campaigns'
@@ -437,8 +456,10 @@ export interface FileRouteTypes {
     | '/services'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/admin/seller-growth'
     | '/messages/$id'
     | '/category/$slug/$parish'
+    | '/admin'
     | '/messages'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
@@ -477,8 +498,10 @@ export interface FileRouteTypes {
     | '/services/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/_authenticated/admin/seller-growth'
     | '/_authenticated/messages/$id'
     | '/category/$slug/$parish'
+    | '/_authenticated/admin/'
     | '/_authenticated/messages/'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
@@ -737,6 +760,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesIndexRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/category/$slug/$parish': {
       id: '/category/$slug/$parish'
       path: '/$parish'
@@ -750,6 +780,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/messages/$id'
       preLoaderRoute: typeof AuthenticatedMessagesIdRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
+    }
+    '/_authenticated/admin/seller-growth': {
+      id: '/_authenticated/admin/seller-growth'
+      path: '/seller-growth'
+      fullPath: '/admin/seller-growth'
+      preLoaderRoute: typeof AuthenticatedAdminSellerGrowthRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
@@ -782,6 +819,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminSellerGrowthRoute: typeof AuthenticatedAdminSellerGrowthRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminSellerGrowthRoute: AuthenticatedAdminSellerGrowthRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedMessagesRouteChildren {
   AuthenticatedMessagesIdRoute: typeof AuthenticatedMessagesIdRoute
   AuthenticatedMessagesIndexRoute: typeof AuthenticatedMessagesIndexRoute
@@ -798,7 +848,7 @@ const AuthenticatedMessagesRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
   AuthenticatedBusinessRoute: typeof AuthenticatedBusinessRoute
   AuthenticatedCampaignsRoute: typeof AuthenticatedCampaignsRoute
@@ -812,7 +862,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
   AuthenticatedBusinessRoute: AuthenticatedBusinessRoute,
   AuthenticatedCampaignsRoute: AuthenticatedCampaignsRoute,
