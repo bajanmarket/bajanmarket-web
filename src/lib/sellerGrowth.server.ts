@@ -55,6 +55,53 @@ export async function getSettings(db: Db) {
   return data;
 }
 
+const OUTREACH_FROM = "BajanMarket <bajanmarket@bajanmarket.app>";
+const RESEND_GATEWAY = "https://connector-gateway.lovable.dev/resend";
+
+/** Actually delivers an approved outreach message. Only ever called for live (non-simulated) sends. */
+export async function deliverOutreach(args: {
+  channel: string;
+  recipient: string;
+  subject: string | null;
+  body: string;
+}): Promise<{ ok: boolean; providerId?: string; error?: string }> {
+  if (args.channel !== "email") {
+    return { ok: false, error: `Live delivery for the ${args.channel} channel is not enabled yet` };
+  }
+  const resendKey = process.env['RESEND_API_KEY'];
+  const lovableKey = process.env['LOVABLE_API_KEY'];
+  if (!resendKey || !lovableKey) return { ok: false, error: "Email sending is not configured" };
+
+  const html = args.body
+    .split(/\n{2,}/)
+    .map((para) => `<p style="margin:0 0 14px;line-height:1.55">${para.replace(/\n/g, "<br/>")}</p>`)
+    .join("");
+
+  try {
+    const res = await fetch(`${RESEND_GATEWAY}/emails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${lovableKey}`,
+        "X-Connection-Api-Key": resendKey,
+      },
+      body: JSON.stringify({
+        from: OUTREACH_FROM,
+        to: [args.recipient],
+        subject: args.subject ?? "BajanMarket",
+        text: args.body,
+        html,
+      }),
+    });
+    const json = (await res.json().catch(() => ({}))) as { id?: string; message?: string };
+    if (!res.ok) return { ok: false, error: json.message ?? `HTTP ${res.status}` };
+    return { ok: true, ...(json.id ? { providerId: json.id } : {}) };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+
 /** Duplicate detection across normalized identity signals. Never merges automatically. */
 export async function findDuplicates(db: Db, p: Partial<ProspectRow>, excludeId?: string) {
   const { data } = await db
