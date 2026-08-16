@@ -307,6 +307,13 @@ export async function evaluateSendGuards(
   if ((attempts ?? 0) >= s.max_contact_attempts) reasons.push("Maximum contact attempts reached");
 
   const simulated = s.simulation_mode || !s.live_sending_enabled;
+  if (simulated)
+    reasons.push(
+      s.simulation_mode
+        ? "Simulation mode is on in Controls — turn it off to send for real"
+        : "Live sending is disabled in Controls — turn it on to send for real",
+    );
+
   const blocking = reasons.filter(
     (r) => r.includes("opted out") || r.includes("suppress") || r.includes("limit") || r.includes("attempts"),
   );
