@@ -1692,6 +1692,7 @@ export type Database = {
       }
       seller_growth_settings: {
         Row: {
+          allowlist_required: boolean
           business_hours_end: number
           business_hours_start: number
           daily_contact_limit: number
@@ -1711,6 +1712,7 @@ export type Database = {
           whatsapp_paused: boolean
         }
         Insert: {
+          allowlist_required?: boolean
           business_hours_end?: number
           business_hours_start?: number
           daily_contact_limit?: number
@@ -1730,6 +1732,7 @@ export type Database = {
           whatsapp_paused?: boolean
         }
         Update: {
+          allowlist_required?: boolean
           business_hours_end?: number
           business_hours_start?: number
           daily_contact_limit?: number
