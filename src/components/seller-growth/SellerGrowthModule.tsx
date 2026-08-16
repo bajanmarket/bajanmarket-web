@@ -761,7 +761,11 @@ function OnboardingTab() {
                 className={btnGhost}
                 onClick={() =>
                   move({ data: { prospectId: s.prospect_id, stage: "activated_seller" } })
-                    .then(() => { toast.success("Marked as activated seller"); qc.invalidateQueries({ queryKey: ["sg-onboarding"] }); })
+                    .then((r) => {
+                      if (!r.ok) { toast.error(r.error); return; }
+                      toast.success("Marked as activated seller");
+                      qc.invalidateQueries({ queryKey: ["sg-onboarding"] });
+                    })
                     .catch((e) => toast.error((e as Error).message))
                 }
               >

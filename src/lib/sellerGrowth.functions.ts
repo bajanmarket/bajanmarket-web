@@ -161,14 +161,19 @@ export const moveStage = createServerFn({ method: "POST" })
         .select("id, seller_user_id")
         .eq("prospect_id", p.id)
         .maybeSingle();
-      if (!session?.seller_user_id) throw new Error("Cannot activate: no linked seller account yet");
+      if (!session?.seller_user_id) {
+        return { ok: false as const, error: "Cannot activate: no linked seller account yet" };
+      }
       const { count } = await db
         .from("listings")
         .select("id", { count: "exact", head: true })
         .eq("seller_id", session.seller_user_id)
         .eq("status", "active");
-      if (!count) throw new Error("Cannot activate: the seller has no active listing yet");
+      if (!count) {
+        return { ok: false as const, error: "Cannot activate: the seller has no active listing yet" };
+      }
     }
+
     await db.from("seller_prospects").update({ pipeline_stage: data.stage }).eq("id", p.id);
     await db.from("seller_pipeline_history").insert({
       prospect_id: p.id,
@@ -178,7 +183,7 @@ export const moveStage = createServerFn({ method: "POST" })
       reason: data.reason ?? null,
     });
     await audit(db, context.userId, "prospect.stage_changed", "seller_prospects", p.id, { to: data.stage });
-    return { ok: true };
+    return { ok: true as const };
   });
 
 export const runOpportunityScan = createServerFn({ method: "POST" })
