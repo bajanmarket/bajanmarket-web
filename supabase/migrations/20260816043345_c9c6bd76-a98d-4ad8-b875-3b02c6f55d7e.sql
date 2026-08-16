@@ -1,0 +1,1 @@
+ALTER TABLE public.seller_growth_settings ADD COLUMN IF NOT EXISTS outreach_days text[] NOT NULL DEFAULT ARRAY['Mon','Tue','Wed','Thu','Fri','Sat'];

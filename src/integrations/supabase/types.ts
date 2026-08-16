@@ -1700,6 +1700,7 @@ export type Database = {
           id: number
           live_sending_enabled: boolean
           max_contact_attempts: number
+          outreach_days: string[]
           simulation_mode: boolean
           social_paused: boolean
           test_recipients: string[]
@@ -1718,6 +1719,7 @@ export type Database = {
           id?: number
           live_sending_enabled?: boolean
           max_contact_attempts?: number
+          outreach_days?: string[]
           simulation_mode?: boolean
           social_paused?: boolean
           test_recipients?: string[]
@@ -1736,6 +1738,7 @@ export type Database = {
           id?: number
           live_sending_enabled?: boolean
           max_contact_attempts?: number
+          outreach_days?: string[]
           simulation_mode?: boolean
           social_paused?: boolean
           test_recipients?: string[]
