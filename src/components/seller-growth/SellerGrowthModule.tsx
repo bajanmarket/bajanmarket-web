@@ -459,10 +459,22 @@ function ScannerTab() {
         },
       }),
     onSuccess: (r) => {
-      toast.success(`${r.tasksCreated} research task(s) created`);
+      if (r.prospectsCreated) {
+        toast.success(
+          `${r.prospectsCreated} candidate prospect(s) added for verification` +
+            (r.duplicatesSkipped ? ` · ${r.duplicatesSkipped} duplicate(s) skipped` : ""),
+        );
+      } else {
+        toast.message(r.note ?? "No new candidates found", {
+          description: `${r.tasksCreated} manual research task(s) created`,
+        });
+      }
       qc.invalidateQueries({ queryKey: ["sg-tasks"] });
+      qc.invalidateQueries({ queryKey: ["sg-prospects"] });
+      qc.invalidateQueries({ queryKey: ["sg-dashboard"] });
     },
     onError: (e) => toast.error((e as Error).message),
+
   });
 
   return (
