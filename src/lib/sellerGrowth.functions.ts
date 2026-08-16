@@ -445,10 +445,16 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
     const recipient =
       draft.channel === "email" ? p.public_email : draft.channel === "whatsapp" ? p.public_whatsapp : p.facebook_url ?? p.instagram_url;
     if (!guard.simulated) {
-      const allow = settings.test_recipients.map((t) => t.toLowerCase());
-      if (!recipient || !allow.includes(String(recipient).toLowerCase()))
-        return { sent: false, simulated: false, reasons: ["Recipient is not on the test-recipient allowlist"] };
+      if (!recipient)
+        return { sent: false, simulated: false, reasons: ["This prospect has no contact address for that channel"] };
+      // Autonomous mode: the admin approval on this request IS the gate.
+      if (settings.allowlist_required) {
+        const allow = settings.test_recipients.map((t) => t.toLowerCase());
+        if (!allow.includes(String(recipient).toLowerCase()))
+          return { sent: false, simulated: false, reasons: ["Recipient is not on the test-recipient allowlist"] };
+      }
     }
+
 
     const idem = `${draft.id}:${draft.sequence_step}:${guard.simulated ? "sim" : "live"}`;
     const { data: existing } = await db
