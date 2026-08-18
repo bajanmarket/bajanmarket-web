@@ -140,13 +140,7 @@ function PreviewStorePage() {
             <div className="grid grid-cols-2 gap-3">
               {products.map((p) => (
                 <article key={p.id} className="bg-white rounded-2xl ring-1 ring-hairline overflow-hidden">
-                  <div className="aspect-square bg-sand-deep grid place-items-center">
-                    {p.image_url ? (
-                      <img src={p.image_url} alt="" loading="lazy" className="w-full h-full object-cover" />
-                    ) : (
-                      <Store className="size-7 text-navy/20" />
-                    )}
-                  </div>
+                  <DraftImage src={p.image_url} label={p.title} className="aspect-square" />
                   <div className="p-3">
                     <p className="text-sm font-medium leading-snug line-clamp-2">{p.title}</p>
                     <p className="text-sm mt-1 text-navy/70">
