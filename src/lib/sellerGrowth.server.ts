@@ -139,10 +139,46 @@ export async function deliverOutreach(args: {
   const lovableKey = process.env['LOVABLE_API_KEY'];
   if (!resendKey || !lovableKey) return { ok: false, error: "Email sending is not configured" };
 
-  const html = args.body
+  const paragraphs = args.body
     .split(/\n{2,}/)
-    .map((para) => `<p style="margin:0 0 14px;line-height:1.55">${para.replace(/\n/g, "<br/>")}</p>`)
+    .map((para) => `<p style="margin:0 0 14px;line-height:1.6;color:#1f2933;font-size:15px">${para.replace(/\n/g, "<br/>")}</p>`)
     .join("");
+
+  const signup = "https://bajanmarket.app/auth?mode=signup&utm_source=outreach&utm_medium=email&utm_campaign=seller_growth";
+  const postUrl = "https://bajanmarket.app/post?utm_source=outreach&utm_medium=email&utm_campaign=seller_growth";
+  const browseUrl = "https://bajanmarket.app/browse?utm_source=outreach&utm_medium=email&utm_campaign=seller_growth";
+  const optOut = `mailto:bajanmarket@bajanmarket.app?subject=${encodeURIComponent("Unsubscribe from BajanMarket outreach")}`;
+
+  const html = `<div style="background:#f6f7f9;padding:24px 0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+  <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:12px;padding:28px 28px 22px">
+    <div style="font-size:18px;font-weight:700;color:#0f766e;margin-bottom:18px">BajanMarket</div>
+    ${paragraphs}
+    <div style="margin:24px 0 8px">
+      <a href="${signup}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600;font-size:15px">Create your free seller account</a>
+    </div>
+    <p style="margin:14px 0 0;font-size:14px;line-height:1.6;color:#4b5563">
+      Already signed up? <a href="${postUrl}" style="color:#0f766e">Post your first listing</a> &middot;
+      <a href="${browseUrl}" style="color:#0f766e">See what's selling</a>
+    </p>
+    <p style="margin:18px 0 0;font-size:14px;line-height:1.6;color:#4b5563">
+      Prefer to talk it through? Just reply to this email and a real person will get back to you.
+    </p>
+    <hr style="border:none;border-top:1px solid #e5e7eb;margin:22px 0 12px"/>
+    <p style="margin:0;font-size:12px;line-height:1.5;color:#8a94a6">
+      BajanMarket &middot; Barbados &middot; <a href="https://bajanmarket.app" style="color:#8a94a6">bajanmarket.app</a><br/>
+      Don't want these emails? <a href="${optOut}" style="color:#8a94a6">Unsubscribe</a>.
+    </p>
+  </div>
+</div>`;
+
+  const text = `${args.body}
+
+Create your free seller account: ${signup}
+Post your first listing: ${postUrl}
+See what's selling: ${browseUrl}
+
+Reply to this email to talk to a real person.
+Unsubscribe: reply with "unsubscribe".`;
 
   try {
     const res = await fetch(`${RESEND_GATEWAY}/emails`, {
@@ -155,10 +191,12 @@ export async function deliverOutreach(args: {
       body: JSON.stringify({
         from: OUTREACH_FROM,
         to: [args.recipient],
+        reply_to: "bajanmarket@bajanmarket.app",
         subject: args.subject ?? "BajanMarket",
-        text: args.body,
+        text,
         html,
       }),
+
     });
     const json = (await res.json().catch(() => ({}))) as { id?: string; message?: string };
     if (!res.ok) return { ok: false, error: json.message ?? `HTTP ${res.status}` };
