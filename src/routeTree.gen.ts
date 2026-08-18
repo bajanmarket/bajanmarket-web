@@ -45,6 +45,7 @@ import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as CategorySlugParishRouteImport } from './routes/category.$slug.$parish'
 import { Route as AuthenticatedMessagesIdRouteImport } from './routes/_authenticated/messages.$id'
+import { Route as AuthenticatedClaimTokenRouteImport } from './routes/_authenticated/claim.$token'
 import { Route as AuthenticatedAdminSellerGrowthRouteImport } from './routes/_authenticated/admin.seller-growth'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -235,6 +236,11 @@ const AuthenticatedMessagesIdRoute = AuthenticatedMessagesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedMessagesRoute,
 } as any)
+const AuthenticatedClaimTokenRoute = AuthenticatedClaimTokenRouteImport.update({
+  id: '/claim/$token',
+  path: '/claim/$token',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminSellerGrowthRoute =
   AuthenticatedAdminSellerGrowthRouteImport.update({
     id: '/seller-growth',
@@ -300,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
+  '/claim/$token': typeof AuthenticatedClaimTokenRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -340,6 +347,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
+  '/claim/$token': typeof AuthenticatedClaimTokenRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
+  '/_authenticated/claim/$token': typeof AuthenticatedClaimTokenRoute
   '/_authenticated/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -428,6 +437,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/seller-growth'
+    | '/claim/$token'
     | '/messages/$id'
     | '/category/$slug/$parish'
     | '/admin/'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/seller-growth'
+    | '/claim/$token'
     | '/messages/$id'
     | '/category/$slug/$parish'
     | '/admin'
@@ -511,6 +522,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/seller-growth'
+    | '/_authenticated/claim/$token'
     | '/_authenticated/messages/$id'
     | '/category/$slug/$parish'
     | '/_authenticated/admin/'
@@ -801,6 +813,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesIdRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
     }
+    '/_authenticated/claim/$token': {
+      id: '/_authenticated/claim/$token'
+      path: '/claim/$token'
+      fullPath: '/claim/$token'
+      preLoaderRoute: typeof AuthenticatedClaimTokenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/seller-growth': {
       id: '/_authenticated/admin/seller-growth'
       path: '/seller-growth'
@@ -879,6 +898,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPostRoute: typeof AuthenticatedPostRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProviderServicesRoute: typeof AuthenticatedProviderServicesRoute
+  AuthenticatedClaimTokenRoute: typeof AuthenticatedClaimTokenRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -893,6 +913,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPostRoute: AuthenticatedPostRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProviderServicesRoute: AuthenticatedProviderServicesRoute,
+  AuthenticatedClaimTokenRoute: AuthenticatedClaimTokenRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
