@@ -442,7 +442,7 @@ export const updateClaimItem = createServerFn({ method: "POST" })
     if (decision) patch['status'] = decision;
     if (Object.keys(patch).length === 0) return { ok: true as const };
 
-    const { error } = await db.from("draft_listings").update(patch).eq("id", itemId).eq("draft_store_id", store.id);
+    const { error } = await db.from("draft_listings").update(patch as never).eq("id", itemId).eq("draft_store_id", store.id);
     if (error) throw error;
     if (decision) {
       await claimAudit(db, decision === "rejected" ? "content_rejected" : "content_approved", {
@@ -498,7 +498,7 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
       const patch = Object.fromEntries(
         Object.entries(bizPayload).filter(([k, v]) => v !== null && v !== undefined && k !== "slug"),
       );
-      await db.from("businesses").update(patch).eq("id", mine.id);
+      await db.from("businesses").update(patch as never).eq("id", mine.id);
     } else {
       const { data: created, error: bizErr } = await db
         .from("businesses")

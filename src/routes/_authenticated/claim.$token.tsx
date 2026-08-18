@@ -162,7 +162,10 @@ function ClaimPage() {
               onToggle={() => setSelected((s) => ({ ...s, [item.id]: !s[item.id] }))}
               onSave={async (patch) => {
                 const res = await saveItem({ data: { token, itemId: item.id, ...patch } });
-                if (!res.ok) return toast.error(res.error);
+                if (!res.ok) {
+                  toast.error(res.error);
+                  return;
+                }
                 await qc.invalidateQueries({ queryKey: ["claim-workspace", token] });
                 toast.success("Saved");
               }}
