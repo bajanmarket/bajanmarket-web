@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Store, MapPin, Globe, Phone, MessageCircle, Mail, Clock, ShieldCheck, Sparkles } from "lucide-react";
 import { getStorePreview } from "@/lib/draftStore.functions";
 import { parishLabel } from "@/lib/parishes";
-import { formatPrice } from "@/lib/format";
+import { formatBBD } from "@/lib/format";
 
 export const Route = createFileRoute("/preview-store/$token")({
   head: () => ({
@@ -54,7 +54,7 @@ function PreviewStorePage() {
   const { store, items } = data;
   const products = items.filter((i) => i.content_type === "product" || i.content_type === "service");
   const social = items.filter((i) => i.content_type !== "product" && i.content_type !== "service");
-  const claimHref = `/auth?claim=${token}&redirect=${encodeURIComponent(`/claim/${token}`)}`;
+  const claimHref = `/auth?claim=${token}&biz=${encodeURIComponent(store.business_name)}&redirect=${encodeURIComponent(`/claim/${token}`)}`;
 
   return (
     <div className="min-h-screen bg-sand pb-28">
@@ -153,7 +153,7 @@ function PreviewStorePage() {
                     <p className="text-sm font-medium leading-snug line-clamp-2">{p.title}</p>
                     <p className="text-sm mt-1 text-navy/70">
                       {p.price !== null && p.price !== undefined
-                        ? formatPrice(p.price, p.currency ?? "BBD")
+                        ? formatBBD(p.price, p.currency ?? "BBD")
                         : "Contact seller for price"}
                     </p>
                   </div>
