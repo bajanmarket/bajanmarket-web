@@ -295,9 +295,11 @@ function ItemRow({
             </>
           )}
         </div>
-        {item.image_url && (
-          <img src={item.image_url} alt="" loading="lazy" className="size-14 rounded-xl object-cover shrink-0" />
-        )}
+        <DraftImage
+          src={item.image_url}
+          label={item.title}
+          className="size-14 rounded-xl shrink-0"
+        />
       </div>
     </div>
   );

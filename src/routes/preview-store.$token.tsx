@@ -88,21 +88,19 @@ function PreviewStorePage() {
 
         {/* Storefront preview — mirrors the live storefront design */}
         <section className="bg-white rounded-3xl ring-1 ring-hairline overflow-hidden">
-          <div className="w-full aspect-[3/1] bg-sand-deep">
-            {store.cover_url ? (
-              <img src={store.cover_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-teal-soft to-sand-deep" />
-            )}
-          </div>
+          <DraftImage
+            src={store.cover_url}
+            label={store.business_name}
+            loading="eager"
+            className="w-full aspect-[3/1]"
+          />
           <div className="p-6 flex flex-col sm:flex-row gap-4 sm:items-end -mt-16 sm:-mt-20 relative">
-            <div className="size-24 rounded-2xl ring-4 ring-white bg-white overflow-hidden shrink-0 grid place-items-center">
-              {store.logo_url ? (
-                <img src={store.logo_url} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <Store className="size-9 text-navy/30" />
-              )}
-            </div>
+            <DraftImage
+              src={store.logo_url}
+              label={store.business_name}
+              loading="eager"
+              className="size-24 rounded-2xl ring-4 ring-white bg-white shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <h2 className="text-xl font-semibold">{store.business_name}</h2>
               {store.tagline && <p className="text-sm text-navy/60 mt-1">{store.tagline}</p>}
