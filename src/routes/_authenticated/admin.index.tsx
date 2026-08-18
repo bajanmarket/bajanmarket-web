@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { listPrivilegedProfiles } from "@/lib/profiles.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
@@ -44,6 +46,7 @@ function AdminPage() {
   const qc = useQueryClient();
   const [section, setSection] = useState<Section>("reports");
   const [tab, setTab] = useState<Tab>("open");
+  const fetchProfiles = useServerFn(listPrivilegedProfiles);
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ["admin-reports", tab],
@@ -82,11 +85,13 @@ function AdminPage() {
     queryKey: ["admin-profiles", userIds.sort().join(",")],
     enabled: userIds.length > 0,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, display_name, banned_at")
-        .in("id", userIds);
-      return new Map((data ?? []).map((p) => [p.id, p]));
+      const data = await fetchProfiles({ data: { user_ids: userIds } });
+      return new Map(
+        (data ?? []).map((p) => [
+          p.id as string,
+          { id: p.id as string, display_name: (p.display_name ?? "") as string, banned_at: (p.banned_at ?? null) as string | null },
+        ]),
+      );
     },
   });
 
