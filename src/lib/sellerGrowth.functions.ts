@@ -438,9 +438,6 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
     const { data: p } = await db.from("seller_prospects").select("*").eq("id", req.prospect_id).single();
     if (!draft || !p) throw new Error("Draft or prospect missing");
 
-    const guard = await evaluateSendGuards(db, p, draft.channel);
-    if (!guard.allowed) return { sent: false, simulated: guard.simulated, reasons: guard.reasons };
-
     const settings = await getSettings(db);
     const contactFor = (ch: string) =>
       ch === "email" ? p.public_email : ch === "whatsapp" ? p.public_whatsapp : ch === "facebook" ? p.facebook_url : ch === "instagram" ? p.instagram_url : null;
@@ -448,6 +445,7 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
     // approved draft on a channel with no handle still reaches them.
     let sendChannel = draft.channel as string;
     let recipient = contactFor(sendChannel);
+
     if (!recipient) {
       for (const ch of ["email", "whatsapp"]) {
         const c = contactFor(ch);
