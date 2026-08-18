@@ -766,6 +766,199 @@ export type Database = {
           },
         ]
       }
+      draft_listings: {
+        Row: {
+          category: string | null
+          content_type: string
+          created_at: string
+          currency: string
+          description: string | null
+          draft_store_id: string
+          id: string
+          image_url: string | null
+          listing_id: string | null
+          price: number | null
+          social_post_id: string | null
+          source_platform: string | null
+          source_posted_at: string | null
+          source_url: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          content_type?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          draft_store_id: string
+          id?: string
+          image_url?: string | null
+          listing_id?: string | null
+          price?: number | null
+          social_post_id?: string | null
+          source_platform?: string | null
+          source_posted_at?: string | null
+          source_url?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          content_type?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          draft_store_id?: string
+          id?: string
+          image_url?: string | null
+          listing_id?: string | null
+          price?: number | null
+          social_post_id?: string | null
+          source_platform?: string | null
+          source_posted_at?: string | null
+          source_url?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "draft_listings_draft_store_id_fkey"
+            columns: ["draft_store_id"]
+            isOneToOne: false
+            referencedRelation: "draft_stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draft_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draft_listings_social_post_id_fkey"
+            columns: ["social_post_id"]
+            isOneToOne: false
+            referencedRelation: "lead_social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      draft_stores: {
+        Row: {
+          address: string | null
+          business_id: string | null
+          business_name: string
+          category: string | null
+          claim_status: string
+          claimed_at: string | null
+          claimed_by_user_id: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          cover_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          hours: Json | null
+          id: string
+          logo_url: string | null
+          parish: string | null
+          preview_status: string
+          prospect_id: string
+          published_at: string | null
+          slug: string
+          social_links: Json
+          tagline: string | null
+          updated_at: string
+          verification_method: string | null
+          verification_note: string | null
+          verification_status: string
+          website: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_id?: string | null
+          business_name: string
+          category?: string | null
+          claim_status?: string
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          hours?: Json | null
+          id?: string
+          logo_url?: string | null
+          parish?: string | null
+          preview_status?: string
+          prospect_id: string
+          published_at?: string | null
+          slug: string
+          social_links?: Json
+          tagline?: string | null
+          updated_at?: string
+          verification_method?: string | null
+          verification_note?: string | null
+          verification_status?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_id?: string | null
+          business_name?: string
+          category?: string | null
+          claim_status?: string
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          hours?: Json | null
+          id?: string
+          logo_url?: string | null
+          parish?: string | null
+          preview_status?: string
+          prospect_id?: string
+          published_at?: string | null
+          slug?: string
+          social_links?: Json
+          tagline?: string | null
+          updated_at?: string
+          verification_method?: string | null
+          verification_note?: string | null
+          verification_status?: string
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "draft_stores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draft_stores_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: true
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -875,6 +1068,74 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_social_posts: {
+        Row: {
+          availability: string | null
+          caption: string | null
+          content_type: string
+          created_at: string
+          cta: string | null
+          description: string | null
+          detected_category: string | null
+          detected_currency: string | null
+          detected_price: number | null
+          detected_title: string | null
+          id: string
+          image_url: string | null
+          import_status: string
+          posted_at: string | null
+          prospect_id: string
+          source_platform: string | null
+          source_url: string | null
+        }
+        Insert: {
+          availability?: string | null
+          caption?: string | null
+          content_type?: string
+          created_at?: string
+          cta?: string | null
+          description?: string | null
+          detected_category?: string | null
+          detected_currency?: string | null
+          detected_price?: number | null
+          detected_title?: string | null
+          id?: string
+          image_url?: string | null
+          import_status?: string
+          posted_at?: string | null
+          prospect_id: string
+          source_platform?: string | null
+          source_url?: string | null
+        }
+        Update: {
+          availability?: string | null
+          caption?: string | null
+          content_type?: string
+          created_at?: string
+          cta?: string | null
+          description?: string | null
+          detected_category?: string | null
+          detected_currency?: string | null
+          detected_price?: number | null
+          detected_title?: string | null
+          id?: string
+          image_url?: string | null
+          import_status?: string
+          posted_at?: string | null
+          prospect_id?: string
+          source_platform?: string | null
+          source_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_social_posts_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
             referencedColumns: ["id"]
           },
         ]
@@ -2374,12 +2635,16 @@ export type Database = {
       }
       seller_prospects: {
         Row: {
+          acquisition_status: string
+          address: string | null
           assigned_admin_id: string | null
           audience_estimate: number | null
           bajanmarket_account_status: string
+          business_description: string | null
           business_name: string
           business_name_norm: string | null
           contact_name: string | null
+          cover_image_url: string | null
           created_at: string
           created_by: string | null
           delivery_available: boolean | null
@@ -2390,14 +2655,17 @@ export type Database = {
           has_existing_website: boolean | null
           id: string
           instagram_url: string | null
+          last_checked_at: string | null
           last_contact_at: string | null
           lead_score: number | null
           location_note: string | null
           marketplace_category: string | null
           next_followup_at: string | null
           notes: string | null
+          opening_hours: Json | null
           opted_out: boolean
           other_source_url: string | null
+          outreach_status: string | null
           parish: string | null
           pipeline_stage: Database["public"]["Enums"]["seller_pipeline_stage"]
           posting_frequency: string | null
@@ -2405,11 +2673,13 @@ export type Database = {
             | Database["public"]["Enums"]["seller_outreach_channel"]
             | null
           priority: Database["public"]["Enums"]["seller_priority"]
+          profile_image_url: string | null
           public_email: string | null
           public_phone: string | null
           public_whatsapp: string | null
           record_mode: Database["public"]["Enums"]["seller_record_mode"]
           seller_type: string | null
+          social_platform: string | null
           suppression_reason: string | null
           updated_at: string
           verification_status: Database["public"]["Enums"]["seller_verification_status"]
@@ -2418,12 +2688,16 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          acquisition_status?: string
+          address?: string | null
           assigned_admin_id?: string | null
           audience_estimate?: number | null
           bajanmarket_account_status?: string
+          business_description?: string | null
           business_name: string
           business_name_norm?: string | null
           contact_name?: string | null
+          cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
           delivery_available?: boolean | null
@@ -2434,14 +2708,17 @@ export type Database = {
           has_existing_website?: boolean | null
           id?: string
           instagram_url?: string | null
+          last_checked_at?: string | null
           last_contact_at?: string | null
           lead_score?: number | null
           location_note?: string | null
           marketplace_category?: string | null
           next_followup_at?: string | null
           notes?: string | null
+          opening_hours?: Json | null
           opted_out?: boolean
           other_source_url?: string | null
+          outreach_status?: string | null
           parish?: string | null
           pipeline_stage?: Database["public"]["Enums"]["seller_pipeline_stage"]
           posting_frequency?: string | null
@@ -2449,11 +2726,13 @@ export type Database = {
             | Database["public"]["Enums"]["seller_outreach_channel"]
             | null
           priority?: Database["public"]["Enums"]["seller_priority"]
+          profile_image_url?: string | null
           public_email?: string | null
           public_phone?: string | null
           public_whatsapp?: string | null
           record_mode?: Database["public"]["Enums"]["seller_record_mode"]
           seller_type?: string | null
+          social_platform?: string | null
           suppression_reason?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["seller_verification_status"]
@@ -2462,12 +2741,16 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          acquisition_status?: string
+          address?: string | null
           assigned_admin_id?: string | null
           audience_estimate?: number | null
           bajanmarket_account_status?: string
+          business_description?: string | null
           business_name?: string
           business_name_norm?: string | null
           contact_name?: string | null
+          cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
           delivery_available?: boolean | null
@@ -2478,14 +2761,17 @@ export type Database = {
           has_existing_website?: boolean | null
           id?: string
           instagram_url?: string | null
+          last_checked_at?: string | null
           last_contact_at?: string | null
           lead_score?: number | null
           location_note?: string | null
           marketplace_category?: string | null
           next_followup_at?: string | null
           notes?: string | null
+          opening_hours?: Json | null
           opted_out?: boolean
           other_source_url?: string | null
+          outreach_status?: string | null
           parish?: string | null
           pipeline_stage?: Database["public"]["Enums"]["seller_pipeline_stage"]
           posting_frequency?: string | null
@@ -2493,11 +2779,13 @@ export type Database = {
             | Database["public"]["Enums"]["seller_outreach_channel"]
             | null
           priority?: Database["public"]["Enums"]["seller_priority"]
+          profile_image_url?: string | null
           public_email?: string | null
           public_phone?: string | null
           public_whatsapp?: string | null
           record_mode?: Database["public"]["Enums"]["seller_record_mode"]
           seller_type?: string | null
+          social_platform?: string | null
           suppression_reason?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["seller_verification_status"]
@@ -2927,6 +3215,107 @@ export type Database = {
           utm_source?: string | null
         }
         Relationships: []
+      }
+      store_claim_audit: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          detail: Json
+          draft_store_id: string | null
+          event: string
+          id: string
+          prospect_id: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          detail?: Json
+          draft_store_id?: string | null
+          event: string
+          id?: string
+          prospect_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          detail?: Json
+          draft_store_id?: string | null
+          event?: string
+          id?: string
+          prospect_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_claim_audit_draft_store_id_fkey"
+            columns: ["draft_store_id"]
+            isOneToOne: false
+            referencedRelation: "draft_stores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_claim_audit_prospect_id_fkey"
+            columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_claim_tokens: {
+        Row: {
+          claimed_at: string | null
+          claimed_by_user_id: string | null
+          created_at: string
+          created_by: string | null
+          draft_store_id: string
+          expires_at: string | null
+          first_viewed_at: string | null
+          id: string
+          last_viewed_at: string | null
+          revoked_at: string | null
+          token_hash: string
+          token_hint: string | null
+          view_count: number
+        }
+        Insert: {
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          draft_store_id: string
+          expires_at?: string | null
+          first_viewed_at?: string | null
+          id?: string
+          last_viewed_at?: string | null
+          revoked_at?: string | null
+          token_hash: string
+          token_hint?: string | null
+          view_count?: number
+        }
+        Update: {
+          claimed_at?: string | null
+          claimed_by_user_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          draft_store_id?: string
+          expires_at?: string | null
+          first_viewed_at?: string | null
+          id?: string
+          last_viewed_at?: string | null
+          revoked_at?: string | null
+          token_hash?: string
+          token_hint?: string | null
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_claim_tokens_draft_store_id_fkey"
+            columns: ["draft_store_id"]
+            isOneToOne: false
+            referencedRelation: "draft_stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {
