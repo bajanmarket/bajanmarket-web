@@ -9,6 +9,7 @@ import { useIsModerator } from "@/lib/useIsModerator";
 import { formatRelative } from "@/lib/format";
 import { PARISHES } from "@/lib/parishes";
 import { sendCampaign } from "@/lib/campaigns.functions";
+import { listPrivilegedProfiles } from "@/lib/profiles.functions";
 import { Megaphone, Send, Users, Mail, Shield, ChevronRight, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/campaigns")({
@@ -39,6 +40,7 @@ function CampaignsPage() {
   const [bodyText, setBodyText] = useState("");
   const [filters, setFilters] = useState<Filters>({ parish: "", intent: "", days: 30 });
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const fetchProfiles = useServerFn(listPrivilegedProfiles);
 
   const { data: prefs } = useQuery({
     queryKey: ["campaigns_prefs"],
@@ -56,13 +58,7 @@ function CampaignsPage() {
   const { data: profiles } = useQuery({
     queryKey: ["campaigns_profiles"],
     enabled: !!role?.isAdmin,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, display_name, parish, onboarding_intent, last_active_at, banned_at")
-        .limit(5000);
-      return data ?? [];
-    },
+    queryFn: async () => await fetchProfiles({ data: { limit: 5000 } }),
   });
 
   const { data: campaigns } = useQuery({

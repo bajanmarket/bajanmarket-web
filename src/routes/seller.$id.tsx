@@ -60,7 +60,14 @@ function Seller() {
 
   const { data: profile } = useQuery({
     queryKey: ["seller-profile", id],
-    queryFn: async () => (await supabase.from("profiles").select("*").eq("id", id).maybeSingle()).data,
+    queryFn: async () =>
+      (
+        await supabase
+          .from("profiles")
+          .select("id, display_name, avatar_url, bio, parish, created_at, last_active_at, listings_count")
+          .eq("id", id)
+          .maybeSingle()
+      ).data,
   });
 
   const { data: listings } = useQuery({

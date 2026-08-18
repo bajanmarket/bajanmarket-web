@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { listPrivilegedProfiles } from "@/lib/profiles.functions";
 import { Users, Mail, MessageSquare, Phone, Download } from "lucide-react";
 import { PARISHES } from "@/lib/parishes";
 
@@ -15,6 +17,7 @@ export function AudiencePanel() {
   const [intent, setIntent] = useState<string>("");
   const [parish, setParish] = useState<string>("");
   const [channel, setChannel] = useState<"" | "email" | "sms" | "whatsapp">("");
+  const fetchProfiles = useServerFn(listPrivilegedProfiles);
 
   const { data: prefs } = useQuery({
     queryKey: ["audience_prefs"],
@@ -26,13 +29,7 @@ export function AudiencePanel() {
 
   const { data: profiles } = useQuery({
     queryKey: ["audience_profiles"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, display_name, parish, onboarding_intent, onboarding_categories, last_active_at, listings_count, favourites_count, messages_sent_count, first_listing_at")
-        .limit(2000);
-      return data ?? [];
-    },
+    queryFn: async () => await fetchProfiles({ data: { limit: 2000 } }),
   });
 
   const prefsById = useMemo(() => new Map((prefs ?? []).map((p) => [p.user_id, p])), [prefs]);

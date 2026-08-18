@@ -30,7 +30,11 @@ function Profile() {
     queryKey: ["profile", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle();
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url, bio, parish, created_at, last_active_at, listings_count")
+        .eq("id", user!.id)
+        .maybeSingle();
       return data;
     },
   });
