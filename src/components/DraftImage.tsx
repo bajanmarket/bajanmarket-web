@@ -50,7 +50,7 @@ export function DraftImage({
       ) : (
         <div className="w-full h-full grid place-items-center bg-gradient-to-br from-teal-soft to-sand-deep">
           {text ? (
-            <span className="font-semibold text-navy/45 tracking-wide text-[clamp(0.75rem,22cqw,2rem)]">
+            <span className="font-semibold text-navy/45 tracking-wide text-lg">
               {text}
             </span>
           ) : (
