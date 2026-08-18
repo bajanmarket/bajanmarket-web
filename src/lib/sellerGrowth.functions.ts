@@ -486,7 +486,7 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
         prospect_id: p.id,
         draft_id: draft.id,
         approval_request_id: req.id,
-        channel: draft.channel,
+        channel: sendChannel as never,
         sequence_step: draft.sequence_step,
         recipient: recipient ?? null,
         subject: draft.subject,
@@ -504,7 +504,7 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
     let delivery: { ok: boolean; providerId?: string; error?: string } | null = null;
     if (!guard.simulated) {
       const d = await deliverOutreach({
-        channel: draft.channel,
+        channel: sendChannel as never,
         recipient: String(recipient),
         subject: draft.subject,
         body: draft.body,
@@ -526,7 +526,7 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
       message_id: msg.id,
       prospect_id: p.id,
       event_type: guard.simulated ? "simulated_send" : delivery?.ok ? "sent" : "failed",
-      channel: draft.channel,
+      channel: sendChannel as never,
       detail: { guard_notes: guard.reasons, error: delivery?.error ?? null } as never,
     });
     if (delivery && !delivery.ok) {
@@ -553,7 +553,7 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
       prospect_id: p.id,
       playbook_id: draft.playbook_id,
       sequence_step: draft.sequence_step === "initial" ? "followup_1" : "followup_final",
-      channel: draft.channel,
+      channel: sendChannel as never,
       due_at: new Date(Date.now() + (pb?.followup_interval_days ?? 4) * 86400000).toISOString(),
       created_by: context.userId,
     });
