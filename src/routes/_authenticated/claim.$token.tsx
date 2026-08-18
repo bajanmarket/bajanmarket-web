@@ -4,8 +4,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Check, Store, ShieldCheck, Loader2, X } from "lucide-react";
-import {
 import { DraftImage } from "@/components/DraftImage";
+import {
   approveSocialFeed,
   getClaimWorkspace,
   startClaim,
