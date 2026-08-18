@@ -7,7 +7,11 @@ import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { track } from "@/lib/analytics";
 
-const searchSchema = z.object({ redirect: z.string().optional() });
+const searchSchema = z.object({
+  redirect: z.string().optional(),
+  claim: z.string().optional(),
+  biz: z.string().optional(),
+});
 
 export const Route = createFileRoute("/auth")({
   validateSearch: searchSchema,
@@ -26,8 +30,8 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const nav = useNavigate();
-  const { redirect } = Route.useSearch();
-  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
+  const { redirect, claim, biz } = Route.useSearch();
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">(claim ? "signup" : "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -43,7 +47,8 @@ function AuthPage() {
   };
   const passwordValid = passwordChecks.length && passwordChecks.letter && passwordChecks.number;
 
-  const safeRedirect = redirect && redirect.startsWith("/") ? redirect : "/";
+  const safeRedirect =
+    redirect && redirect.startsWith("/") ? redirect : claim ? `/claim/${claim}` : "/";
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -126,7 +131,13 @@ function AuthPage() {
             Bajan<span className="text-teal">.market</span>
           </Link>
           <h1 className="text-navy/60 text-sm mt-2 font-normal">
-            {mode === "signup" ? "Create your BajanMarket account" : mode === "forgot" ? "Reset your password" : "Welcome back to BajanMarket"}
+            {claim && mode !== "forgot"
+              ? `Create your BajanMarket account to claim ${biz ?? "your storefront"}`
+              : mode === "signup"
+                ? "Create your BajanMarket account"
+                : mode === "forgot"
+                  ? "Reset your password"
+                  : "Welcome back to BajanMarket"}
           </h1>
         </div>
 

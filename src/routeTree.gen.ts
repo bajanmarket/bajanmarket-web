@@ -24,6 +24,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesIdRouteImport } from './routes/services.$id'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
+import { Route as PreviewStoreTokenRouteImport } from './routes/preview-store.$token'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
@@ -44,6 +45,7 @@ import { Route as AuthenticatedMessagesIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as CategorySlugParishRouteImport } from './routes/category.$slug.$parish'
 import { Route as AuthenticatedMessagesIdRouteImport } from './routes/_authenticated/messages.$id'
+import { Route as AuthenticatedClaimTokenRouteImport } from './routes/_authenticated/claim.$token'
 import { Route as AuthenticatedAdminSellerGrowthRouteImport } from './routes/_authenticated/admin.seller-growth'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -122,6 +124,11 @@ const ServicesIdRoute = ServicesIdRouteImport.update({
 const SellerIdRoute = SellerIdRouteImport.update({
   id: '/seller/$id',
   path: '/seller/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewStoreTokenRoute = PreviewStoreTokenRouteImport.update({
+  id: '/preview-store/$token',
+  path: '/preview-store/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingIdRoute = ListingIdRouteImport.update({
@@ -229,6 +236,11 @@ const AuthenticatedMessagesIdRoute = AuthenticatedMessagesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedMessagesRoute,
 } as any)
+const AuthenticatedClaimTokenRoute = AuthenticatedClaimTokenRouteImport.update({
+  id: '/claim/$token',
+  path: '/claim/$token',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminSellerGrowthRoute =
   AuthenticatedAdminSellerGrowthRouteImport.update({
     id: '/seller-growth',
@@ -287,12 +299,14 @@ export interface FileRoutesByFullPath {
   '/business/$slug': typeof BusinessSlugRoute
   '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
+  '/preview-store/$token': typeof PreviewStoreTokenRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
   '/services/': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
+  '/claim/$token': typeof AuthenticatedClaimTokenRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -326,12 +340,14 @@ export interface FileRoutesByTo {
   '/business/$slug': typeof BusinessSlugRoute
   '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
+  '/preview-store/$token': typeof PreviewStoreTokenRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
   '/services': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
+  '/claim/$token': typeof AuthenticatedClaimTokenRoute
   '/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -369,12 +385,14 @@ export interface FileRoutesById {
   '/business/$slug': typeof BusinessSlugRoute
   '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
+  '/preview-store/$token': typeof PreviewStoreTokenRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
   '/services/': typeof ServicesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/admin/seller-growth': typeof AuthenticatedAdminSellerGrowthRoute
+  '/_authenticated/claim/$token': typeof AuthenticatedClaimTokenRoute
   '/_authenticated/messages/$id': typeof AuthenticatedMessagesIdRoute
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -412,12 +430,14 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/category/$slug'
     | '/listing/$id'
+    | '/preview-store/$token'
     | '/seller/$id'
     | '/services/$id'
     | '/services/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/seller-growth'
+    | '/claim/$token'
     | '/messages/$id'
     | '/category/$slug/$parish'
     | '/admin/'
@@ -451,12 +471,14 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/category/$slug'
     | '/listing/$id'
+    | '/preview-store/$token'
     | '/seller/$id'
     | '/services/$id'
     | '/services'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/seller-growth'
+    | '/claim/$token'
     | '/messages/$id'
     | '/category/$slug/$parish'
     | '/admin'
@@ -493,12 +515,14 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/category/$slug'
     | '/listing/$id'
+    | '/preview-store/$token'
     | '/seller/$id'
     | '/services/$id'
     | '/services/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/admin/seller-growth'
+    | '/_authenticated/claim/$token'
     | '/_authenticated/messages/$id'
     | '/category/$slug/$parish'
     | '/_authenticated/admin/'
@@ -525,6 +549,7 @@ export interface RootRouteChildren {
   BusinessSlugRoute: typeof BusinessSlugRoute
   CategorySlugRoute: typeof CategorySlugRouteWithChildren
   ListingIdRoute: typeof ListingIdRoute
+  PreviewStoreTokenRoute: typeof PreviewStoreTokenRoute
   SellerIdRoute: typeof SellerIdRoute
   ServicesIdRoute: typeof ServicesIdRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
@@ -639,6 +664,13 @@ declare module '@tanstack/react-router' {
       path: '/seller/$id'
       fullPath: '/seller/$id'
       preLoaderRoute: typeof SellerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview-store/$token': {
+      id: '/preview-store/$token'
+      path: '/preview-store/$token'
+      fullPath: '/preview-store/$token'
+      preLoaderRoute: typeof PreviewStoreTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listing/$id': {
@@ -781,6 +813,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesIdRouteImport
       parentRoute: typeof AuthenticatedMessagesRoute
     }
+    '/_authenticated/claim/$token': {
+      id: '/_authenticated/claim/$token'
+      path: '/claim/$token'
+      fullPath: '/claim/$token'
+      preLoaderRoute: typeof AuthenticatedClaimTokenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/seller-growth': {
       id: '/_authenticated/admin/seller-growth'
       path: '/seller-growth'
@@ -859,6 +898,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPostRoute: typeof AuthenticatedPostRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProviderServicesRoute: typeof AuthenticatedProviderServicesRoute
+  AuthenticatedClaimTokenRoute: typeof AuthenticatedClaimTokenRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -873,6 +913,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPostRoute: AuthenticatedPostRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProviderServicesRoute: AuthenticatedProviderServicesRoute,
+  AuthenticatedClaimTokenRoute: AuthenticatedClaimTokenRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -909,6 +950,7 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessSlugRoute: BusinessSlugRoute,
   CategorySlugRoute: CategorySlugRouteWithChildren,
   ListingIdRoute: ListingIdRoute,
+  PreviewStoreTokenRoute: PreviewStoreTokenRoute,
   SellerIdRoute: SellerIdRoute,
   ServicesIdRoute: ServicesIdRoute,
   ServicesIndexRoute: ServicesIndexRoute,
