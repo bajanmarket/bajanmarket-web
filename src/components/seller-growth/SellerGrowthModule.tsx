@@ -619,7 +619,7 @@ function ApprovalsTab() {
                       if (res.sent && !res.simulated) toast.success("Sent for real");
                       else if (res.sent)
                         toast.warning("Recorded as a simulated send", {
-                          description: res.reasons.find((x) => x.includes("Controls")) ?? "Enable live sending in Controls",
+                          description: res.reasons.find((x: string) => x.includes("Controls")) ?? "Enable live sending in Controls",
                         });
                       else toast.error(res.reasons.join(" · "));
                       refresh();
