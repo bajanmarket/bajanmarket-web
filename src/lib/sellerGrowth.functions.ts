@@ -456,7 +456,12 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
         }
       }
     }
+
+    const guard = await evaluateSendGuards(db, p, sendChannel as never);
+    if (!guard.allowed) return { sent: false, simulated: guard.simulated, reasons: guard.reasons };
+
     if (!guard.simulated) {
+
       if (!recipient)
         return { sent: false, simulated: false, reasons: ["This prospect has no email or WhatsApp contact on record"] };
       // Autonomous mode: the admin approval on this request IS the gate.
