@@ -29,11 +29,12 @@ import {
   createOnboardingSession,
   approveOnboardingItem,
 } from "@/lib/sellerGrowth.functions";
+import { AcquisitionTab } from "@/components/seller-growth/AcquisitionTab";
 import {
-  Gauge, Users, Radar, ShieldCheck, BookOpen, Inbox, Rocket, Settings2, Loader2, Plus, Ban,
+  Gauge, Users, Radar, ShieldCheck, BookOpen, Inbox, Rocket, Settings2, Loader2, Plus, Ban, Store,
 } from "lucide-react";
 
-type Tab = "dashboard" | "prospects" | "scanner" | "approvals" | "playbooks" | "onboarding" | "settings";
+type Tab = "dashboard" | "prospects" | "scanner" | "acquisition" | "approvals" | "playbooks" | "onboarding" | "settings";
 
 const card = "bg-white rounded-2xl ring-1 ring-hairline p-4";
 const btn = "text-xs font-medium px-3 py-1.5 rounded-lg bg-navy text-white disabled:opacity-40";
@@ -55,6 +56,7 @@ export function SellerGrowthModule() {
     ["dashboard", "Dashboard", Gauge],
     ["prospects", "Prospects", Users],
     ["scanner", "Opportunity Scanner", Radar],
+    ["acquisition", "Draft Storefronts", Store],
     ["approvals", "Approval Center", ShieldCheck],
     ["playbooks", "Playbooks & Scoring", BookOpen],
     ["onboarding", "Onboarding", Rocket],
@@ -92,6 +94,7 @@ export function SellerGrowthModule() {
       {tab === "dashboard" && <DashboardTab />}
       {tab === "prospects" && <ProspectsTab />}
       {tab === "scanner" && <ScannerTab />}
+      {tab === "acquisition" && <AcquisitionTab />}
       {tab === "approvals" && <ApprovalsTab />}
       {tab === "playbooks" && <PlaybooksTab />}
       {tab === "onboarding" && <OnboardingTab />}
