@@ -24,6 +24,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesIdRouteImport } from './routes/services.$id'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
+import { Route as PreviewStoreTokenRouteImport } from './routes/preview-store.$token'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
@@ -122,6 +123,11 @@ const ServicesIdRoute = ServicesIdRouteImport.update({
 const SellerIdRoute = SellerIdRouteImport.update({
   id: '/seller/$id',
   path: '/seller/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewStoreTokenRoute = PreviewStoreTokenRouteImport.update({
+  id: '/preview-store/$token',
+  path: '/preview-store/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingIdRoute = ListingIdRouteImport.update({
@@ -287,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/business/$slug': typeof BusinessSlugRoute
   '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
+  '/preview-store/$token': typeof PreviewStoreTokenRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
   '/services/': typeof ServicesIndexRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/business/$slug': typeof BusinessSlugRoute
   '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
+  '/preview-store/$token': typeof PreviewStoreTokenRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
   '/services': typeof ServicesIndexRoute
@@ -369,6 +377,7 @@ export interface FileRoutesById {
   '/business/$slug': typeof BusinessSlugRoute
   '/category/$slug': typeof CategorySlugRouteWithChildren
   '/listing/$id': typeof ListingIdRoute
+  '/preview-store/$token': typeof PreviewStoreTokenRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/$id': typeof ServicesIdRoute
   '/services/': typeof ServicesIndexRoute
@@ -412,6 +421,7 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/category/$slug'
     | '/listing/$id'
+    | '/preview-store/$token'
     | '/seller/$id'
     | '/services/$id'
     | '/services/'
@@ -451,6 +461,7 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/category/$slug'
     | '/listing/$id'
+    | '/preview-store/$token'
     | '/seller/$id'
     | '/services/$id'
     | '/services'
@@ -493,6 +504,7 @@ export interface FileRouteTypes {
     | '/business/$slug'
     | '/category/$slug'
     | '/listing/$id'
+    | '/preview-store/$token'
     | '/seller/$id'
     | '/services/$id'
     | '/services/'
@@ -525,6 +537,7 @@ export interface RootRouteChildren {
   BusinessSlugRoute: typeof BusinessSlugRoute
   CategorySlugRoute: typeof CategorySlugRouteWithChildren
   ListingIdRoute: typeof ListingIdRoute
+  PreviewStoreTokenRoute: typeof PreviewStoreTokenRoute
   SellerIdRoute: typeof SellerIdRoute
   ServicesIdRoute: typeof ServicesIdRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
@@ -639,6 +652,13 @@ declare module '@tanstack/react-router' {
       path: '/seller/$id'
       fullPath: '/seller/$id'
       preLoaderRoute: typeof SellerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview-store/$token': {
+      id: '/preview-store/$token'
+      path: '/preview-store/$token'
+      fullPath: '/preview-store/$token'
+      preLoaderRoute: typeof PreviewStoreTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listing/$id': {
@@ -909,6 +929,7 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessSlugRoute: BusinessSlugRoute,
   CategorySlugRoute: CategorySlugRouteWithChildren,
   ListingIdRoute: ListingIdRoute,
+  PreviewStoreTokenRoute: PreviewStoreTokenRoute,
   SellerIdRoute: SellerIdRoute,
   ServicesIdRoute: ServicesIdRoute,
   ServicesIndexRoute: ServicesIndexRoute,
