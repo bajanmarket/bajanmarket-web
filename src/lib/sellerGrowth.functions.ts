@@ -442,11 +442,25 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
     if (!guard.allowed) return { sent: false, simulated: guard.simulated, reasons: guard.reasons };
 
     const settings = await getSettings(db);
-    const recipient =
-      draft.channel === "email" ? p.public_email : draft.channel === "whatsapp" ? p.public_whatsapp : p.facebook_url ?? p.instagram_url;
+    const contactFor = (ch: string) =>
+      ch === "email" ? p.public_email : ch === "whatsapp" ? p.public_whatsapp : ch === "facebook" ? p.facebook_url : ch === "instagram" ? p.instagram_url : null;
+    // Fall back to any deliverable contact the prospect actually has, so an
+    // approved draft on a channel with no handle still reaches them.
+    let sendChannel = draft.channel as string;
+    let recipient = contactFor(sendChannel);
+    if (!recipient) {
+      for (const ch of ["email", "whatsapp"]) {
+        const c = contactFor(ch);
+        if (c) {
+          sendChannel = ch;
+          recipient = c;
+          break;
+        }
+      }
+    }
     if (!guard.simulated) {
       if (!recipient)
-        return { sent: false, simulated: false, reasons: ["This prospect has no contact address for that channel"] };
+        return { sent: false, simulated: false, reasons: ["This prospect has no email or WhatsApp contact on record"] };
       // Autonomous mode: the admin approval on this request IS the gate.
       if (settings.allowlist_required) {
         const allow = settings.test_recipients.map((t) => t.toLowerCase());
@@ -454,6 +468,7 @@ export const sendApprovedOutreach = createServerFn({ method: "POST" })
           return { sent: false, simulated: false, reasons: ["Recipient is not on the test-recipient allowlist"] };
       }
     }
+
 
 
     const idem = `${draft.id}:${draft.sequence_step}:${guard.simulated ? "sim" : "live"}`;
