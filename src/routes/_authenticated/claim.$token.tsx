@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Check, Store, ShieldCheck, Loader2, X } from "lucide-react";
+import { DraftImage } from "@/components/DraftImage";
 import {
   approveSocialFeed,
   getClaimWorkspace,
@@ -295,9 +296,11 @@ function ItemRow({
             </>
           )}
         </div>
-        {item.image_url && (
-          <img src={item.image_url} alt="" loading="lazy" className="size-14 rounded-xl object-cover shrink-0" />
-        )}
+        <DraftImage
+          src={item.image_url}
+          label={item.title}
+          className="size-14 rounded-xl shrink-0"
+        />
       </div>
     </div>
   );
