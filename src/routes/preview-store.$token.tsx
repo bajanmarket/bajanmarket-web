@@ -5,6 +5,7 @@ import { Store, MapPin, Globe, Phone, MessageCircle, Mail, Clock, ShieldCheck, S
 import { getStorePreview } from "@/lib/draftStore.functions";
 import { parishLabel } from "@/lib/parishes";
 import { formatBBD } from "@/lib/format";
+import { DraftImage } from "@/components/DraftImage";
 
 export const Route = createFileRoute("/preview-store/$token")({
   head: () => ({

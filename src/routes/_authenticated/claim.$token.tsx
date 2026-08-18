@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Check, Store, ShieldCheck, Loader2, X } from "lucide-react";
 import {
+import { DraftImage } from "@/components/DraftImage";
   approveSocialFeed,
   getClaimWorkspace,
   startClaim,
