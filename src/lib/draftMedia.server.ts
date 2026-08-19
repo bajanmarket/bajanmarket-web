@@ -27,6 +27,9 @@ export type DiscoveredMedia = {
   posts: DiscoveredPost[];
   pagesRead: number;
   pagesFailed: number;
+  /** URLs Firecrawl found by name when the prospect had none on file. */
+  discoveredUrls: string[];
+
 };
 
 const UA =
@@ -359,7 +362,7 @@ export async function discoverProspectMedia(
 
 
 
-  return { profile_image_url: profile, cover_image_url: cover, posts, pagesRead, pagesFailed };
+  return { profile_image_url: profile, cover_image_url: cover, posts, pagesRead, pagesFailed, discoveredUrls };
 }
 
 /* ---------------- media ingestion (permanent BajanMarket copy) ---------------- */
