@@ -318,3 +318,33 @@ export async function signMedia(db: Db, paths: (string | null | undefined)[], se
   }
   return map;
 }
+
+/**
+ * Moves an imported draft image into the merchant's own listings storage when the
+ * storefront is published, so the real photo survives the claim.
+ * Returns a long-lived signed URL, or null when the copy is not possible.
+ */
+export async function publishStoredMedia(db: Db, path: string, userId: string): Promise<string | null> {
+  try {
+    const { data: file, error } = await db.storage.from(DRAFT_MEDIA_BUCKET).download(path);
+    if (error || !file) return null;
+    const ext = path.split(".").pop() ?? "jpg";
+    const target = `${userId}/${crypto.randomUUID()}.${ext}`;
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const { error: upErr } = await db.storage.from("listings").upload(target, bytes, {
+      contentType: file.type || "image/jpeg",
+      cacheControl: "31536000",
+      upsert: false,
+    });
+    if (upErr) return null;
+    const { data: signed } = await db.storage.from("listings").createSignedUrl(target, 60 * 60 * 24 * 365 * 10);
+    return signed?.signedUrl ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** True when a stored value is a draft-media storage path rather than an external URL. */
+export function isStoredPath(value?: string | null): value is string {
+  return Boolean(value && !/^https?:\/\//i.test(value) && !value.startsWith("/"));
+}
