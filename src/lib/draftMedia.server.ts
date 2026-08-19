@@ -27,6 +27,9 @@ export type DiscoveredMedia = {
   posts: DiscoveredPost[];
   pagesRead: number;
   pagesFailed: number;
+  /** URLs Firecrawl found by name when the prospect had none on file. */
+  discoveredUrls: string[];
+
 };
 
 const UA =
@@ -98,6 +101,97 @@ async function fetchText(url: string, ms = 9000): Promise<string | null> {
     return null;
   }
 }
+
+/* ---------------- Firecrawl (renders JS pages / gets past bot walls) ---------------- */
+
+const FIRECRAWL_GATEWAY = "https://connector-gateway.lovable.dev/firecrawl/v2";
+
+function firecrawlKeys() {
+  const lovable = process.env['LOVABLE_API_KEY'];
+  const connection = process.env['FIRECRAWL_API_KEY'];
+  return lovable && connection ? { lovable, connection } : null;
+}
+
+async function firecrawlCall<T>(path: string, body: unknown, ms = 45000): Promise<T | null> {
+  const keys = firecrawlKeys();
+  if (!keys) return null;
+  try {
+    const res = await fetch(`${FIRECRAWL_GATEWAY}${path}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${keys.lovable}`,
+        "X-Connection-Api-Key": keys.connection,
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(ms),
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      console.error(`Firecrawl ${path} failed [${res.status}]: ${text.slice(0, 500)}`);
+      return null;
+    }
+    return JSON.parse(text) as T;
+  } catch (err) {
+    console.error(`Firecrawl ${path} error:`, err);
+    return null;
+  }
+}
+
+type ScrapeResult = {
+  rawHtml?: string;
+  html?: string;
+  data?: { rawHtml?: string; html?: string };
+};
+
+/** Renders the page with Firecrawl and returns its HTML, or null when unavailable. */
+async function firecrawlHtml(url: string): Promise<string | null> {
+  const out = await firecrawlCall<ScrapeResult>("/scrape", {
+    url,
+    formats: ["rawHtml"],
+    onlyMainContent: false,
+    waitFor: 2500,
+  });
+  const html = out?.rawHtml ?? out?.html ?? out?.data?.rawHtml ?? out?.data?.html ?? null;
+  return html ? html.slice(0, 1_500_000) : null;
+}
+
+const SOCIAL_HOSTS = /(facebook|instagram|tiktok|linkedin)\.com$/i;
+const BAD_HOSTS =
+  /(google|bing|yelp|tripadvisor|yellowpages|wikipedia|linktr|pinterest|youtube|x|twitter|threads|maps|amazon|ebay|indeed|glassdoor|bajanmarket)\./i;
+
+/** Finds the lead's own website / social pages by name when nothing is on file. */
+async function firecrawlFindUrls(businessName: string, parish?: string | null): Promise<string[]> {
+  const query = [businessName, parish?.replace(/_/g, " "), "Barbados official website or Facebook page"]
+    .filter(Boolean)
+    .join(" ");
+  type Hit = { url?: string };
+  const out = await firecrawlCall<{ data?: Hit[] | { web?: Hit[] }; results?: Hit[] }>(
+    "/search",
+    { query, limit: 8, country: "bb", lang: "en" },
+    30000,
+  );
+  const d = out?.data;
+  const rows: Hit[] = Array.isArray(d) ? d : (d?.web ?? out?.results ?? []);
+
+  const picked: string[] = [];
+  for (const row of rows) {
+    const raw = row?.url;
+    if (!raw || !/^https?:\/\//i.test(raw)) continue;
+    let host: string;
+    try {
+      host = new URL(raw).hostname.replace(/^www\./, "");
+    } catch {
+      continue;
+    }
+    if (BAD_HOSTS.test(host) && !SOCIAL_HOSTS.test(host)) continue;
+    if (picked.some((u) => new URL(u).hostname.replace(/^www\./, "") === host)) continue;
+    picked.push(raw);
+    if (picked.length >= 3) break;
+  }
+  return picked;
+}
+
 
 function firstImage(v: unknown, base: string): string | null {
   if (typeof v === "string") return absolutize(v, base);
@@ -224,6 +318,8 @@ function extractPage(html: string, pageUrl: string) {
 /** Reads the lead's own public pages and returns only what is genuinely published there. */
 export async function discoverProspectMedia(
   p: {
+    business_name?: string | null;
+    parish?: string | null;
     website_url?: string | null;
     facebook_url?: string | null;
     instagram_url?: string | null;
@@ -233,9 +329,15 @@ export async function discoverProspectMedia(
   },
   maxPosts = 12,
 ): Promise<DiscoveredMedia> {
-  const urls = [p.website_url, p.facebook_url, p.instagram_url, p.other_source_url]
+  let urls = [p.website_url, p.facebook_url, p.instagram_url, p.other_source_url]
     .filter((u): u is string => Boolean(u && /^https?:\/\//i.test(u)))
     .slice(0, 4);
+
+  // Nothing on file: let Firecrawl find the lead's own public pages by name.
+  const discoveredUrls = !urls.length && p.business_name
+    ? await firecrawlFindUrls(p.business_name, p.parish ?? null)
+    : [];
+  if (discoveredUrls.length) urls = discoveredUrls;
 
   let profile = p.profile_image_url ?? null;
   let cover = p.cover_image_url ?? null;
@@ -244,7 +346,8 @@ export async function discoverProspectMedia(
   let pagesFailed = 0;
 
   for (const url of urls) {
-    const html = await fetchText(url);
+    // Firecrawl first (renders JS and gets past social bot walls), plain fetch as fallback.
+    const html = (await firecrawlHtml(url)) ?? (await fetchText(url));
     if (!html) {
       pagesFailed += 1;
       continue;
@@ -260,7 +363,9 @@ export async function discoverProspectMedia(
     }
   }
 
-  return { profile_image_url: profile, cover_image_url: cover, posts, pagesRead, pagesFailed };
+
+
+  return { profile_image_url: profile, cover_image_url: cover, posts, pagesRead, pagesFailed, discoveredUrls };
 }
 
 /* ---------------- media ingestion (permanent BajanMarket copy) ---------------- */

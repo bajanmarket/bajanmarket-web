@@ -62,7 +62,28 @@ export const generateDraftStore = createServerFn({ method: "POST" })
     // 1. Read the lead's own public pages first — real content beats anything drafted.
     const { discoverProspectMedia, ingestMedia } = await import("@/lib/draftMedia.server");
     const discovered = await discoverProspectMedia(p);
+
+    // Keep any pages Firecrawl found by name on the lead record for future runs.
+    if (discovered.discoveredUrls.length) {
+      const patch: { website_url?: string; facebook_url?: string; instagram_url?: string } = {};
+      for (const url of discovered.discoveredUrls) {
+        const host = (() => {
+          try {
+            return new URL(url).hostname.toLowerCase();
+          } catch {
+            return "";
+          }
+        })();
+        if (host.includes("facebook.com")) patch.facebook_url ??= url;
+        else if (host.includes("instagram.com")) patch.instagram_url ??= url;
+        else patch.website_url ??= url;
+      }
+      if (Object.keys(patch).length) await db.from("seller_prospects").update(patch).eq("id", p.id);
+    }
+
+
     const structured = discovered.posts.length ? await structureDiscoveredPosts(p, discovered.posts) : [];
+
 
     // 2. Only ask AI for storefront copy; items come from real posts when we found any.
     const drafted = await draftStorefrontContent(p);
