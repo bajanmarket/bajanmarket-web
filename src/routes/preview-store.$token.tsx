@@ -5,7 +5,7 @@ import { Store, MapPin, Globe, Phone, MessageCircle, Mail, Clock, ShieldCheck, S
 import { getStorePreview } from "@/lib/draftStore.functions";
 import { parishLabel } from "@/lib/parishes";
 import { formatBBD } from "@/lib/format";
-import { DraftImage } from "@/components/DraftImage";
+import { DraftImage, draftFallbackImage } from "@/components/DraftImage";
 
 export const Route = createFileRoute("/preview-store/$token")({
   head: () => ({
@@ -91,6 +91,7 @@ function PreviewStorePage() {
         <section className="bg-white rounded-3xl ring-1 ring-hairline overflow-hidden">
           <DraftImage
             src={store.cover_url}
+            fallbackSrc={draftFallbackImage(store.category, store.business_name)}
             label={store.business_name}
             loading="eager"
             className="w-full aspect-[3/1]"
@@ -141,7 +142,12 @@ function PreviewStorePage() {
             <div className="grid grid-cols-2 gap-3">
               {products.map((p) => (
                 <article key={p.id} className="bg-white rounded-2xl ring-1 ring-hairline overflow-hidden">
-                  <DraftImage src={p.image_url} label={p.title} className="aspect-square" />
+                   <DraftImage
+                     src={p.image_url}
+                     fallbackSrc={draftFallbackImage(p.category ?? store.category, p.title)}
+                     label={p.title}
+                     className="aspect-square"
+                   />
                   <div className="p-3">
                     <p className="text-sm font-medium leading-snug line-clamp-2">{p.title}</p>
                     <p className="text-sm mt-1 text-navy/70">
