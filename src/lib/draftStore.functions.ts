@@ -442,11 +442,23 @@ export const getClaimWorkspace = createServerFn({ method: "POST" })
     if (store.claimed_by_user_id && store.claimed_by_user_id !== context.userId)
       return { ok: false as const, error: "This storefront has already been claimed by another account." };
 
-    const { data: items } = await db
+    const { data: rawItems } = await db
       .from("draft_listings")
       .select("*")
       .eq("draft_store_id", store.id)
       .order("created_at");
+
+    const { signMedia, isStoredPath } = await import("@/lib/draftMedia.server");
+    const signed = await signMedia(db, [
+      ...(rawItems ?? []).map((i) => i.stored_media_url),
+      isStoredPath(store.logo_url) ? store.logo_url : null,
+      isStoredPath(store.cover_url) ? store.cover_url : null,
+    ]);
+    const resolve = (v?: string | null) => (isStoredPath(v) ? (signed.get(v) ?? null) : (v ?? null));
+    const items = (rawItems ?? []).map((i) => ({
+      ...i,
+      image_url: resolve(i.stored_media_url) ?? i.image_url ?? null,
+    }));
 
     return {
       ok: true as const,
@@ -457,8 +469,8 @@ export const getClaimWorkspace = createServerFn({ method: "POST" })
         tagline: store.tagline,
         description: store.description,
         category: store.category,
-        logo_url: store.logo_url,
-        cover_url: store.cover_url,
+        logo_url: resolve(store.logo_url),
+        cover_url: resolve(store.cover_url),
         parish: store.parish,
         address: store.address,
         contact_email: store.contact_email,
