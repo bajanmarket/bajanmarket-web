@@ -252,8 +252,28 @@ export const listDraftStores = createServerFn({ method: "POST" })
       .limit(300);
     const ids = (stores ?? []).map((s) => s.id);
     const { data: items } = ids.length
-      ? await db.from("draft_listings").select("id, draft_store_id, title, price, status").in("draft_store_id", ids)
-      : { data: [] as { id: string; draft_store_id: string; title: string; price: number | null; status: string }[] };
+      ? await db
+          .from("draft_listings")
+          .select(
+            "id, draft_store_id, title, price, status, image_url, stored_media_url, image_source, source_url, source_platform, source_posted_at, social_post_id",
+          )
+          .in("draft_store_id", ids)
+      : {
+          data: [] as {
+            id: string;
+            draft_store_id: string;
+            title: string;
+            price: number | null;
+            status: string;
+            image_url: string | null;
+            stored_media_url: string | null;
+            image_source: string;
+            source_url: string | null;
+            source_platform: string | null;
+            source_posted_at: string | null;
+            social_post_id: string | null;
+          }[],
+        };
     const { data: tokens } = ids.length
       ? await db
           .from("store_claim_tokens")
