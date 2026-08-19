@@ -10,6 +10,7 @@ import {
   listDraftStores,
   revokeClaimLinks,
 } from "@/lib/draftStore.functions";
+import { WebContentPanel } from "@/components/seller-growth/WebContentPanel";
 
 const card = "bg-white rounded-2xl ring-1 ring-hairline p-4";
 const btn = "text-xs font-medium px-3 py-1.5 rounded-lg bg-navy text-white disabled:opacity-40";
