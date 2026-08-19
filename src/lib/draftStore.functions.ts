@@ -340,12 +340,29 @@ export const getStorePreview = createServerFn({ method: "POST" })
     if (!found.ok) return { ok: false as const, error: found.reason };
     const { store, token } = found;
 
-    const { data: items } = await db
+    const { data: rawItems } = await db
       .from("draft_listings")
-      .select("id, title, description, price, currency, category, image_url, content_type, source_url, source_platform, status")
+      .select(
+        "id, title, description, price, currency, category, image_url, stored_media_url, image_source, original_caption, content_type, source_url, source_posted_at, source_platform, status",
+      )
       .eq("draft_store_id", store.id)
       .neq("status", "rejected")
       .order("created_at");
+
+    // Real content first: our stored copy, then the live source image, then nothing.
+    const { signMedia, isStoredPath } = await import("@/lib/draftMedia.server");
+    const signed = await signMedia(db, [
+      ...(rawItems ?? []).map((i) => i.stored_media_url),
+      isStoredPath(store.logo_url) ? store.logo_url : null,
+      isStoredPath(store.cover_url) ? store.cover_url : null,
+    ]);
+    const resolve = (v?: string | null) => (isStoredPath(v) ? (signed.get(v) ?? null) : (v ?? null));
+
+    const items = (rawItems ?? []).map(({ stored_media_url, ...i }) => ({
+      ...i,
+      image_url: resolve(stored_media_url) ?? i.image_url ?? null,
+      imported: Boolean(i.source_url && (stored_media_url || i.image_url)),
+    }));
 
     const now = new Date().toISOString();
     await db
