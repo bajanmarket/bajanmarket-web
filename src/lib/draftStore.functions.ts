@@ -227,8 +227,15 @@ export const generateDraftStore = createServerFn({ method: "POST" })
       ok: true as const,
       draftStoreId: storeId!,
       regenerated: Boolean(existing),
-      items: drafted.items.length,
-      note: drafted.note ?? null,
+      items: importedFromPosts || drafted.items.length,
+      importedFromPosts,
+      pagesRead: discovered.pagesRead,
+      note:
+        importedFromPosts === 0
+          ? discovered.pagesFailed > 0
+            ? "No public pages could be read — listings have no images until the merchant adds them."
+            : (drafted.note ?? "No public posts found — listings have no images yet.")
+          : (drafted.note ?? null),
     };
   });
 
