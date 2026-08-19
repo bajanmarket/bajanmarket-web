@@ -10,6 +10,7 @@ import {
   listDraftStores,
   revokeClaimLinks,
 } from "@/lib/draftStore.functions";
+import { WebContentPanel } from "@/components/seller-growth/WebContentPanel";
 
 const card = "bg-white rounded-2xl ring-1 ring-hairline p-4";
 const btn = "text-xs font-medium px-3 py-1.5 rounded-lg bg-navy text-white disabled:opacity-40";
@@ -58,6 +59,10 @@ export function AcquisitionTab() {
           them a claim link. Nothing is public until the owner claims and publishes it.
         </p>
       </div>
+
+      <WebContentPanel />
+
+
 
       <div className={card}>
         <h4 className="text-xs font-semibold uppercase tracking-wider text-navy/50 mb-3">Leads without a draft store</h4>

@@ -766,6 +766,93 @@ export type Database = {
           },
         ]
       }
+      discovered_content: {
+        Row: {
+          cleaned_text: string | null
+          content_type: string
+          created_at: string
+          currency: string
+          detected_price: number | null
+          extraction_confidence: string
+          extraction_status: string
+          id: string
+          image_hash: string | null
+          included: boolean
+          lead_id: string
+          merchant_approval_status: string
+          original_image_url: string | null
+          original_text: string | null
+          source_date: string | null
+          source_id: string | null
+          source_platform: string | null
+          source_url: string | null
+          stored_image_url: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          cleaned_text?: string | null
+          content_type?: string
+          created_at?: string
+          currency?: string
+          detected_price?: number | null
+          extraction_confidence?: string
+          extraction_status?: string
+          id?: string
+          image_hash?: string | null
+          included?: boolean
+          lead_id: string
+          merchant_approval_status?: string
+          original_image_url?: string | null
+          original_text?: string | null
+          source_date?: string | null
+          source_id?: string | null
+          source_platform?: string | null
+          source_url?: string | null
+          stored_image_url?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cleaned_text?: string | null
+          content_type?: string
+          created_at?: string
+          currency?: string
+          detected_price?: number | null
+          extraction_confidence?: string
+          extraction_status?: string
+          id?: string
+          image_hash?: string | null
+          included?: boolean
+          lead_id?: string
+          merchant_approval_status?: string
+          original_image_url?: string | null
+          original_text?: string | null
+          source_date?: string | null
+          source_id?: string | null
+          source_platform?: string | null
+          source_url?: string | null
+          stored_image_url?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discovered_content_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discovered_content_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "lead_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       draft_listings: {
         Row: {
           category: string | null
@@ -1149,6 +1236,65 @@ export type Database = {
           {
             foreignKeyName: "lead_social_posts_prospect_id_fkey"
             columns: ["prospect_id"]
+            isOneToOne: false
+            referencedRelation: "seller_prospects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_sources: {
+        Row: {
+          created_at: string
+          discovered_at: string
+          error_message: string | null
+          extraction_status: string | null
+          firecrawl_status: string | null
+          id: string
+          images_found: number
+          items_found: number
+          last_scanned_at: string | null
+          lead_id: string
+          scan_status: string
+          source_platform: string | null
+          source_type: string
+          source_url: string
+        }
+        Insert: {
+          created_at?: string
+          discovered_at?: string
+          error_message?: string | null
+          extraction_status?: string | null
+          firecrawl_status?: string | null
+          id?: string
+          images_found?: number
+          items_found?: number
+          last_scanned_at?: string | null
+          lead_id: string
+          scan_status?: string
+          source_platform?: string | null
+          source_type?: string
+          source_url: string
+        }
+        Update: {
+          created_at?: string
+          discovered_at?: string
+          error_message?: string | null
+          extraction_status?: string | null
+          firecrawl_status?: string | null
+          id?: string
+          images_found?: number
+          items_found?: number
+          last_scanned_at?: string | null
+          lead_id?: string
+          scan_status?: string
+          source_platform?: string | null
+          source_type?: string
+          source_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_sources_lead_id_fkey"
+            columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "seller_prospects"
             referencedColumns: ["id"]

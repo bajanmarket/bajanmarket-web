@@ -59,9 +59,27 @@ export const generateDraftStore = createServerFn({ method: "POST" })
     const { data: existing } = await db.from("draft_stores").select("*").eq("prospect_id", p.id).maybeSingle();
     if (existing && !data.regenerate) return { ok: true as const, draftStoreId: existing.id, regenerated: false };
 
-    // 1. Read the lead's own public pages first — real content beats anything drafted.
+    // 1. Firecrawl web-content acquisition: real pages, real items, real images.
+    const { scanLeadWebSources } = await import("@/lib/contentSources.server");
+    const scan = await scanLeadWebSources(db, p, data.regenerate);
+    const { data: webContent } = await db
+      .from("discovered_content")
+      .select("*")
+      .eq("lead_id", p.id)
+      .eq("included", true)
+      .neq("merchant_approval_status", "rejected")
+      .order("extraction_confidence", { ascending: true })
+      .limit(60);
+    const realItems = (webContent ?? []).filter(
+      (c) => c.title && c.content_type !== "update" && c.extraction_confidence !== "low",
+    );
+
+    // 1b. Legacy reader as a fallback for anything Firecrawl could not reach.
     const { discoverProspectMedia, ingestMedia } = await import("@/lib/draftMedia.server");
-    const discovered = await discoverProspectMedia(p);
+    const discovered = realItems.length
+      ? { profile_image_url: null, cover_image_url: null, posts: [], pagesRead: scan.sourcesScanned, pagesFailed: 0, discoveredUrls: [] as string[] }
+      : await discoverProspectMedia(p);
+
 
     // Keep any pages Firecrawl found by name on the lead record for future runs.
     if (discovered.discoveredUrls.length) {
@@ -135,6 +153,30 @@ export const generateDraftStore = createServerFn({ method: "POST" })
     }
 
     let importedFromPosts = 0;
+
+    // 3. Firecrawl-discovered items → draft listings that keep their real image,
+    //    text, price and source attribution.
+    for (const c of realItems) {
+      await db.from("draft_listings").insert({
+        draft_store_id: storeId!,
+        title: c.title!,
+        description: c.cleaned_text,
+        price: c.detected_price,
+        category: drafted.category ?? p.marketplace_category,
+        image_url: c.original_image_url,
+        stored_media_url: c.stored_image_url,
+        image_source: c.stored_image_url ? "stored" : c.original_image_url ? "original" : "placeholder",
+        original_caption: c.original_text,
+        source_url: c.source_url,
+        source_posted_at: c.source_date,
+        source_platform: c.source_platform,
+        content_type: c.content_type === "service" ? "service" : "product",
+        status: "selected_for_preview",
+      });
+      importedFromPosts += 1;
+    }
+
+
 
     // 3a. Real discovered posts → one draft listing each, atomically bound to its source post.
     for (const item of structured) {
