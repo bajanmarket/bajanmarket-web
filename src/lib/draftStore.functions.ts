@@ -154,6 +154,30 @@ export const generateDraftStore = createServerFn({ method: "POST" })
 
     let importedFromPosts = 0;
 
+    // 3. Firecrawl-discovered items → draft listings that keep their real image,
+    //    text, price and source attribution.
+    for (const c of realItems) {
+      await db.from("draft_listings").insert({
+        draft_store_id: storeId!,
+        title: c.title!,
+        description: c.cleaned_text,
+        price: c.detected_price,
+        category: drafted.category ?? p.marketplace_category,
+        image_url: c.original_image_url,
+        stored_media_url: c.stored_image_url,
+        image_source: c.stored_image_url ? "stored" : c.original_image_url ? "original" : "placeholder",
+        original_caption: c.original_text,
+        source_url: c.source_url,
+        source_posted_at: c.source_date,
+        source_platform: c.source_platform,
+        content_type: c.content_type === "service" ? "service" : "product",
+        status: "selected_for_preview",
+      });
+      importedFromPosts += 1;
+    }
+
+
+
     // 3a. Real discovered posts → one draft listing each, atomically bound to its source post.
     for (const item of structured) {
       const source = discovered.posts[item.index];
