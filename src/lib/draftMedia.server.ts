@@ -165,12 +165,15 @@ async function firecrawlFindUrls(businessName: string, parish?: string | null): 
   const query = [businessName, parish?.replace(/_/g, " "), "Barbados official website or Facebook page"]
     .filter(Boolean)
     .join(" ");
-  const out = await firecrawlCall<{ data?: { url?: string }[]; results?: { url?: string }[] }>(
+  type Hit = { url?: string };
+  const out = await firecrawlCall<{ data?: Hit[] | { web?: Hit[] }; results?: Hit[] }>(
     "/search",
     { query, limit: 8, country: "bb", lang: "en" },
     30000,
   );
-  const rows = out?.data ?? out?.results ?? [];
+  const d = out?.data;
+  const rows: Hit[] = Array.isArray(d) ? d : (d?.web ?? out?.results ?? []);
+
   const picked: string[] = [];
   for (const row of rows) {
     const raw = row?.url;
