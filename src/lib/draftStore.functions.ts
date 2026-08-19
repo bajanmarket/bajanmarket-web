@@ -640,6 +640,11 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
         continue;
       }
       const categoryId = await categoryIdFor(db, item.category ?? store.category);
+      // Keep the merchant's real photo after the claim: move our stored copy into their own storage.
+      const { publishStoredMedia } = await import("@/lib/draftMedia.server");
+      const cover = item.stored_media_url
+        ? ((await publishStoredMedia(db, item.stored_media_url, context.userId)) ?? item.image_url)
+        : item.image_url;
       const { data: listing, error: lErr } = await db
         .from("listings")
         .insert({
@@ -651,7 +656,7 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
           currency: item.currency ?? "BBD",
           parish,
           condition: "new",
-          cover_image_url: item.image_url,
+          cover_image_url: cover,
           status: "active",
         })
         .select("id")
