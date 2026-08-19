@@ -59,9 +59,27 @@ export const generateDraftStore = createServerFn({ method: "POST" })
     const { data: existing } = await db.from("draft_stores").select("*").eq("prospect_id", p.id).maybeSingle();
     if (existing && !data.regenerate) return { ok: true as const, draftStoreId: existing.id, regenerated: false };
 
-    // 1. Read the lead's own public pages first — real content beats anything drafted.
+    // 1. Firecrawl web-content acquisition: real pages, real items, real images.
+    const { scanLeadWebSources } = await import("@/lib/contentSources.server");
+    const scan = await scanLeadWebSources(db, p, data.regenerate);
+    const { data: webContent } = await db
+      .from("discovered_content")
+      .select("*")
+      .eq("lead_id", p.id)
+      .eq("included", true)
+      .neq("merchant_approval_status", "rejected")
+      .order("extraction_confidence", { ascending: true })
+      .limit(60);
+    const realItems = (webContent ?? []).filter(
+      (c) => c.title && c.content_type !== "update" && c.extraction_confidence !== "low",
+    );
+
+    // 1b. Legacy reader as a fallback for anything Firecrawl could not reach.
     const { discoverProspectMedia, ingestMedia } = await import("@/lib/draftMedia.server");
-    const discovered = await discoverProspectMedia(p);
+    const discovered = realItems.length
+      ? { profile_image_url: null, cover_image_url: null, posts: [], pagesRead: scan.sourcesScanned, pagesFailed: 0, discoveredUrls: [] as string[] }
+      : await discoverProspectMedia(p);
+
 
     // Keep any pages Firecrawl found by name on the lead record for future runs.
     if (discovered.discoveredUrls.length) {
