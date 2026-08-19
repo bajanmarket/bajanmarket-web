@@ -312,6 +312,8 @@ function extractPage(html: string, pageUrl: string) {
 /** Reads the lead's own public pages and returns only what is genuinely published there. */
 export async function discoverProspectMedia(
   p: {
+    business_name?: string | null;
+    parish?: string | null;
     website_url?: string | null;
     facebook_url?: string | null;
     instagram_url?: string | null;
@@ -321,9 +323,15 @@ export async function discoverProspectMedia(
   },
   maxPosts = 12,
 ): Promise<DiscoveredMedia> {
-  const urls = [p.website_url, p.facebook_url, p.instagram_url, p.other_source_url]
+  let urls = [p.website_url, p.facebook_url, p.instagram_url, p.other_source_url]
     .filter((u): u is string => Boolean(u && /^https?:\/\//i.test(u)))
     .slice(0, 4);
+
+  // Nothing on file: let Firecrawl find the lead's own public pages by name.
+  const discoveredUrls = !urls.length && p.business_name
+    ? await firecrawlFindUrls(p.business_name, p.parish ?? null)
+    : [];
+  if (discoveredUrls.length) urls = discoveredUrls;
 
   let profile = p.profile_image_url ?? null;
   let cover = p.cover_image_url ?? null;
@@ -332,7 +340,8 @@ export async function discoverProspectMedia(
   let pagesFailed = 0;
 
   for (const url of urls) {
-    const html = await fetchText(url);
+    // Firecrawl first (renders JS and gets past social bot walls), plain fetch as fallback.
+    const html = (await firecrawlHtml(url)) ?? (await fetchText(url));
     if (!html) {
       pagesFailed += 1;
       continue;
@@ -347,6 +356,8 @@ export async function discoverProspectMedia(
       posts.push(post);
     }
   }
+
+
 
   return { profile_image_url: profile, cover_image_url: cover, posts, pagesRead, pagesFailed };
 }
