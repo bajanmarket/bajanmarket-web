@@ -590,6 +590,10 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
     // Guard against a second storefront for the same owner.
     const { data: mine } = await db.from("businesses").select("*").eq("owner_id", context.userId).maybeSingle();
 
+    const { publishStoredMedia: publishBrand, isStoredPath: isPath } = await import("@/lib/draftMedia.server");
+    const brand = async (v: string | null) =>
+      isPath(v) ? ((await publishBrand(db, v, context.userId)) ?? null) : v;
+
     const bizPayload = {
       name: store.business_name,
       slug: mine?.slug ?? (await uniqueSlug(db, store.slug)),
@@ -601,8 +605,8 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
       website: store.website,
       address: store.address,
       parish: store.parish,
-      logo_url: store.logo_url,
-      banner_url: store.cover_url,
+      logo_url: await brand(store.logo_url),
+      banner_url: await brand(store.cover_url),
       hours: store.hours,
     };
 
