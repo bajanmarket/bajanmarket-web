@@ -386,8 +386,8 @@ export const getStorePreview = createServerFn({ method: "POST" })
         tagline: store.tagline,
         description: store.description,
         category: store.category,
-        logo_url: store.logo_url,
-        cover_url: store.cover_url,
+        logo_url: resolve(store.logo_url),
+        cover_url: resolve(store.cover_url),
         parish: store.parish,
         address: store.address,
         contact_email: store.contact_email,
@@ -398,7 +398,7 @@ export const getStorePreview = createServerFn({ method: "POST" })
         social_links: store.social_links,
         claim_status: store.claim_status,
       },
-      items: items ?? [],
+      items,
     };
   });
 
