@@ -11,6 +11,7 @@ import {
   findExistingBusiness,
   issueClaimToken,
   lookupToken,
+  structureDiscoveredPosts,
   toParish,
   uniqueSlug,
 } from "@/lib/draftStore.server";
