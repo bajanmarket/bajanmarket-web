@@ -10,6 +10,7 @@
  * platform, extraction date and confidence it came from.
  */
 import type { Db, ProspectRow } from "@/lib/draftStore.server";
+import type { Database } from "@/integrations/supabase/types";
 import { DRAFT_MEDIA_BUCKET } from "@/lib/draftMedia.server";
 import {
   firecrawlConfigured,
