@@ -99,6 +99,94 @@ async function fetchText(url: string, ms = 9000): Promise<string | null> {
   }
 }
 
+/* ---------------- Firecrawl (renders JS pages / gets past bot walls) ---------------- */
+
+const FIRECRAWL_GATEWAY = "https://connector-gateway.lovable.dev/firecrawl/v2";
+
+function firecrawlKeys() {
+  const lovable = process.env['LOVABLE_API_KEY'];
+  const connection = process.env['FIRECRAWL_API_KEY'];
+  return lovable && connection ? { lovable, connection } : null;
+}
+
+async function firecrawlCall<T>(path: string, body: unknown, ms = 45000): Promise<T | null> {
+  const keys = firecrawlKeys();
+  if (!keys) return null;
+  try {
+    const res = await fetch(`${FIRECRAWL_GATEWAY}${path}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${keys.lovable}`,
+        "X-Connection-Api-Key": keys.connection,
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(ms),
+    });
+    const text = await res.text();
+    if (!res.ok) {
+      console.error(`Firecrawl ${path} failed [${res.status}]: ${text.slice(0, 500)}`);
+      return null;
+    }
+    return JSON.parse(text) as T;
+  } catch (err) {
+    console.error(`Firecrawl ${path} error:`, err);
+    return null;
+  }
+}
+
+type ScrapeResult = {
+  rawHtml?: string;
+  html?: string;
+  data?: { rawHtml?: string; html?: string };
+};
+
+/** Renders the page with Firecrawl and returns its HTML, or null when unavailable. */
+async function firecrawlHtml(url: string): Promise<string | null> {
+  const out = await firecrawlCall<ScrapeResult>("/scrape", {
+    url,
+    formats: ["rawHtml"],
+    onlyMainContent: false,
+    waitFor: 2500,
+  });
+  const html = out?.rawHtml ?? out?.html ?? out?.data?.rawHtml ?? out?.data?.html ?? null;
+  return html ? html.slice(0, 1_500_000) : null;
+}
+
+const SOCIAL_HOSTS = /(facebook|instagram|tiktok|linkedin)\.com$/i;
+const BAD_HOSTS =
+  /(google|bing|yelp|tripadvisor|yellowpages|wikipedia|linktr|pinterest|youtube|x|twitter|threads|maps|amazon|ebay|indeed|glassdoor|bajanmarket)\./i;
+
+/** Finds the lead's own website / social pages by name when nothing is on file. */
+async function firecrawlFindUrls(businessName: string, parish?: string | null): Promise<string[]> {
+  const query = [businessName, parish?.replace(/_/g, " "), "Barbados official website or Facebook page"]
+    .filter(Boolean)
+    .join(" ");
+  const out = await firecrawlCall<{ data?: { url?: string }[]; results?: { url?: string }[] }>(
+    "/search",
+    { query, limit: 8, country: "bb", lang: "en" },
+    30000,
+  );
+  const rows = out?.data ?? out?.results ?? [];
+  const picked: string[] = [];
+  for (const row of rows) {
+    const raw = row?.url;
+    if (!raw || !/^https?:\/\//i.test(raw)) continue;
+    let host: string;
+    try {
+      host = new URL(raw).hostname.replace(/^www\./, "");
+    } catch {
+      continue;
+    }
+    if (BAD_HOSTS.test(host) && !SOCIAL_HOSTS.test(host)) continue;
+    if (picked.some((u) => new URL(u).hostname.replace(/^www\./, "") === host)) continue;
+    picked.push(raw);
+    if (picked.length >= 3) break;
+  }
+  return picked;
+}
+
+
 function firstImage(v: unknown, base: string): string | null {
   if (typeof v === "string") return absolutize(v, base);
   if (Array.isArray(v)) {
