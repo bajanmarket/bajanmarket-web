@@ -775,14 +775,17 @@ export type Database = {
           description: string | null
           draft_store_id: string
           id: string
+          image_source: string
           image_url: string | null
           listing_id: string | null
+          original_caption: string | null
           price: number | null
           social_post_id: string | null
           source_platform: string | null
           source_posted_at: string | null
           source_url: string | null
           status: string
+          stored_media_url: string | null
           title: string
           updated_at: string
         }
@@ -794,14 +797,17 @@ export type Database = {
           description?: string | null
           draft_store_id: string
           id?: string
+          image_source?: string
           image_url?: string | null
           listing_id?: string | null
+          original_caption?: string | null
           price?: number | null
           social_post_id?: string | null
           source_platform?: string | null
           source_posted_at?: string | null
           source_url?: string | null
           status?: string
+          stored_media_url?: string | null
           title: string
           updated_at?: string
         }
@@ -813,14 +819,17 @@ export type Database = {
           description?: string | null
           draft_store_id?: string
           id?: string
+          image_source?: string
           image_url?: string | null
           listing_id?: string | null
+          original_caption?: string | null
           price?: number | null
           social_post_id?: string | null
           source_platform?: string | null
           source_posted_at?: string | null
           source_url?: string | null
           status?: string
+          stored_media_url?: string | null
           title?: string
           updated_at?: string
         }
@@ -1087,10 +1096,12 @@ export type Database = {
           id: string
           image_url: string | null
           import_status: string
+          media_status: string
           posted_at: string | null
           prospect_id: string
           source_platform: string | null
           source_url: string | null
+          stored_media_url: string | null
         }
         Insert: {
           availability?: string | null
@@ -1106,10 +1117,12 @@ export type Database = {
           id?: string
           image_url?: string | null
           import_status?: string
+          media_status?: string
           posted_at?: string | null
           prospect_id: string
           source_platform?: string | null
           source_url?: string | null
+          stored_media_url?: string | null
         }
         Update: {
           availability?: string | null
@@ -1125,10 +1138,12 @@ export type Database = {
           id?: string
           image_url?: string | null
           import_status?: string
+          media_status?: string
           posted_at?: string | null
           prospect_id?: string
           source_platform?: string | null
           source_url?: string | null
+          stored_media_url?: string | null
         }
         Relationships: [
           {
