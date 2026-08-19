@@ -58,8 +58,23 @@ export const generateDraftStore = createServerFn({ method: "POST" })
     const { data: existing } = await db.from("draft_stores").select("*").eq("prospect_id", p.id).maybeSingle();
     if (existing && !data.regenerate) return { ok: true as const, draftStoreId: existing.id, regenerated: false };
 
+    // 1. Read the lead's own public pages first — real content beats anything drafted.
+    const { discoverProspectMedia, ingestMedia } = await import("@/lib/draftMedia.server");
+    const discovered = await discoverProspectMedia(p);
+    const structured = discovered.posts.length ? await structureDiscoveredPosts(p, discovered.posts) : [];
+
+    // 2. Only ask AI for storefront copy; items come from real posts when we found any.
     const drafted = await draftStorefrontContent(p);
     const slug = existing?.slug ?? (await uniqueSlug(db, p.business_name));
+
+    const storeLogo =
+      (discovered.profile_image_url ? await ingestMedia(db, discovered.profile_image_url, p.id) : null) ??
+      discovered.profile_image_url ??
+      p.profile_image_url;
+    const storeCover =
+      (discovered.cover_image_url ? await ingestMedia(db, discovered.cover_image_url, p.id) : null) ??
+      discovered.cover_image_url ??
+      p.cover_image_url;
 
     const payload = {
       prospect_id: p.id,
@@ -68,8 +83,8 @@ export const generateDraftStore = createServerFn({ method: "POST" })
       category: drafted.category ?? p.marketplace_category,
       tagline: drafted.tagline,
       description: drafted.description ?? p.business_description,
-      logo_url: p.profile_image_url,
-      cover_url: p.cover_image_url,
+      logo_url: storeLogo,
+      cover_url: storeCover,
       contact_email: p.public_email,
       contact_phone: p.public_phone,
       whatsapp: p.public_whatsapp,
@@ -97,22 +112,34 @@ export const generateDraftStore = createServerFn({ method: "POST" })
       storeId = row.id;
     }
 
-    for (const item of drafted.items) {
+    let importedFromPosts = 0;
+
+    // 3a. Real discovered posts → one draft listing each, atomically bound to its source post.
+    for (const item of structured) {
+      const source = discovered.posts[item.index];
+      if (!source) continue;
+
+      const storedPath = source.original_media_url
+        ? await ingestMedia(db, source.original_media_url, p.id)
+        : null;
+
       const { data: post } = await db
         .from("lead_social_posts")
         .insert({
           prospect_id: p.id,
-          source_platform: item.source_platform ?? p.social_platform,
-          source_url: item.source_url,
-          caption: item.caption,
-          image_url: item.image_url,
+          source_platform: source.source_platform ?? p.social_platform,
+          source_url: source.source_url,
+          caption: source.caption,
+          image_url: source.original_media_url,
+          stored_media_url: storedPath,
+          media_status: storedPath ? "stored" : source.original_media_url ? "source_only" : "none",
+          posted_at: source.posted_at,
           content_type: item.content_type,
           detected_title: item.title,
           detected_price: item.price,
+          detected_currency: source.detected_currency,
           detected_category: item.category,
           description: item.description,
-          cta: item.cta,
-          availability: item.availability,
           import_status: "selected_for_preview",
         })
         .select("id")
@@ -125,12 +152,57 @@ export const generateDraftStore = createServerFn({ method: "POST" })
         description: item.description,
         price: item.price,
         category: item.category,
-        image_url: item.image_url,
-        source_url: item.source_url,
-        source_platform: item.source_platform ?? p.social_platform,
+        image_url: source.original_media_url,
+        stored_media_url: storedPath,
+        image_source: storedPath ? "stored" : source.original_media_url ? "original" : "placeholder",
+        original_caption: source.caption,
+        source_url: source.source_url,
+        source_posted_at: source.posted_at,
+        source_platform: source.source_platform ?? p.social_platform,
         content_type: item.content_type,
         status: "selected_for_preview",
       });
+      importedFromPosts += 1;
+    }
+
+    // 3b. Nothing public could be read → fall back to drafted copy WITHOUT any image.
+    if (importedFromPosts === 0) {
+      for (const item of drafted.items) {
+        const { data: post } = await db
+          .from("lead_social_posts")
+          .insert({
+            prospect_id: p.id,
+            source_platform: item.source_platform ?? p.social_platform,
+            source_url: item.source_url,
+            caption: item.caption,
+            content_type: item.content_type,
+            detected_title: item.title,
+            detected_price: item.price,
+            detected_category: item.category,
+            description: item.description,
+            cta: item.cta,
+            availability: item.availability,
+            media_status: "none",
+            import_status: "selected_for_preview",
+          })
+          .select("id")
+          .single();
+
+        await db.from("draft_listings").insert({
+          draft_store_id: storeId!,
+          social_post_id: post?.id ?? null,
+          title: item.title,
+          description: item.description,
+          price: item.price,
+          category: item.category,
+          image_url: null,
+          image_source: "placeholder",
+          source_url: item.source_url,
+          source_platform: item.source_platform ?? p.social_platform,
+          content_type: item.content_type,
+          status: "selected_for_preview",
+        });
+      }
     }
 
     await db
@@ -143,7 +215,12 @@ export const generateDraftStore = createServerFn({ method: "POST" })
       draftStoreId: storeId,
       prospectId: p.id,
       actorUserId: context.userId,
-      detail: { items: drafted.items.length, note: drafted.note ?? null },
+      detail: {
+        imported_from_posts: importedFromPosts,
+        pages_read: discovered.pagesRead,
+        pages_failed: discovered.pagesFailed,
+        note: drafted.note ?? null,
+      },
     });
 
     return {
