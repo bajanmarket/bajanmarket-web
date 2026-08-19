@@ -11,6 +11,7 @@ import {
   findExistingBusiness,
   issueClaimToken,
   lookupToken,
+  structureDiscoveredPosts,
   toParish,
   uniqueSlug,
 } from "@/lib/draftStore.server";
@@ -58,8 +59,23 @@ export const generateDraftStore = createServerFn({ method: "POST" })
     const { data: existing } = await db.from("draft_stores").select("*").eq("prospect_id", p.id).maybeSingle();
     if (existing && !data.regenerate) return { ok: true as const, draftStoreId: existing.id, regenerated: false };
 
+    // 1. Read the lead's own public pages first — real content beats anything drafted.
+    const { discoverProspectMedia, ingestMedia } = await import("@/lib/draftMedia.server");
+    const discovered = await discoverProspectMedia(p);
+    const structured = discovered.posts.length ? await structureDiscoveredPosts(p, discovered.posts) : [];
+
+    // 2. Only ask AI for storefront copy; items come from real posts when we found any.
     const drafted = await draftStorefrontContent(p);
     const slug = existing?.slug ?? (await uniqueSlug(db, p.business_name));
+
+    const storeLogo =
+      (discovered.profile_image_url ? await ingestMedia(db, discovered.profile_image_url, p.id) : null) ??
+      discovered.profile_image_url ??
+      p.profile_image_url;
+    const storeCover =
+      (discovered.cover_image_url ? await ingestMedia(db, discovered.cover_image_url, p.id) : null) ??
+      discovered.cover_image_url ??
+      p.cover_image_url;
 
     const payload = {
       prospect_id: p.id,
@@ -68,8 +84,8 @@ export const generateDraftStore = createServerFn({ method: "POST" })
       category: drafted.category ?? p.marketplace_category,
       tagline: drafted.tagline,
       description: drafted.description ?? p.business_description,
-      logo_url: p.profile_image_url,
-      cover_url: p.cover_image_url,
+      logo_url: storeLogo,
+      cover_url: storeCover,
       contact_email: p.public_email,
       contact_phone: p.public_phone,
       whatsapp: p.public_whatsapp,
@@ -97,22 +113,34 @@ export const generateDraftStore = createServerFn({ method: "POST" })
       storeId = row.id;
     }
 
-    for (const item of drafted.items) {
+    let importedFromPosts = 0;
+
+    // 3a. Real discovered posts → one draft listing each, atomically bound to its source post.
+    for (const item of structured) {
+      const source = discovered.posts[item.index];
+      if (!source) continue;
+
+      const storedPath = source.original_media_url
+        ? await ingestMedia(db, source.original_media_url, p.id)
+        : null;
+
       const { data: post } = await db
         .from("lead_social_posts")
         .insert({
           prospect_id: p.id,
-          source_platform: item.source_platform ?? p.social_platform,
-          source_url: item.source_url,
-          caption: item.caption,
-          image_url: item.image_url,
+          source_platform: source.source_platform ?? p.social_platform,
+          source_url: source.source_url,
+          caption: source.caption,
+          image_url: source.original_media_url,
+          stored_media_url: storedPath,
+          media_status: storedPath ? "stored" : source.original_media_url ? "source_only" : "none",
+          posted_at: source.posted_at,
           content_type: item.content_type,
           detected_title: item.title,
           detected_price: item.price,
+          detected_currency: source.detected_currency,
           detected_category: item.category,
           description: item.description,
-          cta: item.cta,
-          availability: item.availability,
           import_status: "selected_for_preview",
         })
         .select("id")
@@ -125,12 +153,57 @@ export const generateDraftStore = createServerFn({ method: "POST" })
         description: item.description,
         price: item.price,
         category: item.category,
-        image_url: item.image_url,
-        source_url: item.source_url,
-        source_platform: item.source_platform ?? p.social_platform,
+        image_url: source.original_media_url,
+        stored_media_url: storedPath,
+        image_source: storedPath ? "stored" : source.original_media_url ? "original" : "placeholder",
+        original_caption: source.caption,
+        source_url: source.source_url,
+        source_posted_at: source.posted_at,
+        source_platform: source.source_platform ?? p.social_platform,
         content_type: item.content_type,
         status: "selected_for_preview",
       });
+      importedFromPosts += 1;
+    }
+
+    // 3b. Nothing public could be read → fall back to drafted copy WITHOUT any image.
+    if (importedFromPosts === 0) {
+      for (const item of drafted.items) {
+        const { data: post } = await db
+          .from("lead_social_posts")
+          .insert({
+            prospect_id: p.id,
+            source_platform: item.source_platform ?? p.social_platform,
+            source_url: item.source_url,
+            caption: item.caption,
+            content_type: item.content_type,
+            detected_title: item.title,
+            detected_price: item.price,
+            detected_category: item.category,
+            description: item.description,
+            cta: item.cta,
+            availability: item.availability,
+            media_status: "none",
+            import_status: "selected_for_preview",
+          })
+          .select("id")
+          .single();
+
+        await db.from("draft_listings").insert({
+          draft_store_id: storeId!,
+          social_post_id: post?.id ?? null,
+          title: item.title,
+          description: item.description,
+          price: item.price,
+          category: item.category,
+          image_url: null,
+          image_source: "placeholder",
+          source_url: item.source_url,
+          source_platform: item.source_platform ?? p.social_platform,
+          content_type: item.content_type,
+          status: "selected_for_preview",
+        });
+      }
     }
 
     await db
@@ -143,15 +216,27 @@ export const generateDraftStore = createServerFn({ method: "POST" })
       draftStoreId: storeId,
       prospectId: p.id,
       actorUserId: context.userId,
-      detail: { items: drafted.items.length, note: drafted.note ?? null },
+      detail: {
+        imported_from_posts: importedFromPosts,
+        pages_read: discovered.pagesRead,
+        pages_failed: discovered.pagesFailed,
+        note: drafted.note ?? null,
+      },
     });
 
     return {
       ok: true as const,
       draftStoreId: storeId!,
       regenerated: Boolean(existing),
-      items: drafted.items.length,
-      note: drafted.note ?? null,
+      items: importedFromPosts || drafted.items.length,
+      importedFromPosts,
+      pagesRead: discovered.pagesRead,
+      note:
+        importedFromPosts === 0
+          ? discovered.pagesFailed > 0
+            ? "No public pages could be read — listings have no images until the merchant adds them."
+            : (drafted.note ?? "No public posts found — listings have no images yet.")
+          : (drafted.note ?? null),
     };
   });
 
@@ -167,8 +252,28 @@ export const listDraftStores = createServerFn({ method: "POST" })
       .limit(300);
     const ids = (stores ?? []).map((s) => s.id);
     const { data: items } = ids.length
-      ? await db.from("draft_listings").select("id, draft_store_id, title, price, status").in("draft_store_id", ids)
-      : { data: [] as { id: string; draft_store_id: string; title: string; price: number | null; status: string }[] };
+      ? await db
+          .from("draft_listings")
+          .select(
+            "id, draft_store_id, title, price, status, image_url, stored_media_url, image_source, source_url, source_platform, source_posted_at, social_post_id",
+          )
+          .in("draft_store_id", ids)
+      : {
+          data: [] as {
+            id: string;
+            draft_store_id: string;
+            title: string;
+            price: number | null;
+            status: string;
+            image_url: string | null;
+            stored_media_url: string | null;
+            image_source: string;
+            source_url: string | null;
+            source_platform: string | null;
+            source_posted_at: string | null;
+            social_post_id: string | null;
+          }[],
+        };
     const { data: tokens } = ids.length
       ? await db
           .from("store_claim_tokens")
@@ -255,12 +360,29 @@ export const getStorePreview = createServerFn({ method: "POST" })
     if (!found.ok) return { ok: false as const, error: found.reason };
     const { store, token } = found;
 
-    const { data: items } = await db
+    const { data: rawItems } = await db
       .from("draft_listings")
-      .select("id, title, description, price, currency, category, image_url, content_type, source_url, source_platform, status")
+      .select(
+        "id, title, description, price, currency, category, image_url, stored_media_url, image_source, original_caption, content_type, source_url, source_posted_at, source_platform, status",
+      )
       .eq("draft_store_id", store.id)
       .neq("status", "rejected")
       .order("created_at");
+
+    // Real content first: our stored copy, then the live source image, then nothing.
+    const { signMedia, isStoredPath } = await import("@/lib/draftMedia.server");
+    const signed = await signMedia(db, [
+      ...(rawItems ?? []).map((i) => i.stored_media_url),
+      isStoredPath(store.logo_url) ? store.logo_url : null,
+      isStoredPath(store.cover_url) ? store.cover_url : null,
+    ]);
+    const resolve = (v?: string | null) => (isStoredPath(v) ? (signed.get(v) ?? null) : (v ?? null));
+
+    const items = (rawItems ?? []).map(({ stored_media_url, ...i }) => ({
+      ...i,
+      image_url: resolve(stored_media_url) ?? i.image_url ?? null,
+      imported: Boolean(i.source_url && (stored_media_url || i.image_url)),
+    }));
 
     const now = new Date().toISOString();
     await db
@@ -284,8 +406,8 @@ export const getStorePreview = createServerFn({ method: "POST" })
         tagline: store.tagline,
         description: store.description,
         category: store.category,
-        logo_url: store.logo_url,
-        cover_url: store.cover_url,
+        logo_url: resolve(store.logo_url),
+        cover_url: resolve(store.cover_url),
         parish: store.parish,
         address: store.address,
         contact_email: store.contact_email,
@@ -296,7 +418,7 @@ export const getStorePreview = createServerFn({ method: "POST" })
         social_links: store.social_links,
         claim_status: store.claim_status,
       },
-      items: items ?? [],
+      items,
     };
   });
 
@@ -340,11 +462,23 @@ export const getClaimWorkspace = createServerFn({ method: "POST" })
     if (store.claimed_by_user_id && store.claimed_by_user_id !== context.userId)
       return { ok: false as const, error: "This storefront has already been claimed by another account." };
 
-    const { data: items } = await db
+    const { data: rawItems } = await db
       .from("draft_listings")
       .select("*")
       .eq("draft_store_id", store.id)
       .order("created_at");
+
+    const { signMedia, isStoredPath } = await import("@/lib/draftMedia.server");
+    const signed = await signMedia(db, [
+      ...(rawItems ?? []).map((i) => i.stored_media_url),
+      isStoredPath(store.logo_url) ? store.logo_url : null,
+      isStoredPath(store.cover_url) ? store.cover_url : null,
+    ]);
+    const resolve = (v?: string | null) => (isStoredPath(v) ? (signed.get(v) ?? null) : (v ?? null));
+    const items = (rawItems ?? []).map((i) => ({
+      ...i,
+      image_url: resolve(i.stored_media_url) ?? i.image_url ?? null,
+    }));
 
     return {
       ok: true as const,
@@ -355,8 +489,8 @@ export const getClaimWorkspace = createServerFn({ method: "POST" })
         tagline: store.tagline,
         description: store.description,
         category: store.category,
-        logo_url: store.logo_url,
-        cover_url: store.cover_url,
+        logo_url: resolve(store.logo_url),
+        cover_url: resolve(store.cover_url),
         parish: store.parish,
         address: store.address,
         contact_email: store.contact_email,
@@ -368,7 +502,7 @@ export const getClaimWorkspace = createServerFn({ method: "POST" })
         verification_method: store.verification_method,
         business_id: store.business_id,
       },
-      items: items ?? [],
+      items,
     };
   });
 
@@ -476,6 +610,10 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
     // Guard against a second storefront for the same owner.
     const { data: mine } = await db.from("businesses").select("*").eq("owner_id", context.userId).maybeSingle();
 
+    const { publishStoredMedia: publishBrand, isStoredPath: isPath } = await import("@/lib/draftMedia.server");
+    const brand = async (v: string | null) =>
+      isPath(v) ? ((await publishBrand(db, v, context.userId)) ?? null) : v;
+
     const bizPayload = {
       name: store.business_name,
       slug: mine?.slug ?? (await uniqueSlug(db, store.slug)),
@@ -487,8 +625,8 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
       website: store.website,
       address: store.address,
       parish: store.parish,
-      logo_url: store.logo_url,
-      banner_url: store.cover_url,
+      logo_url: await brand(store.logo_url),
+      banner_url: await brand(store.cover_url),
       hours: store.hours,
     };
 
@@ -526,6 +664,11 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
         continue;
       }
       const categoryId = await categoryIdFor(db, item.category ?? store.category);
+      // Keep the merchant's real photo after the claim: move our stored copy into their own storage.
+      const { publishStoredMedia } = await import("@/lib/draftMedia.server");
+      const cover = item.stored_media_url
+        ? ((await publishStoredMedia(db, item.stored_media_url, context.userId)) ?? item.image_url)
+        : item.image_url;
       const { data: listing, error: lErr } = await db
         .from("listings")
         .insert({
@@ -537,7 +680,7 @@ export const approveSocialFeed = createServerFn({ method: "POST" })
           currency: item.currency ?? "BBD",
           parish,
           condition: "new",
-          cover_image_url: item.image_url,
+          cover_image_url: cover,
           status: "active",
         })
         .select("id")

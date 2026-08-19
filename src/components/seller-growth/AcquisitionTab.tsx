@@ -119,6 +119,41 @@ export function AcquisitionTab() {
                 </div>
               </div>
 
+              {items.length > 0 && (
+                <details className="mt-3 rounded-xl bg-sand/60 px-3 py-2">
+                  <summary className="text-[11px] font-medium text-navy/60 cursor-pointer">
+                    Image source debug (admin only)
+                  </summary>
+                  <div className="mt-2 flex flex-col gap-2">
+                    {items.map((i) => (
+                      <div key={i.id} className="text-[11px] text-navy/60 leading-relaxed border-b border-hairline last:border-0 pb-1">
+                        <span className="font-medium text-navy/80">{i.title}</span>
+                        <br />
+                        Source: {i.source_platform ?? "—"}
+                        {i.source_url ? (
+                          <>
+                            {" · "}
+                            <a href={i.source_url} target="_blank" rel="noreferrer" className="underline">
+                              post
+                            </a>
+                          </>
+                        ) : null}
+                        {i.source_posted_at ? ` · ${new Date(i.source_posted_at).toLocaleDateString()}` : ""}
+                        <br />
+                        Original media: {i.image_url ? "available" : "unavailable"} · Stored media:{" "}
+                        {i.stored_media_url ? "available" : "unavailable"} · Preview image:{" "}
+                        {i.stored_media_url
+                          ? "stored copy"
+                          : i.image_url
+                            ? "original"
+                            : "placeholder"}
+                        {i.image_source ? ` (${i.image_source})` : ""}
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
+
               <div className="flex flex-wrap gap-2 mt-3">
                 <button
                   className={btnGhost}

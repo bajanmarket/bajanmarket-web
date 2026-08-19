@@ -342,3 +342,134 @@ export async function categoryIdFor(db: Db, label?: string | null) {
   const partial = rows.find((r) => s.includes(r.slug) || r.slug.includes(s) || slugify(r.name) === s);
   return (partial ?? fallback)?.id ?? null;
 }
+
+/* ---------------- structuring REAL discovered posts ---------------- */
+
+import type { DiscoveredPost } from "@/lib/draftMedia.server";
+
+export type StructuredPost = {
+  index: number;
+  content_type: DraftContentItem["content_type"];
+  title: string;
+  description: string | null;
+  category: string | null;
+  price: number | null;
+};
+
+/**
+ * Cleans up what the business already published — it never invents a product,
+ * a price or an image. Each returned entry stays bound to its source post by
+ * index so image/caption/price can never be mixed between posts.
+ */
+export async function structureDiscoveredPosts(
+  p: ProspectRow,
+  posts: DiscoveredPost[],
+): Promise<StructuredPost[]> {
+  const fallback = (): StructuredPost[] =>
+    posts.map((post, index) => ({
+      index,
+      content_type: "product" as const,
+      title: (post.detected_title ?? post.caption ?? p.business_name).slice(0, 120),
+      description: post.caption,
+      category: p.marketplace_category ?? null,
+      price: post.detected_price,
+    }));
+
+  const key = process.env['LOVABLE_API_KEY'];
+  if (!key || posts.length === 0) return fallback();
+
+  const listed = posts
+    .map((post, index) =>
+      [
+        `#${index}`,
+        post.detected_title ? `title: ${post.detected_title}` : "",
+        post.caption ? `caption: ${post.caption.slice(0, 600)}` : "",
+        post.detected_price ? `published price: ${post.detected_price}` : "",
+        post.source_url ? `source: ${post.source_url}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    )
+    .join("\n---\n");
+
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You tidy a merchant's own published posts into marketplace listings. You never invent products, prices, brands or claims, and you never move information between posts. Each output item must keep the same index as its input post. If a post is not a product/service offering, mark it as update. Return via emit_items.",
+          },
+          {
+            role: "user",
+            content: `Business: ${p.business_name}${p.marketplace_category ? ` (${p.marketplace_category})` : ""}\n\nPosts:\n${listed}\n\nFor each post return a clean listing title and a short factual description based only on that post. Only return a price if the post itself states one. Leave category null if unclear. Categories: ${CATEGORIES.join(", ")}.`,
+          },
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "emit_items",
+              parameters: {
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                  items: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      additionalProperties: false,
+                      properties: {
+                        index: { type: "number" },
+                        content_type: {
+                          type: "string",
+                          enum: ["product", "service", "promotion", "update", "event", "irrelevant"],
+                        },
+                        title: { type: "string" },
+                        description: { type: ["string", "null"] },
+                        category: { type: ["string", "null"] },
+                        price: { type: ["number", "null"] },
+                      },
+                      required: ["index", "title", "content_type"],
+                    },
+                  },
+                },
+                required: ["items"],
+              },
+            },
+          },
+        ],
+        tool_choice: { type: "function", function: { name: "emit_items" } },
+      }),
+    });
+    if (!res.ok) return fallback();
+    const json = (await res.json()) as {
+      choices?: Array<{ message?: { tool_calls?: Array<{ function?: { arguments?: string } }> } }>;
+    };
+    const argStr = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+    if (!argStr) return fallback();
+    const parsed = JSON.parse(argStr) as { items?: StructuredPost[] };
+    const base = fallback();
+    for (const item of parsed.items ?? []) {
+      const i = Number(item.index);
+      if (!Number.isInteger(i) || i < 0 || i >= base.length) continue;
+      const source = posts[i]!;
+      const row = base[i]!;
+      if (typeof item.title === "string" && item.title.trim().length > 1) row.title = item.title.trim().slice(0, 120);
+      if (typeof item.description === "string" && item.description.trim()) {
+        row.description = item.description.trim().slice(0, 1200);
+      }
+      if (typeof item.category === "string" && item.category.trim()) row.category = item.category.trim().slice(0, 60);
+      if (item.content_type) row.content_type = item.content_type;
+      // A price is only ever accepted when the source post itself carried one.
+      row.price = source.detected_price ?? (typeof item.price === "number" && item.price > 0 && /\d/.test(source.caption ?? "") ? Math.round(item.price * 100) / 100 : null);
+    }
+    return base.filter((r) => r.content_type !== "irrelevant");
+  } catch {
+    return fallback();
+  }
+}
