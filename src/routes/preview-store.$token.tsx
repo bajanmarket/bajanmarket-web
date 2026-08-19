@@ -153,6 +153,9 @@ function PreviewStorePage() {
                         ? formatBBD(p.price, p.currency ?? "BBD")
                         : "Contact seller for price"}
                     </p>
+                    {p.imported && (
+                      <p className="text-[10px] text-navy/40 mt-2">Imported from your own content</p>
+                    )}
                   </div>
                 </article>
               ))}
@@ -165,10 +168,24 @@ function PreviewStorePage() {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-navy/50 mb-3 px-1">Recent business content</h3>
             <div className="flex flex-col gap-2">
               {social.map((s) => (
-                <div key={s.id} className="bg-white rounded-2xl ring-1 ring-hairline p-4">
-                  <p className="text-sm font-medium">{s.title}</p>
-                  {s.description && <p className="text-xs text-navy/60 mt-1 leading-relaxed">{s.description}</p>}
-                  <p className="text-[11px] text-navy/40 mt-2 capitalize">{s.content_type}</p>
+                <div key={s.id} className="bg-white rounded-2xl ring-1 ring-hairline p-4 flex gap-3">
+                  {s.image_url && (
+                    <DraftImage src={s.image_url} label={s.title} className="size-16 rounded-xl shrink-0" />
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{s.title}</p>
+                    {(s.original_caption ?? s.description) && (
+                      <p className="text-xs text-navy/60 mt-1 leading-relaxed line-clamp-3">
+                        {s.original_caption ?? s.description}
+                      </p>
+                    )}
+                    <p className="text-[11px] text-navy/40 mt-2 capitalize">
+                      {s.content_type}
+                      {s.source_posted_at
+                        ? ` · ${new Date(s.source_posted_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`
+                        : ""}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
