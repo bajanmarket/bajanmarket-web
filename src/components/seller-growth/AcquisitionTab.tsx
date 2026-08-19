@@ -59,6 +59,10 @@ export function AcquisitionTab() {
         </p>
       </div>
 
+      <WebContentPanel />
+
+
+
       <div className={card}>
         <h4 className="text-xs font-semibold uppercase tracking-wider text-navy/50 mb-3">Leads without a draft store</h4>
         <div className="flex flex-col gap-2">
