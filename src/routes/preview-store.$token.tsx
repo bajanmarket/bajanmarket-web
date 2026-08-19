@@ -99,6 +99,7 @@ function PreviewStorePage() {
           <div className="p-6 flex flex-col sm:flex-row gap-4 sm:items-end -mt-16 sm:-mt-20 relative">
             <DraftImage
               src={store.logo_url}
+              fallbackSrc={draftFallbackImage(store.category, store.business_name)}
               label={store.business_name}
               loading="eager"
               className="size-24 rounded-2xl ring-4 ring-white bg-white shrink-0"
