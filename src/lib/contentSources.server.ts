@@ -365,7 +365,7 @@ export async function scanLeadWebSources(db: Db, p: ProspectRow, force = false):
 
   // Keep newly found pages on the lead record for future runs.
   if (discoveredUrls.length) {
-    const patch: Record<string, string> = {};
+    const patch: ProspectPatch = {};
     for (const url of discoveredUrls) {
       const h = hostOf(url);
       if (h.includes("facebook.com")) patch['facebook_url'] ??= url;
