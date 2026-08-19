@@ -65,7 +65,7 @@ export const generateDraftStore = createServerFn({ method: "POST" })
 
     // Keep any pages Firecrawl found by name on the lead record for future runs.
     if (discovered.discoveredUrls.length) {
-      const patch: Record<string, string> = {};
+      const patch: { website_url?: string; facebook_url?: string; instagram_url?: string } = {};
       for (const url of discovered.discoveredUrls) {
         const host = (() => {
           try {
@@ -74,12 +74,13 @@ export const generateDraftStore = createServerFn({ method: "POST" })
             return "";
           }
         })();
-        if (host.includes("facebook.com")) patch['facebook_url'] ??= url;
-        else if (host.includes("instagram.com")) patch['instagram_url'] ??= url;
-        else patch['website_url'] ??= url;
+        if (host.includes("facebook.com")) patch.facebook_url ??= url;
+        else if (host.includes("instagram.com")) patch.instagram_url ??= url;
+        else patch.website_url ??= url;
       }
       if (Object.keys(patch).length) await db.from("seller_prospects").update(patch).eq("id", p.id);
     }
+
 
     const structured = discovered.posts.length ? await structureDiscoveredPosts(p, discovered.posts) : [];
 
