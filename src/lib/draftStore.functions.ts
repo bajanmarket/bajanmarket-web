@@ -482,7 +482,7 @@ export const getClaimWorkspace = createServerFn({ method: "POST" })
         verification_method: store.verification_method,
         business_id: store.business_id,
       },
-      items: items ?? [],
+      items,
     };
   });
 
