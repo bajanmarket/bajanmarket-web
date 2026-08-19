@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Check, Store, ShieldCheck, Loader2, X } from "lucide-react";
-import { DraftImage } from "@/components/DraftImage";
+import { DraftImage, draftFallbackImage } from "@/components/DraftImage";
 import {
   approveSocialFeed,
   getClaimWorkspace,
@@ -298,6 +298,7 @@ function ItemRow({
         </div>
         <DraftImage
           src={item.image_url}
+          fallbackSrc={draftFallbackImage(item.category, item.title)}
           label={item.title}
           className="size-14 rounded-xl shrink-0"
         />

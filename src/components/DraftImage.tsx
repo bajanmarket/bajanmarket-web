@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { Store } from "lucide-react";
+import generalImage from "@/assets/draft-store-general.jpg.asset.json";
+import vehiclesImage from "@/assets/draft-store-vehicles.jpg.asset.json";
+import foodImage from "@/assets/draft-store-food.jpg.asset.json";
+import servicesImage from "@/assets/draft-store-services.jpg.asset.json";
+import retailImage from "@/assets/draft-store-retail.jpg.asset.json";
 
 function initials(label?: string | null) {
   if (!label) return "";
@@ -7,8 +12,17 @@ function initials(label?: string | null) {
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((w) => w[0]!.toUpperCase())
+    .map((w) => w.charAt(0).toUpperCase())
     .join("");
+}
+
+export function draftFallbackImage(category?: string | null, title?: string | null) {
+  const value = `${category ?? ""} ${title ?? ""}`.toLowerCase();
+  if (/vehicle|car|auto|motor|suv|sedan|van|truck/.test(value)) return vehiclesImage.url;
+  if (/food|cater|restaurant|bak|meal|drink|grocery|agricultur/.test(value)) return foodImage.url;
+  if (/service|repair|clean|beauty|health|education|professional/.test(value)) return servicesImage.url;
+  if (/fashion|clothing|retail|jewel|accessor|furniture|home|phone|electronic/.test(value)) return retailImage.url;
+  return generalImage.url;
 }
 
 /**
@@ -20,6 +34,7 @@ export function DraftImage({
   src,
   alt,
   label,
+  fallbackSrc,
   className = "",
   imgClassName = "",
   loading = "lazy",
@@ -27,24 +42,25 @@ export function DraftImage({
   src?: string | null;
   alt?: string;
   label?: string | null;
+  fallbackSrc?: string | null;
   className?: string;
   imgClassName?: string;
   loading?: "lazy" | "eager";
 }) {
-  const [failed, setFailed] = useState(false);
-  const showImage = !!src && !failed;
+  const [failedSrc, setFailedSrc] = useState<string[]>([]);
+  const imageSrc = [src, fallbackSrc].find((candidate) => Boolean(candidate) && !failedSrc.includes(candidate ?? ""));
   const text = initials(label);
 
   return (
     <div className={`relative overflow-hidden bg-sand-deep ${className}`}>
-      {showImage ? (
+      {imageSrc ? (
         <img
-          src={src!}
+          src={imageSrc}
           alt={alt ?? ""}
           loading={loading}
           decoding="async"
           referrerPolicy="no-referrer"
-          onError={() => setFailed(true)}
+          onError={() => setFailedSrc((current) => (current.includes(imageSrc) ? current : [...current, imageSrc]))}
           className={`w-full h-full object-cover ${imgClassName}`}
         />
       ) : (
