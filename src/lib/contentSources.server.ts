@@ -304,20 +304,24 @@ function firstNonEmpty(...vals: (string | null | undefined)[]) {
   return null;
 }
 
+type ProspectPatch = Database["public"]["Tables"]["seller_prospects"]["Update"];
+
 async function enrichLead(db: Db, p: ProspectRow, business: Extraction["business"] | undefined) {
   if (!business) return;
-  const patch: Record<string, string> = {};
-  const set = (field: string, current: unknown, incoming?: string) => {
+  const patch: ProspectPatch = {};
+  const take = (current: unknown, incoming?: string) => {
     const value = firstNonEmpty(incoming);
-    if (value && !current) patch[field] = value.slice(0, 400);
+    return value && !current ? value.slice(0, 400) : undefined;
   };
-  set("business_description", p.business_description, business.description);
-  set("public_phone", p.public_phone, business.phone);
-  set("public_email", p.public_email, business.email);
-  set("public_whatsapp", p.public_whatsapp, business.whatsapp);
-  set("address", p.address, business.address);
-  if (Object.keys(patch).length) await db.from("seller_prospects").update(patch).eq("id", p.id);
+  patch.business_description = take(p.business_description, business.description);
+  patch.public_phone = take(p.public_phone, business.phone);
+  patch.public_email = take(p.public_email, business.email);
+  patch.public_whatsapp = take(p.public_whatsapp, business.whatsapp);
+  patch.address = take(p.address, business.address);
+  const clean = Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined)) as ProspectPatch;
+  if (Object.keys(clean).length) await db.from("seller_prospects").update(clean).eq("id", p.id);
 }
+
 
 /* ---------------- the web adapter ---------------- */
 
