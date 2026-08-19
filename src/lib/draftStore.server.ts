@@ -345,7 +345,7 @@ export async function categoryIdFor(db: Db, label?: string | null) {
 
 /* ---------------- structuring REAL discovered posts ---------------- */
 
-import type { DiscoveredPost } from "@/lib/draftMedia";
+import type { DiscoveredPost } from "@/lib/draftMedia.server";
 
 export type StructuredPost = {
   index: number;
