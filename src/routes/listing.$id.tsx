@@ -26,6 +26,7 @@ const SCHEMA_CONDITION: Record<string, string> = {
 
 export const Route = createFileRoute("/listing/$id")({
   loader: async ({ params }) => {
+    if (!isUuid(params.id)) return { listing: null };
     const { data } = await supabase
       .from("listings")
       .select(
