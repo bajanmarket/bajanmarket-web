@@ -715,6 +715,68 @@ export type Database = {
         }
         Relationships: []
       }
+      commission_rules: {
+        Row: {
+          active: boolean
+          approved_by: string | null
+          category_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          effective_from: string
+          effective_to: string | null
+          fixed_fee_cents: number
+          id: string
+          name: string
+          percentage_bps: number
+          scope: string
+          seller_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          approved_by?: string | null
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          effective_from?: string
+          effective_to?: string | null
+          fixed_fee_cents?: number
+          id?: string
+          name: string
+          percentage_bps?: number
+          scope?: string
+          seller_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          approved_by?: string | null
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          effective_from?: string
+          effective_to?: string | null
+          fixed_fee_cents?: number
+          id?: string
+          name?: string
+          percentage_bps?: number
+          scope?: string
+          seller_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commission_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           booking_id: string | null
@@ -1669,6 +1731,447 @@ export type Database = {
           },
         ]
       }
+      payment_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: string
+          new_value: Json | null
+          previous_value: Json | null
+          readiness_snapshot: Json | null
+          reason: string | null
+          request_metadata: Json | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+          readiness_snapshot?: Json | null
+          reason?: string | null
+          request_metadata?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+          readiness_snapshot?: Json | null
+          reason?: string | null
+          request_metadata?: Json | null
+        }
+        Relationships: []
+      }
+      payment_disputes: {
+        Row: {
+          amount_cents: number
+          buyer_id: string | null
+          created_at: string
+          currency: string
+          evidence_due_at: string | null
+          evidence_reference: string | null
+          evidence_submitted_at: string | null
+          gateway_dispute_ref: string | null
+          id: string
+          provider: string | null
+          reason_category: string | null
+          seller_id: string | null
+          status: Database["public"]["Enums"]["dispute_status"]
+          transaction_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          buyer_id?: string | null
+          created_at?: string
+          currency?: string
+          evidence_due_at?: string | null
+          evidence_reference?: string | null
+          evidence_submitted_at?: string | null
+          gateway_dispute_ref?: string | null
+          id?: string
+          provider?: string | null
+          reason_category?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["dispute_status"]
+          transaction_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          buyer_id?: string | null
+          created_at?: string
+          currency?: string
+          evidence_due_at?: string | null
+          evidence_reference?: string | null
+          evidence_submitted_at?: string | null
+          gateway_dispute_ref?: string | null
+          id?: string
+          provider?: string | null
+          reason_category?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["dispute_status"]
+          transaction_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_disputes_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_feature_testers: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          id: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_gateway_configuration: {
+        Row: {
+          capabilities: Json
+          created_at: string
+          credentials_configured: boolean
+          environment: Database["public"]["Enums"]["payment_environment"]
+          id: string
+          last_connection_test_at: string | null
+          last_connection_test_ok: boolean | null
+          notes: string | null
+          provider: string | null
+          singleton: boolean
+          updated_at: string
+          updated_by: string | null
+          webhook_endpoint_url: string | null
+          webhook_secret_configured: boolean
+          webhook_verified: boolean
+        }
+        Insert: {
+          capabilities?: Json
+          created_at?: string
+          credentials_configured?: boolean
+          environment?: Database["public"]["Enums"]["payment_environment"]
+          id?: string
+          last_connection_test_at?: string | null
+          last_connection_test_ok?: boolean | null
+          notes?: string | null
+          provider?: string | null
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          webhook_endpoint_url?: string | null
+          webhook_secret_configured?: boolean
+          webhook_verified?: boolean
+        }
+        Update: {
+          capabilities?: Json
+          created_at?: string
+          credentials_configured?: boolean
+          environment?: Database["public"]["Enums"]["payment_environment"]
+          id?: string
+          last_connection_test_at?: string | null
+          last_connection_test_ok?: boolean | null
+          notes?: string | null
+          provider?: string | null
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          webhook_endpoint_url?: string | null
+          webhook_secret_configured?: boolean
+          webhook_verified?: boolean
+        }
+        Relationships: []
+      }
+      payment_readiness_checks: {
+        Row: {
+          checked_at: string | null
+          checked_by: string | null
+          created_at: string
+          evidence_reference: string | null
+          id: string
+          key: string
+          label: string
+          required: boolean
+          sort_order: number
+          status: Database["public"]["Enums"]["readiness_status"]
+          updated_at: string
+        }
+        Insert: {
+          checked_at?: string | null
+          checked_by?: string | null
+          created_at?: string
+          evidence_reference?: string | null
+          id?: string
+          key: string
+          label: string
+          required?: boolean
+          sort_order?: number
+          status?: Database["public"]["Enums"]["readiness_status"]
+          updated_at?: string
+        }
+        Update: {
+          checked_at?: string | null
+          checked_by?: string | null
+          created_at?: string
+          evidence_reference?: string | null
+          id?: string
+          key?: string
+          label?: string
+          required?: boolean
+          sort_order?: number
+          status?: Database["public"]["Enums"]["readiness_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payment_refunds: {
+        Row: {
+          admin_approved_at: string | null
+          admin_approved_by: string | null
+          amount_cents: number
+          buyer_id: string | null
+          created_at: string
+          currency: string
+          failure_reason: string | null
+          gateway_refund_ref: string | null
+          id: string
+          idempotency_key: string | null
+          reason: string | null
+          requested_by: string | null
+          seller_id: string | null
+          status: Database["public"]["Enums"]["refund_status"]
+          transaction_id: string
+          updated_at: string
+        }
+        Insert: {
+          admin_approved_at?: string | null
+          admin_approved_by?: string | null
+          amount_cents?: number
+          buyer_id?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          gateway_refund_ref?: string | null
+          id?: string
+          idempotency_key?: string | null
+          reason?: string | null
+          requested_by?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["refund_status"]
+          transaction_id: string
+          updated_at?: string
+        }
+        Update: {
+          admin_approved_at?: string | null
+          admin_approved_by?: string | null
+          amount_cents?: number
+          buyer_id?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          gateway_refund_ref?: string | null
+          id?: string
+          idempotency_key?: string | null
+          reason?: string | null
+          requested_by?: string | null
+          seller_id?: string | null
+          status?: Database["public"]["Enums"]["refund_status"]
+          transaction_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_refunds_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_transactions: {
+        Row: {
+          authorized_at: string | null
+          booking_id: string | null
+          buyer_id: string | null
+          captured_at: string | null
+          commission_rule_id: string | null
+          created_at: string
+          currency: string
+          environment: Database["public"]["Enums"]["payment_environment"]
+          failed_at: string | null
+          failure_reason: string | null
+          gateway_event_ref: string | null
+          gateway_fee_cents: number
+          gateway_payment_ref: string | null
+          gross_amount_cents: number
+          id: string
+          idempotency_key: string
+          listing_id: string | null
+          order_id: string | null
+          platform_commission_cents: number
+          provider: string | null
+          refunded_at: string | null
+          seller_id: string
+          seller_net_cents: number
+          status: Database["public"]["Enums"]["payment_txn_status"]
+          updated_at: string
+        }
+        Insert: {
+          authorized_at?: string | null
+          booking_id?: string | null
+          buyer_id?: string | null
+          captured_at?: string | null
+          commission_rule_id?: string | null
+          created_at?: string
+          currency?: string
+          environment?: Database["public"]["Enums"]["payment_environment"]
+          failed_at?: string | null
+          failure_reason?: string | null
+          gateway_event_ref?: string | null
+          gateway_fee_cents?: number
+          gateway_payment_ref?: string | null
+          gross_amount_cents?: number
+          id?: string
+          idempotency_key: string
+          listing_id?: string | null
+          order_id?: string | null
+          platform_commission_cents?: number
+          provider?: string | null
+          refunded_at?: string | null
+          seller_id: string
+          seller_net_cents?: number
+          status?: Database["public"]["Enums"]["payment_txn_status"]
+          updated_at?: string
+        }
+        Update: {
+          authorized_at?: string | null
+          booking_id?: string | null
+          buyer_id?: string | null
+          captured_at?: string | null
+          commission_rule_id?: string | null
+          created_at?: string
+          currency?: string
+          environment?: Database["public"]["Enums"]["payment_environment"]
+          failed_at?: string | null
+          failure_reason?: string | null
+          gateway_event_ref?: string | null
+          gateway_fee_cents?: number
+          gateway_payment_ref?: string | null
+          gross_amount_cents?: number
+          id?: string
+          idempotency_key?: string
+          listing_id?: string | null
+          order_id?: string | null
+          platform_commission_cents?: number
+          provider?: string | null
+          refunded_at?: string | null
+          seller_id?: string
+          seller_net_cents?: number
+          status?: Database["public"]["Enums"]["payment_txn_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_commission_rule_id_fkey"
+            columns: ["commission_rule_id"]
+            isOneToOne: false
+            referencedRelation: "commission_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "ci_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_webhook_events: {
+        Row: {
+          event_type: string
+          failure_summary: string | null
+          gateway_event_id: string
+          id: string
+          processed_at: string | null
+          provider: string
+          received_at: string
+          retry_count: number
+          safe_payload: Json
+          status: Database["public"]["Enums"]["webhook_process_status"]
+        }
+        Insert: {
+          event_type: string
+          failure_summary?: string | null
+          gateway_event_id: string
+          id?: string
+          processed_at?: string | null
+          provider: string
+          received_at?: string
+          retry_count?: number
+          safe_payload?: Json
+          status?: Database["public"]["Enums"]["webhook_process_status"]
+        }
+        Update: {
+          event_type?: string
+          failure_summary?: string | null
+          gateway_event_id?: string
+          id?: string
+          processed_at?: string | null
+          provider?: string
+          received_at?: string
+          retry_count?: number
+          safe_payload?: Json
+          status?: Database["public"]["Enums"]["webhook_process_status"]
+        }
+        Relationships: []
+      }
       plan_settings: {
         Row: {
           enabled: boolean
@@ -1690,6 +2193,36 @@ export type Database = {
           plan?: Database["public"]["Enums"]["seller_plan"]
           price_bbd_cents?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -2587,6 +3120,134 @@ export type Database = {
           value_proposition?: string
         }
         Relationships: []
+      }
+      seller_payment_accounts: {
+        Row: {
+          charges_enabled: boolean
+          created_at: string
+          default_commission_rule_id: string | null
+          environment: Database["public"]["Enums"]["payment_environment"]
+          gateway_account_ref: string | null
+          id: string
+          last_synced_at: string | null
+          onboarding_status: Database["public"]["Enums"]["seller_payment_onboarding_status"]
+          payouts_enabled: boolean
+          provider: string | null
+          requirements_due: Json
+          restriction_reason: string | null
+          seller_id: string
+          updated_at: string
+          verification_status: string
+        }
+        Insert: {
+          charges_enabled?: boolean
+          created_at?: string
+          default_commission_rule_id?: string | null
+          environment?: Database["public"]["Enums"]["payment_environment"]
+          gateway_account_ref?: string | null
+          id?: string
+          last_synced_at?: string | null
+          onboarding_status?: Database["public"]["Enums"]["seller_payment_onboarding_status"]
+          payouts_enabled?: boolean
+          provider?: string | null
+          requirements_due?: Json
+          restriction_reason?: string | null
+          seller_id: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Update: {
+          charges_enabled?: boolean
+          created_at?: string
+          default_commission_rule_id?: string | null
+          environment?: Database["public"]["Enums"]["payment_environment"]
+          gateway_account_ref?: string | null
+          id?: string
+          last_synced_at?: string | null
+          onboarding_status?: Database["public"]["Enums"]["seller_payment_onboarding_status"]
+          payouts_enabled?: boolean
+          provider?: string | null
+          requirements_due?: Json
+          restriction_reason?: string | null
+          seller_id?: string
+          updated_at?: string
+          verification_status?: string
+        }
+        Relationships: []
+      }
+      seller_payouts: {
+        Row: {
+          adjustments_cents: number
+          created_at: string
+          currency: string
+          environment: Database["public"]["Enums"]["payment_environment"]
+          expected_arrival_at: string | null
+          failure_reason: string | null
+          gateway_payout_ref: string | null
+          gross_earnings_cents: number
+          id: string
+          idempotency_key: string | null
+          net_payout_cents: number
+          paid_at: string | null
+          period_end: string | null
+          period_start: string | null
+          provider: string | null
+          seller_id: string
+          status: Database["public"]["Enums"]["payout_status"]
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          adjustments_cents?: number
+          created_at?: string
+          currency?: string
+          environment?: Database["public"]["Enums"]["payment_environment"]
+          expected_arrival_at?: string | null
+          failure_reason?: string | null
+          gateway_payout_ref?: string | null
+          gross_earnings_cents?: number
+          id?: string
+          idempotency_key?: string | null
+          net_payout_cents?: number
+          paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider?: string | null
+          seller_id: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          adjustments_cents?: number
+          created_at?: string
+          currency?: string
+          environment?: Database["public"]["Enums"]["payment_environment"]
+          expected_arrival_at?: string | null
+          failure_reason?: string | null
+          gateway_payout_ref?: string | null
+          gross_earnings_cents?: number
+          id?: string
+          idempotency_key?: string | null
+          net_payout_cents?: number
+          paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider?: string | null
+          seller_id?: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_payouts_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       seller_pipeline_history: {
         Row: {
@@ -3774,6 +4435,7 @@ export type Database = {
         }
         Returns: number
       }
+      payments_enabled: { Args: never; Returns: boolean }
       providers_with_availability: {
         Args: { _provider_ids: string[] }
         Returns: {
@@ -3833,6 +4495,14 @@ export type Database = {
         | "completed"
         | "no_show"
         | "disputed"
+      dispute_status:
+        | "open"
+        | "under_review"
+        | "evidence_required"
+        | "evidence_submitted"
+        | "won"
+        | "lost"
+        | "cancelled"
       listing_condition: "new" | "like_new" | "good" | "fair" | "for_parts"
       listing_status: "active" | "paused" | "sold" | "deleted"
       parish:
@@ -3847,6 +4517,39 @@ export type Database = {
         | "saint_peter"
         | "saint_philip"
         | "saint_thomas"
+      payment_environment: "unconfigured" | "sandbox" | "live"
+      payment_txn_status:
+        | "created"
+        | "requires_action"
+        | "authorized"
+        | "captured"
+        | "failed"
+        | "cancelled"
+        | "refunded"
+        | "partially_refunded"
+        | "disputed"
+      payout_status:
+        | "pending"
+        | "processing"
+        | "paid"
+        | "failed"
+        | "reversed"
+        | "cancelled"
+      readiness_status:
+        | "pending"
+        | "in_progress"
+        | "passed"
+        | "failed"
+        | "not_applicable"
+      refund_status:
+        | "requested"
+        | "pending"
+        | "approved"
+        | "completed"
+        | "partially_refunded"
+        | "failed"
+        | "cancelled"
+        | "rejected"
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
       report_target: "listing" | "user" | "message"
       seller_approval_status:
@@ -3863,6 +4566,14 @@ export type Database = {
         | "phone"
         | "in_person"
         | "other"
+      seller_payment_onboarding_status:
+        | "not_started"
+        | "pending"
+        | "requirements_due"
+        | "restricted"
+        | "active"
+        | "rejected"
+        | "disabled"
       seller_pipeline_stage:
         | "discovered"
         | "verification_required"
@@ -3900,6 +4611,7 @@ export type Database = {
         | "phone"
         | "images"
       service_listing_status: "draft" | "active" | "paused" | "removed"
+      webhook_process_status: "received" | "processed" | "ignored" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4039,6 +4751,15 @@ export const Constants = {
         "no_show",
         "disputed",
       ],
+      dispute_status: [
+        "open",
+        "under_review",
+        "evidence_required",
+        "evidence_submitted",
+        "won",
+        "lost",
+        "cancelled",
+      ],
       listing_condition: ["new", "like_new", "good", "fair", "for_parts"],
       listing_status: ["active", "paused", "sold", "deleted"],
       parish: [
@@ -4053,6 +4774,43 @@ export const Constants = {
         "saint_peter",
         "saint_philip",
         "saint_thomas",
+      ],
+      payment_environment: ["unconfigured", "sandbox", "live"],
+      payment_txn_status: [
+        "created",
+        "requires_action",
+        "authorized",
+        "captured",
+        "failed",
+        "cancelled",
+        "refunded",
+        "partially_refunded",
+        "disputed",
+      ],
+      payout_status: [
+        "pending",
+        "processing",
+        "paid",
+        "failed",
+        "reversed",
+        "cancelled",
+      ],
+      readiness_status: [
+        "pending",
+        "in_progress",
+        "passed",
+        "failed",
+        "not_applicable",
+      ],
+      refund_status: [
+        "requested",
+        "pending",
+        "approved",
+        "completed",
+        "partially_refunded",
+        "failed",
+        "cancelled",
+        "rejected",
       ],
       report_status: ["open", "reviewing", "resolved", "dismissed"],
       report_target: ["listing", "user", "message"],
@@ -4071,6 +4829,15 @@ export const Constants = {
         "phone",
         "in_person",
         "other",
+      ],
+      seller_payment_onboarding_status: [
+        "not_started",
+        "pending",
+        "requirements_due",
+        "restricted",
+        "active",
+        "rejected",
+        "disabled",
       ],
       seller_pipeline_stage: [
         "discovered",
@@ -4112,6 +4879,7 @@ export const Constants = {
         "images",
       ],
       service_listing_status: ["draft", "active", "paused", "removed"],
+      webhook_process_status: ["received", "processed", "ignored", "failed"],
     },
   },
 } as const
