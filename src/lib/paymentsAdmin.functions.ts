@@ -148,7 +148,8 @@ export const setPaymentFlag = createServerFn({ method: "POST" })
       readiness_snapshot: readiness ?? [],
     });
 
-    return { ok: true };
+    return { ok: true as const, error: null };
+
   });
 
 /** Update gateway metadata. Secrets are never accepted or stored here. */
