@@ -89,6 +89,7 @@ function Seller() {
 
   const { data: storefront } = useQuery({
     queryKey: ["seller-storefront", id],
+    enabled: isUuid(id),
     queryFn: async () =>
       (await supabase.from("businesses").select("slug").eq("owner_id", id).eq("status", "approved").maybeSingle()).data,
   });
