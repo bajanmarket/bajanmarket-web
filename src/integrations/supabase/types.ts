@@ -4416,6 +4416,7 @@ export type Database = {
         Args: { _listing_id: string }
         Returns: undefined
       }
+      is_user_banned: { Args: { _user_id: string }; Returns: boolean }
       log_share_visit: {
         Args: {
           _path: string

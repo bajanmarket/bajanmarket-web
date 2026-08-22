@@ -7,6 +7,7 @@ import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { initials } from "@/lib/format";
 import { parishLabel } from "@/lib/parishes";
 import { useAuth } from "@/lib/useAuth";
+import { isUuid } from "@/lib/uuid";
 import { ReportDialog } from "@/components/ReportDialog";
 import { Flag } from "lucide-react";
 import { ShareMenu } from "@/components/ShareMenu";
@@ -17,6 +18,7 @@ const SITE_URL = "https://bajanmarket.app";
 
 export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
+    if (!isUuid(params.id)) return { profile: null };
     const { data } = await supabase
       .from("profiles")
       .select("id, display_name, avatar_url, bio")
@@ -60,6 +62,7 @@ function Seller() {
 
   const { data: profile } = useQuery({
     queryKey: ["seller-profile", id],
+    enabled: isUuid(id),
     queryFn: async () =>
       (
         await supabase
@@ -72,6 +75,7 @@ function Seller() {
 
   const { data: listings } = useQuery({
     queryKey: ["seller-listings", id],
+    enabled: isUuid(id),
     queryFn: async () => {
       const { data } = await supabase
         .from("listings")
@@ -85,6 +89,7 @@ function Seller() {
 
   const { data: storefront } = useQuery({
     queryKey: ["seller-storefront", id],
+    enabled: isUuid(id),
     queryFn: async () =>
       (await supabase.from("businesses").select("slug").eq("owner_id", id).eq("status", "approved").maybeSingle()).data,
   });

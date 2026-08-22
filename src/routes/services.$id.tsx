@@ -7,6 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { ServiceTemplateForm, type AnswerMap } from "@/components/ServiceTemplateForm";
 import { useAuth } from "@/lib/useAuth";
+import { isUuid } from "@/lib/uuid";
 import { parishLabel } from "@/lib/parishes";
 import { bookingWhenLabel, TZ_NOTE, type TemplateField, type Slot } from "@/lib/services";
 import { notifyEvent } from "@/lib/notify.functions";
@@ -41,6 +42,7 @@ function ServiceDetail() {
 
   const { data: service, isLoading } = useQuery({
     queryKey: ["service", id],
+    enabled: isUuid(id),
     queryFn: async () => {
       const { data, error } = await supabase.from("service_listings").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
@@ -89,7 +91,7 @@ function ServiceDetail() {
     },
   });
 
-  if (isLoading) return <AppShell><div className="text-navy/40 text-sm">Loading…</div></AppShell>;
+  if (isLoading && isUuid(id)) return <AppShell><div className="text-navy/40 text-sm">Loading…</div></AppShell>;
   if (!service)
     return (
       <AppShell>

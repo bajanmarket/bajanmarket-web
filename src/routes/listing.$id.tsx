@@ -13,6 +13,7 @@ import { ShareMenu } from "@/components/ShareMenu";
 import { SellerTrust } from "@/components/SellerTrust";
 import { sharePrefill } from "@/lib/share";
 import { track, deviceType } from "@/lib/analytics";
+import { isUuid } from "@/lib/uuid";
 
 const SITE_URL = "https://bajanmarket.app";
 
@@ -26,6 +27,7 @@ const SCHEMA_CONDITION: Record<string, string> = {
 
 export const Route = createFileRoute("/listing/$id")({
   loader: async ({ params }) => {
+    if (!isUuid(params.id)) return { listing: null };
     const { data } = await supabase
       .from("listings")
       .select(
@@ -115,6 +117,7 @@ function ListingDetail() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
+    enabled: isUuid(id),
     queryFn: async () => {
       const { data: listing, error } = await supabase
         .from("listings")
@@ -139,7 +142,7 @@ function ListingDetail() {
 
   // Increment view count once per session per listing
   useEffect(() => {
-    if (typeof window === "undefined" || !id) return;
+    if (typeof window === "undefined" || !isUuid(id)) return;
     const key = `viewed:${id}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
@@ -151,7 +154,7 @@ function ListingDetail() {
 
   const { data: isFav } = useQuery({
     queryKey: ["fav", id, user?.id],
-    enabled: !!user,
+    enabled: !!user && isUuid(id),
     queryFn: async () => {
       const { data } = await supabase
         .from("favourites")
@@ -204,7 +207,7 @@ function ListingDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (isLoading) return <AppShell><div className="animate-pulse space-y-4">
+  if (isLoading && isUuid(id)) return <AppShell><div className="animate-pulse space-y-4">
     <div className="w-full aspect-[4/5] bg-sand-deep rounded-3xl" />
     <div className="h-8 bg-sand-deep rounded w-2/3" />
     <div className="h-4 bg-sand-deep rounded w-1/3" />
