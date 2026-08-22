@@ -207,7 +207,7 @@ function ListingDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (isLoading) return <AppShell><div className="animate-pulse space-y-4">
+  if (isLoading && isUuid(id)) return <AppShell><div className="animate-pulse space-y-4">
     <div className="w-full aspect-[4/5] bg-sand-deep rounded-3xl" />
     <div className="h-8 bg-sand-deep rounded w-2/3" />
     <div className="h-4 bg-sand-deep rounded w-1/3" />

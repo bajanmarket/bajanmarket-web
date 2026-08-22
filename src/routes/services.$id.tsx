@@ -91,7 +91,7 @@ function ServiceDetail() {
     },
   });
 
-  if (isLoading) return <AppShell><div className="text-navy/40 text-sm">Loading…</div></AppShell>;
+  if (isLoading && isUuid(id)) return <AppShell><div className="text-navy/40 text-sm">Loading…</div></AppShell>;
   if (!service)
     return (
       <AppShell>
