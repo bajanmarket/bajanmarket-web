@@ -7,6 +7,7 @@ import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { initials } from "@/lib/format";
 import { parishLabel } from "@/lib/parishes";
 import { useAuth } from "@/lib/useAuth";
+import { isUuid } from "@/lib/uuid";
 import { ReportDialog } from "@/components/ReportDialog";
 import { Flag } from "lucide-react";
 import { ShareMenu } from "@/components/ShareMenu";
