@@ -54,12 +54,18 @@ export function PaymentsAdminPanel() {
   const toggleFlag = useMutation({
     mutationFn: (v: { key: "marketplace_payments_enabled" | "marketplace_payments_announcement_enabled"; enabled: boolean }) =>
       flagFn({ data: v }),
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if (res && res.ok === false) {
+        toast.error(res.error ?? "Could not update this setting.");
+        refresh();
+        return;
+      }
       refresh();
       toast.success("Updated");
     },
     onError: (e) => toast.error((e as Error).message),
   });
+
 
   if (isLoading || !data) return <div className="text-navy/40 text-sm">Loading payments…</div>;
 
