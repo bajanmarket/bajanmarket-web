@@ -116,18 +116,26 @@ export const setPaymentFlag = createServerFn({ method: "POST" })
         .limit(1)
         .maybeSingle();
       if (!gateway || gateway.environment !== "live" || !gateway.credentials_configured || !gateway.webhook_verified) {
-        throw new Error("Gateway must be live, with credentials configured and webhook verified, before enabling payments.");
+        return {
+          ok: false as const,
+          error: "Gateway must be live, with credentials configured and webhook verified, before enabling payments.",
+        };
       }
       if (blockers.length > 0) {
-        throw new Error(`${blockers.length} readiness requirement(s) still outstanding: ${blockers.map((b) => b.label).join(", ")}`);
+        return {
+          ok: false as const,
+          error: `${blockers.length} readiness requirement(s) still outstanding: ${blockers.map((b) => b.label).join(", ")}`,
+        };
       }
     }
+
 
     const { error } = await supabaseAdmin
       .from("platform_feature_flags")
       .update({ enabled: data.enabled, updated_by: context.userId, updated_at: new Date().toISOString() })
       .eq("key", data.key);
-    if (error) throw new Error(error.message);
+    if (error) return { ok: false as const, error: error.message };
+
 
     await audit(supabaseAdmin, {
       actor_id: context.userId,
@@ -140,7 +148,8 @@ export const setPaymentFlag = createServerFn({ method: "POST" })
       readiness_snapshot: readiness ?? [],
     });
 
-    return { ok: true };
+    return { ok: true as const, error: null };
+
   });
 
 /** Update gateway metadata. Secrets are never accepted or stored here. */
