@@ -31,6 +31,7 @@ import { Route as BusinessSlugRouteImport } from './routes/business.$slug'
 import { Route as AuthenticatedProviderServicesRouteImport } from './routes/_authenticated/provider-services'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPostRouteImport } from './routes/_authenticated/post'
+import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMyListingsRouteImport } from './routes/_authenticated/my-listings'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
@@ -51,6 +52,7 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicWhatsappWebhookRouteImport } from './routes/api/public/whatsapp/webhook'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -162,6 +164,11 @@ const AuthenticatedPostRoute = AuthenticatedPostRouteImport.update({
   path: '/post',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPaymentsRoute = AuthenticatedPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedNotificationsRoute =
   AuthenticatedNotificationsRouteImport.update({
     id: '/notifications',
@@ -270,6 +277,12 @@ const ApiPublicWhatsappWebhookRoute =
     path: '/api/public/whatsapp/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -293,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/my-listings': typeof AuthenticatedMyListingsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/payments': typeof AuthenticatedPaymentsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/provider-services': typeof AuthenticatedProviderServicesRoute
@@ -311,6 +325,7 @@ export interface FileRoutesByFullPath {
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/messages/': typeof AuthenticatedMessagesIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -334,6 +349,7 @@ export interface FileRoutesByTo {
   '/favourites': typeof AuthenticatedFavouritesRoute
   '/my-listings': typeof AuthenticatedMyListingsRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/payments': typeof AuthenticatedPaymentsRoute
   '/post': typeof AuthenticatedPostRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/provider-services': typeof AuthenticatedProviderServicesRoute
@@ -352,6 +368,7 @@ export interface FileRoutesByTo {
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/messages': typeof AuthenticatedMessagesIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -379,6 +396,7 @@ export interface FileRoutesById {
   '/_authenticated/messages': typeof AuthenticatedMessagesRouteWithChildren
   '/_authenticated/my-listings': typeof AuthenticatedMyListingsRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
   '/_authenticated/post': typeof AuthenticatedPostRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/provider-services': typeof AuthenticatedProviderServicesRoute
@@ -397,6 +415,7 @@ export interface FileRoutesById {
   '/category/$slug/$parish': typeof CategorySlugParishRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/messages/': typeof AuthenticatedMessagesIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
@@ -424,6 +443,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/my-listings'
     | '/notifications'
+    | '/payments'
     | '/post'
     | '/profile'
     | '/provider-services'
@@ -442,6 +462,7 @@ export interface FileRouteTypes {
     | '/category/$slug/$parish'
     | '/admin/'
     | '/messages/'
+    | '/api/public/payments/webhook'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
@@ -465,6 +486,7 @@ export interface FileRouteTypes {
     | '/favourites'
     | '/my-listings'
     | '/notifications'
+    | '/payments'
     | '/post'
     | '/profile'
     | '/provider-services'
@@ -483,6 +505,7 @@ export interface FileRouteTypes {
     | '/category/$slug/$parish'
     | '/admin'
     | '/messages'
+    | '/api/public/payments/webhook'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
   id:
@@ -509,6 +532,7 @@ export interface FileRouteTypes {
     | '/_authenticated/messages'
     | '/_authenticated/my-listings'
     | '/_authenticated/notifications'
+    | '/_authenticated/payments'
     | '/_authenticated/post'
     | '/_authenticated/profile'
     | '/_authenticated/provider-services'
@@ -527,6 +551,7 @@ export interface FileRouteTypes {
     | '/category/$slug/$parish'
     | '/_authenticated/admin/'
     | '/_authenticated/messages/'
+    | '/api/public/payments/webhook'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
@@ -555,6 +580,7 @@ export interface RootRouteChildren {
   ServicesIndexRoute: typeof ServicesIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
@@ -715,6 +741,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPostRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/payments': {
+      id: '/_authenticated/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof AuthenticatedPaymentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/notifications': {
       id: '/_authenticated/notifications'
       path: '/notifications'
@@ -855,6 +888,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWhatsappWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -895,6 +935,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRouteWithChildren
   AuthenticatedMyListingsRoute: typeof AuthenticatedMyListingsRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRoute
   AuthenticatedPostRoute: typeof AuthenticatedPostRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProviderServicesRoute: typeof AuthenticatedProviderServicesRoute
@@ -910,6 +951,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMessagesRoute: AuthenticatedMessagesRouteWithChildren,
   AuthenticatedMyListingsRoute: AuthenticatedMyListingsRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedPaymentsRoute: AuthenticatedPaymentsRoute,
   AuthenticatedPostRoute: AuthenticatedPostRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProviderServicesRoute: AuthenticatedProviderServicesRoute,
@@ -956,6 +998,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesIndexRoute: ServicesIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
