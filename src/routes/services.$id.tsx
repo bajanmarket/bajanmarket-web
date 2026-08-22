@@ -41,6 +41,7 @@ function ServiceDetail() {
 
   const { data: service, isLoading } = useQuery({
     queryKey: ["service", id],
+    enabled: isUuid(id),
     queryFn: async () => {
       const { data, error } = await supabase.from("service_listings").select("*").eq("id", id).maybeSingle();
       if (error) throw error;

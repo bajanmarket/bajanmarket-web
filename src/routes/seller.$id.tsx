@@ -17,6 +17,7 @@ const SITE_URL = "https://bajanmarket.app";
 
 export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
+    if (!isUuid(params.id)) return { profile: null };
     const { data } = await supabase
       .from("profiles")
       .select("id, display_name, avatar_url, bio")
@@ -60,6 +61,7 @@ function Seller() {
 
   const { data: profile } = useQuery({
     queryKey: ["seller-profile", id],
+    enabled: isUuid(id),
     queryFn: async () =>
       (
         await supabase
@@ -72,6 +74,7 @@ function Seller() {
 
   const { data: listings } = useQuery({
     queryKey: ["seller-listings", id],
+    enabled: isUuid(id),
     queryFn: async () => {
       const { data } = await supabase
         .from("listings")

@@ -13,6 +13,7 @@ import { ShareMenu } from "@/components/ShareMenu";
 import { SellerTrust } from "@/components/SellerTrust";
 import { sharePrefill } from "@/lib/share";
 import { track, deviceType } from "@/lib/analytics";
+import { isUuid } from "@/lib/uuid";
 
 const SITE_URL = "https://bajanmarket.app";
 
@@ -116,6 +117,7 @@ function ListingDetail() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
+    enabled: isUuid(id),
     queryFn: async () => {
       const { data: listing, error } = await supabase
         .from("listings")
@@ -140,7 +142,7 @@ function ListingDetail() {
 
   // Increment view count once per session per listing
   useEffect(() => {
-    if (typeof window === "undefined" || !id) return;
+    if (typeof window === "undefined" || !isUuid(id)) return;
     const key = `viewed:${id}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
@@ -152,7 +154,7 @@ function ListingDetail() {
 
   const { data: isFav } = useQuery({
     queryKey: ["fav", id, user?.id],
-    enabled: !!user,
+    enabled: !!user && isUuid(id),
     queryFn: async () => {
       const { data } = await supabase
         .from("favourites")
