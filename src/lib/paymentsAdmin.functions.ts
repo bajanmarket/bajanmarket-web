@@ -116,12 +116,19 @@ export const setPaymentFlag = createServerFn({ method: "POST" })
         .limit(1)
         .maybeSingle();
       if (!gateway || gateway.environment !== "live" || !gateway.credentials_configured || !gateway.webhook_verified) {
-        throw new Error("Gateway must be live, with credentials configured and webhook verified, before enabling payments.");
+        return {
+          ok: false as const,
+          error: "Gateway must be live, with credentials configured and webhook verified, before enabling payments.",
+        };
       }
       if (blockers.length > 0) {
-        throw new Error(`${blockers.length} readiness requirement(s) still outstanding: ${blockers.map((b) => b.label).join(", ")}`);
+        return {
+          ok: false as const,
+          error: `${blockers.length} readiness requirement(s) still outstanding: ${blockers.map((b) => b.label).join(", ")}`,
+        };
       }
     }
+
 
     const { error } = await supabaseAdmin
       .from("platform_feature_flags")
