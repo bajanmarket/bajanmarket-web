@@ -134,7 +134,8 @@ export const setPaymentFlag = createServerFn({ method: "POST" })
       .from("platform_feature_flags")
       .update({ enabled: data.enabled, updated_by: context.userId, updated_at: new Date().toISOString() })
       .eq("key", data.key);
-    if (error) throw new Error(error.message);
+    if (error) return { ok: false as const, error: error.message };
+
 
     await audit(supabaseAdmin, {
       actor_id: context.userId,
