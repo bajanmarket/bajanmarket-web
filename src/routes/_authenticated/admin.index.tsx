@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { useIsModerator } from "@/lib/useIsModerator";
 import { formatRelative } from "@/lib/format";
-import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3, Users, Megaphone, ShieldCheck, Store, LineChart, Settings2, MessageCircle, Sprout } from "lucide-react";
+import { Shield, Ban, EyeOff, CheckCircle2, XCircle, RotateCcw, BarChart3, Users, Megaphone, ShieldCheck, Store, LineChart, Settings2, MessageCircle, Sprout, CreditCard } from "lucide-react";
 import { InsightsPanel } from "@/components/InsightsPanel";
 import { AudiencePanel } from "@/components/AudiencePanel";
 import { AdminsPanel } from "@/components/AdminsPanel";
@@ -16,6 +16,7 @@ import { BusinessesPanel } from "@/components/BusinessesPanel";
 import { AnalyticsPanel } from "@/components/AnalyticsPanel";
 import { MarketplaceControlsPanel } from "@/components/MarketplaceControlsPanel";
 import { WhatsAppPanel } from "@/components/WhatsAppPanel";
+import { PaymentsAdminPanel } from "@/components/PaymentsAdminPanel";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
@@ -39,7 +40,7 @@ type ReportRow = {
 };
 
 type Tab = "open" | "reviewing" | "resolved" | "dismissed";
-type Section = "reports" | "analytics" | "insights" | "audience" | "admins" | "businesses" | "marketplace" | "whatsapp";
+type Section = "reports" | "analytics" | "insights" | "audience" | "admins" | "businesses" | "marketplace" | "whatsapp" | "payments";
 
 function AdminPage() {
   const { data: role, isLoading: roleLoading } = useIsModerator();
@@ -171,6 +172,7 @@ function AdminPage() {
           ["businesses", "Businesses", Store],
           ["marketplace", "Marketplace", Settings2],
           ["whatsapp", "WhatsApp", MessageCircle],
+          ["payments", "Payments", CreditCard],
         ] as [Section, string, typeof Shield][]).map(([key, label, Icon]) => (
           <button
             key={key}
@@ -211,6 +213,8 @@ function AdminPage() {
         <MarketplaceControlsPanel />
       ) : section === "whatsapp" ? (
         <WhatsAppPanel />
+      ) : section === "payments" ? (
+        <PaymentsAdminPanel />
       ) : (
         <ReportsSection
           tab={tab}
