@@ -126,3 +126,21 @@ export const MATCHING_THRESHOLDS = {
   /** Below this match score, do not surface a listing as a recommendation. */
   minListingMatchToShow: 55,
 } as const;
+
+/**
+ * Phase 4 silent-capture configuration. Central home for every capture number
+ * so tuning never requires touching route or server-function code.
+ */
+export const CAPTURE_CONFIG = {
+  /** Feature flag gating ALL buyer-intent capture writes. */
+  captureFlagKey: "buyer_intent_capture_enabled",
+  /** Repeat views of the same listing by the same user inside this window
+   *  collapse into the single earlier buyer-view event. */
+  listingViewDedupeMinutes: 30,
+  /** Cap on stored raw query variants per intent (audit trail, not scoring). */
+  maxRawQueriesPerIntent: 20,
+  /** Cap on stored keywords per intent. */
+  maxKeywordsPerIntent: 24,
+  /** Searches within this window count in the `recentSearch` bucket. */
+  recentSearchWindowDays: 7,
+} as const;
