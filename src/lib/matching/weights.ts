@@ -90,9 +90,13 @@ export const LISTING_RECENCY = {
  * searching > a single search > a passive view.
  */
 export const INTENT_SIGNAL_WEIGHTS = {
-  search: { points: 6, cap: 24 },
-  /** Searches in the recent window count on top of `search`. */
-  recentSearch: { points: 8, cap: 24 },
+  /** Older (non-recent) searches. Mutually exclusive with `recentSearch`:
+   *  the scorer subtracts recent searches from the base bucket so a single
+   *  recent search is never counted twice. */
+  search: { points: 5, cap: 20 },
+  /** Searches inside the recent window, counted INSTEAD of `search`. A single
+   *  one must stay below a save (12) and far below a seller contact (22). */
+  recentSearch: { points: 8, cap: 28 },
   listingView: { points: 3, cap: 18 },
   favourite: { points: 12, cap: 30 },
   sellerContact: { points: 22, cap: 44 },
