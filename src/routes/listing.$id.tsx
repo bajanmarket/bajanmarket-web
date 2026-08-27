@@ -14,6 +14,7 @@ import { SellerTrust } from "@/components/SellerTrust";
 import { sharePrefill } from "@/lib/share";
 import { track, deviceType } from "@/lib/analytics";
 import { isUuid } from "@/lib/uuid";
+import { captureListingViewClient } from "@/lib/captureIntentClient";
 
 const SITE_URL = "https://bajanmarket.app";
 
@@ -150,6 +151,8 @@ function ListingDetail() {
       // silent; don't refetch — counts are eventually consistent
     });
     track("listing_viewed", { listing_id: id, device: deviceType() });
+    // Additive, authenticated-only, flag-gated buyer-view capture.
+    captureListingViewClient(id);
   }, [id]);
 
   const { data: isFav } = useQuery({

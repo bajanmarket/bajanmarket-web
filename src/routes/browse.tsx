@@ -8,6 +8,7 @@ import { CategoryChips } from "@/components/CategoryChips";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 import { PARISHES, parishLabel } from "@/lib/parishes";
 import { logSearchEvent } from "@/lib/logSearchEvent";
+import { captureSearchIntentClient } from "@/lib/captureIntentClient";
 import type { Database } from "@/integrations/supabase/types";
 import { track, deviceType } from "@/lib/analytics";
 
@@ -78,6 +79,14 @@ function Browse() {
           parish: (search.parish as Database["public"]["Enums"]["parish"] | undefined) ?? null,
           categorySlug: search.category ?? null,
           resultCount: rows.length,
+        });
+        // Silent, fail-closed buyer-intent capture (flag-gated server side).
+        captureSearchIntentClient({
+          query: search.q,
+          categorySlug: search.category ?? null,
+          parish: search.parish ?? null,
+          minPrice: search.min ?? null,
+          maxPrice: search.max ?? null,
         });
         track("search_performed", {
           query: search.q, parish: search.parish ?? null,
