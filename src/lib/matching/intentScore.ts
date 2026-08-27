@@ -70,8 +70,23 @@ export function calculateBuyerIntentScore(
   const components: IntentComponentResult[] = [];
   let raw = 0;
 
-  for (const { signal, field } of SIGNAL_FIELDS) {
-    const count = safeCount(signals[field] as number | undefined);
+  // `recent_search_count` is a SUBSET of `search_count`. Recent searches are
+  // scored only in the higher-value `recentSearch` bucket; the base bucket
+  // gets the remainder. Without this, one recent search would score twice and
+  // could outrank a save, inverting the intended signal hierarchy.
+  const totalSearches = safeCount(signals.search_count);
+  const recentSearches = Math.min(safeCount(signals.recent_search_count), Math.max(totalSearches, safeCount(signals.recent_search_count)));
+  const olderSearches = Math.max(0, totalSearches - recentSearches);
+  const counts: Record<IntentSignal, number> = {
+    search: olderSearches,
+    recentSearch: recentSearches,
+    listingView: safeCount(signals.listing_view_count),
+    favourite: safeCount(signals.favourite_count),
+    sellerContact: safeCount(signals.seller_contact_count),
+  };
+
+  for (const { signal } of SIGNAL_FIELDS) {
+    const count = counts[signal];
     const config = INTENT_SIGNAL_WEIGHTS[signal];
     const uncapped = count * config.points;
     const points = Math.min(uncapped, config.cap);
