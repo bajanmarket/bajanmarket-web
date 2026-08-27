@@ -137,6 +137,12 @@ export const CAPTURE_CONFIG = {
   /** Repeat views of the same listing by the same user inside this window
    *  collapse into the single earlier buyer-view event. */
   listingViewDedupeMinutes: 30,
+  /** Client-side guard so a remount/refetch of the same search URL does not
+   *  re-fire capture. Real repeat searching still registers after this. */
+  searchCaptureDedupeSeconds: 60,
+  /** Category-only searches (no text) are NOT captured: a bare category browse
+   *  is not evidence of a specific purchase intent. */
+  allowCategoryOnlyIntents: false,
   /** Cap on stored raw query variants per intent (audit trail, not scoring). */
   maxRawQueriesPerIntent: 20,
   /** Cap on stored keywords per intent. */
