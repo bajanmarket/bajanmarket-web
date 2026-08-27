@@ -64,7 +64,7 @@ export const recordListingViewIntent = createServerFn({ method: "POST" })
 
       const { data: listing } = await supabase
         .from("listings")
-        .select("id, category_id")
+        .select("id, category_id, seller_id")
         .eq("id", listingId)
         .maybeSingle();
       if (!listing) return { ok: true };
@@ -74,6 +74,7 @@ export const recordListingViewIntent = createServerFn({ method: "POST" })
         userId,
         listingId: listing.id,
         categoryId: listing.category_id ?? null,
+        sellerId: listing.seller_id ?? null,
       });
     } catch {
       console.warn("[buyer-intent] listing-view capture skipped");
