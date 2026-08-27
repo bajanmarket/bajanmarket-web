@@ -333,6 +333,142 @@ export type Database = {
         }
         Relationships: []
       }
+      buyer_activity_events: {
+        Row: {
+          category_id: string | null
+          event_type: string
+          id: string
+          listing_id: string | null
+          occurred_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          event_type?: string
+          id?: string
+          listing_id?: string | null
+          occurred_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          event_type?: string
+          id?: string
+          listing_id?: string | null
+          occurred_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_activity_events_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_activity_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_activity_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      buyer_intents: {
+        Row: {
+          active: boolean
+          attributes: Json
+          category_id: string | null
+          created_at: string
+          first_seen: string
+          id: string
+          intent_key: string
+          intent_score: number
+          keywords: string[]
+          last_seen: string
+          max_price: number | null
+          min_price: number | null
+          normalized_query: string
+          preferred_condition:
+            | Database["public"]["Enums"]["listing_condition"]
+            | null
+          preferred_parish: Database["public"]["Enums"]["parish"] | null
+          raw_queries: string[]
+          signal_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          attributes?: Json
+          category_id?: string | null
+          created_at?: string
+          first_seen?: string
+          id?: string
+          intent_key: string
+          intent_score?: number
+          keywords?: string[]
+          last_seen?: string
+          max_price?: number | null
+          min_price?: number | null
+          normalized_query: string
+          preferred_condition?:
+            | Database["public"]["Enums"]["listing_condition"]
+            | null
+          preferred_parish?: Database["public"]["Enums"]["parish"] | null
+          raw_queries?: string[]
+          signal_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          attributes?: Json
+          category_id?: string | null
+          created_at?: string
+          first_seen?: string
+          id?: string
+          intent_key?: string
+          intent_score?: number
+          keywords?: string[]
+          last_seen?: string
+          max_price?: number | null
+          min_price?: number | null
+          normalized_query?: string
+          preferred_condition?:
+            | Database["public"]["Enums"]["listing_condition"]
+            | null
+          preferred_parish?: Database["public"]["Enums"]["parish"] | null
+          raw_queries?: string[]
+          signal_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_intents_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_intents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_sends: {
         Row: {
           campaign_id: string
