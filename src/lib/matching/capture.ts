@@ -93,7 +93,10 @@ export interface SearchIntentInput {
 }
 
 export type CaptureOutcome =
-  | { captured: false; reason: "disabled" | "anonymous" | "empty" | "error" | "deduped" }
+  | {
+      captured: false;
+      reason: "disabled" | "anonymous" | "empty" | "error" | "deduped" | "own_listing";
+    }
   | { captured: true; action: "created" | "merged" };
 
 function nowIso(now?: string | Date): string {
@@ -163,8 +166,13 @@ export async function captureSearchIntent(
 ): Promise<CaptureOutcome> {
   try {
     if (!input.userId) return { captured: false, reason: "anonymous" };
+    // Low-information guard: a blank / punctuation-only query carries no
+    // product evidence. Category-only browsing is deliberately NOT captured
+    // (CAPTURE_CONFIG.allowCategoryOnlyIntents), so no ":" or "unknown:" key
+    // can ever be written.
     const normalized = normalizeText(input.query);
-    if (!normalized) return { captured: false, reason: "empty" };
+    const tokens = meaningfulTokens(input.query);
+    if (!normalized || tokens.length === 0) return { captured: false, reason: "empty" };
 
     let enabled = false;
     try {
@@ -211,11 +219,20 @@ export async function captureSearchIntent(
 /** Silent, fail-closed capture of an authenticated listing view. */
 export async function captureListingView(
   store: CaptureStore,
-  input: { userId: string | null; listingId: string; categoryId?: string | null },
+  input: {
+    userId: string | null;
+    listingId: string;
+    categoryId?: string | null;
+    /** Owner of the listing; a seller viewing their own listing is not a buyer. */
+    sellerId?: string | null;
+  },
   opts: { now?: string | Date } = {},
 ): Promise<CaptureOutcome> {
   try {
     if (!input.userId || !input.listingId) return { captured: false, reason: "anonymous" };
+    if (input.sellerId && input.sellerId === input.userId) {
+      return { captured: false, reason: "own_listing" };
+    }
 
     let enabled = false;
     try {

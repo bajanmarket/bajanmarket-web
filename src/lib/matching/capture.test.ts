@@ -263,3 +263,76 @@ describe("listing-view dedupe", () => {
     expect(JSON.stringify(store.views)).not.toMatch(/saved|contact|favourite/i);
   });
 });
+
+describe("phase 4.5 hardening", () => {
+  it("excludes a seller viewing their own listing", async () => {
+    const store = fakeStore();
+    const out = await captureListingView(
+      store,
+      { userId: USER, listingId: LISTING, sellerId: USER },
+      { now: NOW },
+    );
+    expect(out).toEqual({ captured: false, reason: "own_listing" });
+    expect(store.views).toHaveLength(0);
+  });
+
+  it("still captures another authenticated buyer viewing that listing", async () => {
+    const store = fakeStore();
+    const out = await captureListingView(
+      store,
+      { userId: USER, listingId: LISTING, sellerId: "someone-else" },
+      { now: NOW },
+    );
+    expect(out).toEqual({ captured: true, action: "created" });
+    expect(store.views).toHaveLength(1);
+  });
+
+  it("creates no intent for an empty query with no category", async () => {
+    const store = fakeStore();
+    expect(await captureSearchIntent(store, { userId: USER, query: "   " }, { now: NOW })).toEqual({
+      captured: false,
+      reason: "empty",
+    });
+    expect(store.intents).toHaveLength(0);
+  });
+
+  it("creates no intent for a punctuation-only query", async () => {
+    const store = fakeStore();
+    for (const q of ["!!!", "***", "-- , --", "?"]) {
+      expect(await captureSearchIntent(store, { userId: USER, query: q }, { now: NOW })).toEqual({
+        captured: false,
+        reason: "empty",
+      });
+    }
+    expect(store.intents).toHaveLength(0);
+  });
+
+  it("creates no category-only intent (no empty or 'unknown' intent keys)", async () => {
+    const store = fakeStore();
+    const out = await captureSearchIntent(
+      store,
+      { userId: USER, query: "", categoryId: "cat-1" },
+      { now: NOW },
+    );
+    expect(out).toEqual({ captured: false, reason: "empty" });
+    expect(CAPTURE_CONFIG.allowCategoryOnlyIntents).toBe(false);
+    expect(store.intents).toHaveLength(0);
+  });
+
+  it("always produces a non-empty, category-qualified intent key when it does write", async () => {
+    const store = fakeStore();
+    await captureSearchIntent(store, { userId: USER, query: "iphone 15 pro", categoryId: "cat-1" }, { now: NOW });
+    const key = store.intents[0]!.intent_key;
+    expect(key).toBe("cat-1:15-iphone-pro");
+    expect(key.endsWith(":")).toBe(false);
+    expect(key).not.toMatch(/unknown/);
+  });
+
+  it("writes nothing at all while the capture flag is off", async () => {
+    const store = fakeStore({ enabled: false });
+    await captureSearchIntent(store, { userId: USER, query: "iphone 15 pro" }, { now: NOW });
+    await captureListingView(store, { userId: USER, listingId: LISTING, sellerId: "other" }, { now: NOW });
+    expect(store.inserts + store.updates).toBe(0);
+    expect(store.views).toHaveLength(0);
+  });
+});
