@@ -4532,6 +4532,10 @@ export type Database = {
       ci_refresh_category_stats: { Args: never; Returns: undefined }
       ci_refresh_rollups: { Args: never; Returns: undefined }
       ci_refresh_trust_scores: { Args: never; Returns: undefined }
+      conversation_listing_seller: {
+        Args: { _listing_id: string }
+        Returns: string
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
