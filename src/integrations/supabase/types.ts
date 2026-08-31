@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -4532,6 +4532,10 @@ export type Database = {
       ci_refresh_category_stats: { Args: never; Returns: undefined }
       ci_refresh_rollups: { Args: never; Returns: undefined }
       ci_refresh_trust_scores: { Args: never; Returns: undefined }
+      conversation_listing_seller: {
+        Args: { _listing_id: string }
+        Returns: string
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
