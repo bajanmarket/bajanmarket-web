@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 const InputSchema = z.object({
@@ -18,13 +19,42 @@ export type AiListingSuggestion = {
   negotiable: boolean;
 };
 
+const HOURLY_LIMIT = 30;
+const DAILY_LIMIT = 100;
+
 export const suggestListingFromImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
-  .handler(async ({ data }): Promise<AiListingSuggestion> => {
+  .handler(async ({ data, context }): Promise<AiListingSuggestion> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("AI is not configured");
 
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const userId = context.userId;
+    const now = Date.now();
+    const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+    const hourAgo = new Date(now - 60 * 60 * 1000).toISOString();
+
+    const { data: recent, error: usageError } = await supabaseAdmin
+      .from("ai_usage_events")
+      .select("created_at")
+      .eq("user_id", userId)
+      .eq("feature", "listing_suggest")
+      .gte("created_at", dayAgo);
+    if (usageError) throw new Error("Could not verify AI usage limits — please try again");
+
+    const rows = recent ?? [];
+    if (rows.length >= DAILY_LIMIT) {
+      throw new Error("Daily AI limit reached — try again tomorrow");
+    }
+    if (rows.filter((r) => r.created_at >= hourAgo).length >= HOURLY_LIMIT) {
+      throw new Error("Too many AI requests — please wait a few minutes and try again");
+    }
+
+    await supabaseAdmin.from("ai_usage_events").insert({ user_id: userId, feature: "listing_suggest" });
+
     const catList = data.categories.map((c) => `- ${c.name} (id: ${c.id})`).join("\n");
+
 
     const systemPrompt = `You help sellers in Barbados write marketplace listings. Prices are Barbadian dollars (BBD). Given a photo of an item and an optional short hint from the seller, produce a concise, honest listing.
 
