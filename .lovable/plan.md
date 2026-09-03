@@ -1,79 +1,77 @@
-# Phase 1 — Audit: Buyer Intent + Listing Matching foundation
+# Transfer Audit — Git / GitHub Linkage (READ-ONLY)
 
-No code or database changes were made. Findings first, implementation only after approval.
+No code, config, database, or deployment was changed. Findings only.
 
-## What already exists
+## 1. Is the project currently connected to any GitHub repository?
 
-**Auth & accounts** — Single account type (no separate buyer/seller records). Session via `src/lib/useAuth.tsx`; protected pages live under `src/routes/_authenticated/`. Roles in `user_roles` + `has_role()`. Sellers are just users who post; `profiles` holds display name, parish, avatar, `banned_at` (hidden from public reads).
+**No.** The project is not connected to GitHub.
 
-**Listings** — `listings`: seller_id, category_id, title, description, price, currency, negotiable, condition (enum), parish (enum), status (enum), views, favourite_count, cover_image_url, featured_until, created_at. Photos in `listing_images`. No structured attributes (brand/model/year) anywhere — free text only.
+- Git remotes (`git remote -v`):
+  - `origin` → `https://...@git.private.lovable-gcp.code.storage/8db25fba-...git` (Lovable-managed private Git storage on GCP)
+  - `secondary` → `s3://lovable-repositories/8db25fba-...git` (Lovable S3 mirror)
+- Both remotes are Lovable-owned infrastructure. There is **no** `github.com` remote.
+- No GitHub CLI (`gh`) is installed in this environment, and no `GITHUB`/`GH_TOKEN` environment variables are present.
+- No `.github/` directory exists in the project.
+- No GitHub **App Connector** connection exists either — `standard_connectors--list_connections` (github) returns no connections.
 
-**Categories** — `categories` (slug, name, icon, sort_order, active). Services use a separate `service_categories` + `service_listings` tree.
+So: the only version-control linkage today is Lovable's internal private Git/S3 storage. There is no GitHub link at all (neither Git-sync nor the GitHub REST connector).
 
-**Search** — Client-side query in `src/routes/browse.tsx`: plain Supabase `ilike` on title + filters (category, parish, price min/max, sort). Also `category.$slug` and `category.$slug.$parish` routes. No full-text index, no ranking.
+## 2. Can the complete current code + commit history be synced to the existing private repo `bajanmarket/bajanmarket-web`?
 
-**Existing buyer-activity capture**
-- `search_events` (query, parish, category_slug, result_count, user_id) written by `src/lib/logSearchEvent.ts`, rate-limited by a trigger. Used by the admin Insights panel.
-- `favourites` (user_id, listing_id, created_at).
-- `conversations` (buyer_id, seller_id, listing_id) — the "contacted seller" signal.
-- `listings.views` counter via `increment_listing_view` RPC — aggregate only, **not per-user**, so "recently viewed by this buyer" does not exist today.
-- `ci_events` — a generic event table with `ci_log_event()`; present in the schema but not called anywhere in app code.
-- GA4/Meta pixel in `src/lib/analytics.ts` (external only, not queryable).
+**Conditionally yes, but with important caveats — and not something this chat can execute directly.**
 
-**Location** — Parish enum only (11 parishes). No lat/long, no distance. "4 km away" is not currently possible; parish match / neighbouring-parish is.
+Facts about the source state (good for transfer):
+- Full commit history is intact: **623 commits** across all refs; `main` has a linear history.
+- Working tree is **clean** (0 uncommitted changes).
+- `main` is tracked by `origin/main` (Lovable storage).
+- Current checkout is an edit branch `edit/edt-6c611560-...`; `main` is the publishable line.
 
-**Feature flags** — `platform_feature_flags` (key, enabled) already exists with admin toggles in the Payments panel. Directly reusable.
+What Lovable's native GitHub sync supports vs. your specific ask:
+- Lovable **Git sync** (Plus (+) menu → GitHub → Connect project) creates a **new** GitHub repository under your connected GitHub account/organization and pushes the full codebase **with commit history**. It is the native path that preserves both code and history.
+- Lovable **does not support directly connecting/importing to an already-existing GitHub repository** as the sync target. The documented limitation is: no import of existing repos. So syncing *into* the pre-existing private repo `bajanmarket/bajanmarket-web` is **not** a supported one-click Lovable flow. Git sync will create its own new repo (you choose the name/account when connecting).
+- The **GitHub App Connector** (`standard_connectors--connect`) is a different thing: it calls the GitHub REST API from app server code. It is **not** a code-sync mechanism and cannot push the codebase or history. It also requires a workspace connection to be created first in connector settings, and none exists now.
 
-**Existing AI** — Lovable AI Gateway (Gemini) used for listing autofill and the Seller Growth agent, all server-side in `*.server.ts`. No embeddings, and **pgvector is not installed** (extensions: pgcrypto, pg_cron, pg_net, pgmq, uuid-ossp).
+## 3. If yes, the exact action required — and whether this chat can perform it
 
-**Notifications** — `notifications` + `notification_preferences` + bell UI exist, so seller demand alerts are feasible later.
+This chat **cannot** perform the GitHub connect/sync. It is a workspace-level, UI-driven action that requires your authorization in the Lovable editor (you must authorize the Lovable GitHub App on GitHub and pick the repo).
 
-## What can be reused (no duplication)
+Exact native action (must be done by you in the Lovable UI):
+1. In the Lovable editor, open the **Plus (+) menu** (bottom-left of chat) → **GitHub** → **Connect project**.
+2. Authorize the Lovable GitHub App on GitHub.
+3. Select your GitHub account/organization.
+4. Click **Create Repository** — Lovable will create a **new** GitHub repo and push the full codebase + 623-commit history. Two-way sync is then real-time.
 
-- `search_events` as the primary intent signal — read it, don't re-log searches.
-- `favourites` and `conversations` as save/contact signals.
-- `categories`, `listings`, `ListingCard`, `AppShell`, existing design tokens.
-- `platform_feature_flags` for the kill switch.
-- `createServerFn` + `requireSupabaseAuth` pattern for all scoring (never the browser).
-- `notifications` infra for the future seller-demand feature.
+Because `bajanmarket/bajanmarket-web` already exists, you have two options:
+- **(Recommended)** Let Lovable create a new repo (e.g. `bajanmarket-web`), then on your machine merge/push that history into the existing `bajanmarket/bajanmarket-web` repo if you want everything under that specific name. The history is preserved through the new repo.
+- **(Alternative)** Clone `bajanmarket/bajanmarket-web` locally, add the Lovable-created repo as a remote, fetch, and merge history — but this is manual Git work outside Lovable, not a one-click sync.
 
-## What must be added (minimum)
+I have no tool in this chat that performs Git operations to GitHub (no `gh` CLI, no Git-sync tool, no GitHub connector connection). Pushing directly from here is not possible.
 
-1. `buyer_activity_events` — the one genuinely missing signal is **per-user listing views**. Table: user_id, event_type (`listing_viewed` | `seller_contacted` | `listing_saved`), listing_id, category_id, occurred_at. Searches keep flowing to `search_events`; this table covers the rest. RLS: insert/select own rows only; admins via `has_role`.
-2. `buyer_intents` — user_id, category_id, normalized_query, keywords[], min_price, max_price, preferred_condition, preferred_parish, attributes jsonb, intent_score, first_seen, last_seen, active. Unique-ish per (user_id, normalized intent) so repeat searches **strengthen** an existing row rather than creating new ones. RLS: owner-only read/write; no public exposure.
-3. Both tables additive, indexed on (user_id, last_seen) and (category_id, active), with GRANTs, RLS enabled, no changes to existing tables or policies.
+## 4. Safest native Lovable export/sync that preserves the complete codebase and history
 
-Not added: `listing_matches` (a materialised table is premature — scoring on demand for one buyer's top intents is cheap). Not added: pgvector/embeddings.
+Two native options, both preserve code and (for option A) history:
 
-## Files that would change
+**A. Git sync to a new GitHub repo (best for preserving history + ongoing two-way sync)**
+- Plus (+) menu → GitHub → Connect project → authorize → Create Repository.
+- Preserves the **full 623-commit history** and enables real-time two-way sync between Lovable and GitHub afterward.
+- Limitation: creates a new repo, does not target the existing `bajanmarket/bajanmarket-web`.
 
-| File | Change |
-| --- | --- |
-| `src/lib/matching/weights.ts` (new) | All tunable weights + thresholds in one place |
-| `src/lib/matching/score.ts` (new) | Pure `calculateListingMatch(intent, listing)` → scores + `match_reasons`; unit-testable, no I/O |
-| `src/lib/matching/intent.ts` (new) | Query normalisation, keyword extraction, price/condition hints, intent merging, recency decay |
-| `src/lib/matching.functions.ts` (new) | `recordActivity`, `getMyIntents`, `getRecommendations` server fns behind `requireSupabaseAuth` |
-| `src/components/RecommendedForYou.tsx` (new) | Renders existing `ListingCard`s; returns `null` when flag off, data thin, or the call fails |
-| `src/lib/logSearchEvent.ts` | Additive: after logging, fire-and-forget intent upsert. Existing behaviour untouched |
-| `src/routes/listing.$id.tsx` | Additive fire-and-forget `listing_viewed` next to the existing view RPC |
-| `src/routes/index.tsx` / `browse.tsx` | Mount `<RecommendedForYou />` above existing content; nothing else touched |
-| Migration | Two new tables + RLS + GRANTs + indexes + `buyer_matching_enabled` flag row |
+**B. Download codebase (best for a one-time archive/snapshot)**
+- Open the Code Editor → click **Download codebase** at the bottom of the file tree sidebar (paid workspace).
+- Or, once a GitHub repo is connected via (A), clone/download from GitHub.
+- This gives a complete codebase snapshot but **not** Git history (it's a file export, not a clone).
+- Database data is exported separately via Cloud → Advanced settings → Export data.
 
-## Risks
+Recommendation: Use **A** (Git sync) to create a new GitHub repo — it is the only native path that preserves the full commit history and gives you ongoing sync. If the destination must be the existing `bajanmarket/bajanmarket-web`, complete the Git sync to a new repo first, then locally merge that repo's history into `bajanmarket/bajanmarket-web` on your own machine.
 
-- **Silent-failure discipline** — every new call must be fire-and-forget and try/caught, or a matching bug becomes a marketplace bug. The recommendations component fails to `null`, never an error boundary.
-- `search_events` has a rate-limit trigger; intent writes must not trip it (server-side, debounced).
-- Free-text titles mean keyword matching only; no brand/model precision until structured attributes exist. Reasons will say "matches your search for X", not fake precision.
-- Parish-level location only — reasons must say "in your parish"/"nearby parish", never a fake distance.
-- Privacy: intents are owner-only. Seller-side demand stays unbuilt this phase; only aggregate counts later.
-- Scale: recommendations query = top 3 active intents × ≤200 candidate listings pre-filtered by category/price/status in SQL, scored in memory, cached by React Query. No cross-join.
+## Summary
 
-## Smallest safe implementation plan
+| Question | Answer |
+|---|---|
+| Connected to GitHub now? | No — only Lovable private GCP/S3 Git storage |
+| Full code + history available? | Yes — 623 commits, clean working tree, `main` intact |
+| Can sync into existing `bajanmarket/bajanmarket-web`? | Not directly via Lovable (no import-to-existing-repo); new-repo sync only |
+| Can this chat perform it? | No — requires UI authorization (Plus → GitHub → Connect) |
+| Safest native export preserving history? | Git sync to a new GitHub repo (Plus → GitHub → Connect project) |
 
-- **Phase 2** — migration (2 tables, RLS, GRANTs, indexes, feature flag row, default off).
-- **Phase 3** — pure scoring modules + centralised weights + vitest cases for scenarios A–C.
-- **Phase 4** — capture hooks (search → intent, listing view, save, contact) — writes only, no UI.
-- **Phase 5** — `RecommendedForYou` behind the flag, shown only when the buyer has ≥1 intent scoring above threshold; otherwise renders nothing.
-- **Phase 6** — verify scenarios D (new user) and E (engine disabled/failing) leave browse, search and home identical.
-
-Approve and I'll start at Phase 2.
+No changes were made to the project.
