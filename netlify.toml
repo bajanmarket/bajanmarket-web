@@ -1,4 +1,4 @@
-# Standalone migration preview — rebuild after environment configuration.
+# Standalone migration preview — rebuild after verified Supabase environment configuration.
 [build]
   command = "npm run build"
   publish = "dist/client"
