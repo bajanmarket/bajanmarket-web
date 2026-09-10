@@ -47,8 +47,14 @@ function AuthPage() {
   };
   const passwordValid = passwordChecks.length && passwordChecks.letter && passwordChecks.number;
 
+  // Only allow same-site relative paths (reject "//host" and "/\host" protocol-relative URLs).
+  const isInternalPath = (p: string) => /^\/(?![/\\])/.test(p);
   const safeRedirect =
-    redirect && redirect.startsWith("/") ? redirect : claim ? `/claim/${claim}` : "/";
+    redirect && isInternalPath(redirect)
+      ? redirect
+      : claim
+        ? `/claim/${encodeURIComponent(claim)}`
+        : "/";
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -118,8 +124,17 @@ function AuthPage() {
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
-    if (result.error) toast.error(result.error.message);
     if (result.redirected) return;
+    if (result.error) {
+      toast.error(result.error.message);
+      return;
+    }
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      toast.error("Google sign-in didn't complete. Please try again.");
+      return;
+    }
+    track("login_completed", { method: "google" });
     nav({ to: safeRedirect });
   };
 
@@ -187,7 +202,8 @@ function AuthPage() {
               <div className="relative">
                 <input
                   id="auth-password"
-                  required type={showPassword ? "text" : "password"} minLength={8}
+                  required type={showPassword ? "text" : "password"}
+                  {...(mode === "signup" ? { minLength: 8 } : {})}
                   autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   value={password} onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-sand rounded-xl px-4 py-2.5 pr-11 text-sm outline-none focus:ring-2 focus:ring-teal"
