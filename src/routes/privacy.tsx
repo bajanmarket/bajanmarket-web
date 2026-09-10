@@ -70,9 +70,12 @@ function Privacy() {
           in moderation records where needed to keep the community safe.
         </p>
 
-        <H2>Cookies</H2>
+        <H2>Cookies and analytics</H2>
         <p>
-          We use only the cookies and local storage needed to keep you signed in and remember your preferences.
+          We use the cookies and local storage needed to keep you signed in and remember your preferences.
+          We also use Google Analytics, and where enabled the Meta pixel, to understand how pages are used
+          so we can improve the marketplace. These measurement tools may set their own cookies and receive
+          page and device information. We do not sell your personal information.
         </p>
 
         <H2>Children</H2>
