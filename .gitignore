@@ -16,9 +16,17 @@ dist-ssr
 .nitro
 *.local
 
+# Environment / secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+
 # Wrangler / Cloudflare
 .wrangler/
-.dev.vars
+
+# Netlify local state
+.netlify/
 
 # Editor directories and files
 .vscode/*
