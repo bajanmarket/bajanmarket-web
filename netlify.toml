@@ -1,3 +1,4 @@
+# Standalone migration preview — rebuild after environment configuration.
 [build]
   command = "npm run build"
   publish = "dist/client"
